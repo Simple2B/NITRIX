@@ -1,10 +1,8 @@
 # ignore directories
 __pycache__/
-env/
 
 # ignore files
 .env
-*.pyc
 
 ### Flask ###
 instance/*
@@ -16,9 +14,6 @@ instance/*
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
@@ -131,3 +126,7 @@ dmypy.json
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+# SQLite data bases
+database-devel.sqlite3
+database-test.sqlite3
