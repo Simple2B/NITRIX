@@ -4,6 +4,6 @@
 # NOTE: This file is placed under version control and should NOT include sensitive information such as passwords.
 # For those cases, use the .env file.
 
-FLASK_APP=wsgi:app
+FLASK_APP=flask_app
 FLASK_ENV=development
 FLASK_DEBUG=1
