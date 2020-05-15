@@ -1,5 +1,6 @@
 from ..database import db
 from .account import Account
+from datetime import datetime
 
 
 class AccountChanges(db.Model):
@@ -11,4 +12,4 @@ class AccountChanges(db.Model):
     account_id = db.Column(db.Integer, db.ForeignKey("account.id"))
     extension_date = db.Column(db.DateTime, default=datetime.now)
     name = db.Column(db.String(60), unique=True, nullable=False)
-    sim = db.Column(db.Integer)
+    sim = db.Column(db.String(20))

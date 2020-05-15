@@ -10,10 +10,10 @@ class Account(db.Model):
     __tablename__ = "account"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60), unique=True, nullable=False)
+    name = db.Column(db.String(60), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"))
     reseller_id = db.Column(db.Integer, db.ForeignKey("reseller.id"))
-    sim = db.Column(db.Integer)
+    sim = db.Column(db.String(20))
     comment = db.Column(db.String(200))
-    activaation_date = db.Column(db.DateTime, default=datetime.now)
+    activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)

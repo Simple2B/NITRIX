@@ -14,5 +14,4 @@ class Product(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
-    instance = db.Column(ChoiceType(TYPES), default='not_active')
- 
+    status = db.Column(ChoiceType(TYPES), default='not_active')

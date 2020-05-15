@@ -16,7 +16,7 @@ def create_app(environment="development"):
     from config import config
     from .views import main_blueprint
     from .auth.views import auth_blueprint
-    from .auth.models import User
+    from .models import User
 
     # Instantiate app.
     app = Flask(__name__)
