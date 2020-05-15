@@ -12,3 +12,4 @@ WTForms>=2.2.1
 flake8
 pytest
 email_validator
+sqlalchemy_utils
