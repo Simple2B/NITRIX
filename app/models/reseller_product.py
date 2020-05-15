@@ -1,6 +1,4 @@
 from ..database import db
-from .product import Product
-from .reseller import Reseller
 
 
 class ResellerProduct(db.Model):

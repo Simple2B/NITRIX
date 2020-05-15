@@ -1,7 +1,6 @@
 from unittest import TestCase, main
 
 from app import db, create_app
-from app.models import User
 
 app = create_app(environment='testing')
 
@@ -34,6 +33,7 @@ class TestApp(TestCase):
     def test_login_page(self):
         response = self.client.get('/login')
         self.assertEqual(response.status_code, 200)
+
 
 if __name__ == "__main__":
     main()

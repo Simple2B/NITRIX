@@ -1,4 +1,3 @@
-from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import generate_password_hash, check_password_hash
 from .. import db
