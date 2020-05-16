@@ -30,8 +30,8 @@ class User(db.Model):
         self.password = generate_password_hash(password)
 
     @classmethod
-    def authenticate(cls, user_id, password):
-        user = cls.query.filter(cls.name == user_id).first()
+    def authenticate(cls, user_name, password):
+        user = cls.query.filter(cls.name == user_name).first()
         if user is not None and check_password_hash(user.password, password):
             return user
 

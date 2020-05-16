@@ -43,7 +43,8 @@ class ProductionConfig(BaseConfig):
     WTF_CSRF_ENABLED = True
 
 
-config = dict(
-    development=DevelopmentConfig,
-    testing=TestingConfig,
-    production=ProductionConfig)
+config = {
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'production': ProductionConfig
+}
