@@ -13,8 +13,8 @@ login_manager = LoginManager()
 def create_app(environment="development"):
 
     from config import config
-    from .views import main_blueprint
-    from .auth.views import auth_blueprint
+    from .views import main_blueprint, auth_blueprint, account_blueprint
+    from .views import product_blueprint, reseller_blueprint, user_blueprint
     from .models import User
 
     # Instantiate app.
@@ -32,6 +32,10 @@ def create_app(environment="development"):
     # Register blueprints.
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(main_blueprint)
+    app.register_blueprint(account_blueprint)
+    app.register_blueprint(product_blueprint)
+    app.register_blueprint(reseller_blueprint)
+    app.register_blueprint(user_blueprint)
 
     # Set up flask login.
     @login_manager.user_loader
