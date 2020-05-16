@@ -36,7 +36,7 @@ def accounts():
 
 @main_blueprint.route("/resellers")
 def resellers():
-    return render_template("reseller.html")
+    return render_template("resellers.html")
 
 
 @main_blueprint.route("/users")
