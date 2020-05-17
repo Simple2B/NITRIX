@@ -1,6 +1,7 @@
 #!python
 import click
 from app import create_app, db, models, forms
+from app.models import User
 
 app = create_app()
 
@@ -16,6 +17,9 @@ def get_context():
 def create_db():
     """Create the configured database."""
     db.create_all()
+    # add supper user acc
+    user = User(name='admin', password='admin', user_type='super_user', activated=True)
+    user.save()
 
 
 @app.cli.command()
