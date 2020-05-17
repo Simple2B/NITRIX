@@ -58,7 +58,6 @@
   <!-- Content table -->
   <table id="example" class="display" style="width:100%">
     <thead>
-
       <tr>
         {% for value in columns %}
         <th>{{value}}</th>
@@ -68,7 +67,6 @@
     <tbody>
 
       {% for record in table_data %}
-
       <tr id="{{record.id}}">
         {% for value in record.values() %}
         <td>{{value}}</td>
@@ -88,8 +86,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
-
-
+  <script src="static/main.js"></script>
 </body>
 
 </html>
