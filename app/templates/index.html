@@ -30,6 +30,7 @@
               <a class="dropdown-item" href="{{url_for('main.accounts')}}">Accounts</a>
               <a class="dropdown-item" href="{{url_for('main.resellers')}}">Resellers</a>
               <a class="dropdown-item" href="{{url_for('main.users')}}">Users</a>
+              <a class="dropdown-item" href="{{url_for('main.products')}}">Products</a>
             </div>
           </li>
         </ul>
@@ -40,6 +41,20 @@
       </div>
     </nav>
   </div>
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }} alert-dismisible">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+      <span class="sr-only">Close</span>
+    </button>
+    {{ message }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
   <!-- Content table -->
   <table id="example" class="display" style="width:100%">
     <thead>

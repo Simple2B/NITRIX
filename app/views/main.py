@@ -19,7 +19,7 @@ def accounts():
     return render_template(
         'index.html',
         main_content='Accounts',
-        table_data=[u.to_dict() for u in Account.query.all()],
+        table_data=[acc.to_dict() for acc in Account.query.all()],
         columns=Account.columns())
 
 
@@ -49,5 +49,5 @@ def products():
     return render_template(
         'index.html',
         main_content='Products',
-        table_data=[u.to_dict() for u in Product.query.all()],
+        table_data=[p.to_dict() for p in Product.query.all()],
         columns=Product.columns())

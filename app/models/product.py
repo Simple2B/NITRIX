@@ -1,27 +1,27 @@
+import enum
 from ..database import db
-from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy import Enum
 from app.utils import ModelMixin
 
 
 class Product(db.Model, ModelMixin):
     """Product entity"""
 
-    TYPES = (
-        ('active', 'Active'),
-        ('not_active', 'Not active')
-    )
-
     __tablename__ = 'products'
+
+    class Status(enum.Enum):
+        active = 'Active'
+        not_active = 'Not active'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
-    status = db.Column(ChoiceType(TYPES), default='not_active')
+    status = db.Column(Enum(Status), default=Status.active)
 
     def to_dict(self) -> dict:
         return {
             'id': self.id,
             'name': self.name,
-            'status': 'active' if self.activated else 'not active'
+            'status': self.status.value
         }
 
     @staticmethod

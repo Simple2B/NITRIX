@@ -1,6 +1,7 @@
 from ..database import db
 from datetime import datetime
 from app.utils import ModelMixin
+from sqlalchemy.orm import relationship
 
 
 class Account(db.Model, ModelMixin):
@@ -16,6 +17,8 @@ class Account(db.Model, ModelMixin):
     comment = db.Column(db.String(200))
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
+    product = relationship('Product')
+    reseller = relationship('Reseller')
 
     def to_dict(self) -> dict:
         return {

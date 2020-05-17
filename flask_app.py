@@ -13,16 +13,15 @@ def get_context():
     return dict(app=app, db=db, models=models, forms=forms)
 
 
-@app.cli.command()
-def create_db():
-    """Create the configured database."""
+def create_database():
+    """ build database """
     db.create_all()
     # add supper user acc
     user = User(name='admin', password='admin', user_type='super_user', activated=True)
     user.save()
-    product = Product(name='Kiev Star', status=True)
+    product = Product(name='Kiev Star')
     product.save()
-    reseller = Reseller(name='Dima', status=True, comments='Good reseller')
+    reseller = Reseller(name='Dima', comments='Good reseller')
     reseller.save()
     acc = Account(name='Account A', sim='1234567890', comment='Comment', months=3)
     acc.product = product
@@ -31,10 +30,24 @@ def create_db():
 
 
 @app.cli.command()
-@click.confirmation_option(prompt='Drop all database tables?')
+def create_db():
+    """Create the configured database."""
+    create_database()
+
+
+@app.cli.command()
+@click.confirmation_option(prompt='Are you sure?')
 def drop_db():
     """Drop the current database."""
     db.drop_all()
+
+
+@app.cli.command()
+@click.confirmation_option(prompt='Are you sure?')
+def reset_db():
+    """Reset the current database."""
+    db.drop_all()
+    create_database()
 
 
 if __name__ == '__main__':

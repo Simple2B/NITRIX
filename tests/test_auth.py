@@ -39,7 +39,7 @@ def test_index_page(client):
     # Login by test user
     response = login(client, 'sam')
     assert b'Login successful.' in response.data
-    response = client.get('/')
+    response = client.get('/accounts')
     assert response.status_code == 200
 
 

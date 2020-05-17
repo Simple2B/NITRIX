@@ -37,7 +37,7 @@ class TestApp(TestCase):
         # Login by test user
         response = self.login('sam')
         self.assertIn(b'Login successful.', response.data)
-        response = self.client.get('/')
+        response = self.client.get('/accounts')
         self.assertEqual(response.status_code, 200)
 
     def test_login_page(self):
