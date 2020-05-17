@@ -38,4 +38,16 @@ class User(db.Model, UserMixin, ModelMixin):
             return user
 
     def __str__(self):
-        return f"<User: {self.name}>"
+        return f'<User: {self.name}>'
+
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.user_type,
+            'status': 'active' if self.activated else 'not active'
+        }
+
+    @staticmethod
+    def columns():
+        return ['ID', 'Name', 'Type', 'Status']

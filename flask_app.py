@@ -1,7 +1,7 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User
+from app.models import User, Account, Product, Reseller
 
 app = create_app()
 
@@ -20,6 +20,14 @@ def create_db():
     # add supper user acc
     user = User(name='admin', password='admin', user_type='super_user', activated=True)
     user.save()
+    product = Product(name='Kiev Star', status=True)
+    product.save()
+    reseller = Reseller(name='Dima', status=True, comments='Good reseller')
+    reseller.save()
+    acc = Account(name='Account A', sim='1234567890', comment='Comment', months=3)
+    acc.product = product
+    acc.reseller = reseller
+    acc.save()
 
 
 @app.cli.command()
