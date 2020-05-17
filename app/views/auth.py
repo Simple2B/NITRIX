@@ -11,12 +11,12 @@ auth_blueprint = Blueprint("auth", __name__)
 def login():
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user = User.authenticate(form.user_id.data, form.password.data)
+        user = User.authenticate(form.user_name.data, form.password.data)
         if user is not None:
             login_user(user)
             flash("Login successful.", "success")
             return redirect(url_for("main.index"))
-        flash("Wrong user ID or password.", "danger")
+        flash("Wrong user name or password.", "danger")
     return render_template("login.html", form=form)
 
 
