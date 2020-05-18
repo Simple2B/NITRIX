@@ -17,16 +17,17 @@ def create_database():
     """ build database """
     db.create_all()
     # add supper user acc
-    user = User(name='admin', password='admin', user_type='super_user', activated=True)
-    user.save()
-    product = Product(name='Kiev Star')
-    product.save()
-    reseller = Reseller(name='Dima', comments='Good reseller')
-    reseller.save()
-    acc = Account(name='Account A', sim='1234567890', comment='Comment', months=3)
-    acc.product = product
-    acc.reseller = reseller
-    acc.save()
+    for i in range(10):
+        user = User(name='admin-{}'.format(i), password='admin', user_type='super_user', activated=True)
+        user.save()
+        product = Product(name='Kiev Star-{}'.format(i))
+        product.save()
+        reseller = Reseller(name='Dima-{}'.format(i), comments='Good reseller')
+        reseller.save()
+        acc = Account(name='Account A-{}'.format(i), sim='1234567890', comment='Comment', months=3)
+        acc.product = product
+        acc.reseller = reseller
+        acc.save()
 
 
 @app.cli.command()
