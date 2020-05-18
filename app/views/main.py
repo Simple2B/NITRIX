@@ -20,7 +20,8 @@ def accounts():
         'index.html',
         main_content='Accounts',
         table_data=[acc.to_dict() for acc in Account.query.all()],
-        columns=Account.columns())
+        columns=Account.columns(),
+        edit_href=url_for('account.edit'))
 
 
 @main_blueprint.route('/users')
@@ -30,7 +31,8 @@ def users():
         'index.html',
         main_content='Users',
         table_data=[u.to_dict() for u in User.query.all()],
-        columns=User.columns())
+        columns=User.columns(),
+        edit_href=url_for('user.edit'))
 
 
 @main_blueprint.route('/resellers')
@@ -40,7 +42,8 @@ def resellers():
         'index.html',
         main_content='Resellers',
         table_data=[i.to_dict() for i in Reseller.query.all()],
-        columns=Reseller.columns())
+        columns=Reseller.columns(),
+        edit_href=url_for('reseller.edit'))
 
 
 @main_blueprint.route('/products')
@@ -50,4 +53,5 @@ def products():
         'index.html',
         main_content='Products',
         table_data=[p.to_dict() for p in Product.query.all()],
-        columns=Product.columns())
+        columns=Product.columns(),
+        edit_href=url_for('product.edit'))
