@@ -1,228 +1,180 @@
 {% extends "base_add_edit.html" %}
 
 {% block content %}
-    <div class="container bg-light mt-3">
-        <div class="row">
-            <h1>Account_details</h1>
+<div class="container bg-light mt-3">
+    <div class="row">
+        {% if is_edit %}
+        <h2>Edit Account</h2>
+        {% else %}
+        <h2>New Account</h2>
+        {% endif %}
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label">Account name:</label>
+        <div class="col-sm-5">
+            {% if is_edit %}
+            <input class="form-control" id="name" value="{{account.name}}">
+            {% else %}
+            <input class="form-control" id="name" placeholder="Account name">
+            {% endif %}
         </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label">Account name:</label>
-                  <div class="col-sm-5">
-                    <input type="months" class="form-control" id="mohths" >
-                  </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label">SIM:</label>
+        <div class="col-sm-5">
+            {% if is_edit %}
+            <input class="form-control" id="sim" value="{{account.sim}}">
+            {% else %}
+            <input class="form-control" id="sim" placeholder="SIM value">
+            {% endif %}
         </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label">SIM:</label>
-                  <div class="col-sm-5">
-                    <input type="months" class="form-control" id="mohths" >
-                </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label">Product:</label>
+        <div class="col-sm-5">
+            <select class="form-control" name="product">
+                {% for record in product.query.all() %}
+                {% if is_edit and record.id == account.product_id %}
+                <option value="{{record.id}}" selected>{{ record.name }}</option>
+                {% else %}
+                <option value="{{record.id}}">{{ record.name }}</option>
+                {% endif %}
+                {%endfor%}
+            </select>
         </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label">Product:</label>
-            <div class="col-sm-5">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-          </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label">Reseller:</label>
+        <div class="col-sm-5">
+            <select class="form-control" name="reseller">
+                {% for record in reseller.query.all() %}
+                {% if is_edit and record.id == account.reseller_id %}
+                <option value="{{record.id}}" selected>{{ record.name }}</option>
+                {% else %}
+                <option value="{{record.id}}">{{ record.name }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
         </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label">Client:</label>
-            <div class="col-sm-5">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-            </div>
-        </div>
-        <div class="row">
-            <label class="col-sm-5 col-form-label" for="exampleFormControlTextarea1">Comment:</label>
-            <div class="container">
-                <textarea class="col-sm-8 form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
-            </div>
-
-        </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label mt-2">Activation date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-2 mt-2">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                    <option>6</option>
-                    <option>7</option>
-                    <option>8</option>
-                    <option>9</option>
-                    <option>10</option>
-                    <option>11</option>
-                  </select>
-            </div>       
-        </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label mt-2">End date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>      
-        </div>
-        <div class="row">
-            <label  class="col-sm-2 col-form-label mt-2">Extension date:</label>
-        </div>
-        <div class="row">
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-2 mt-2">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                    <option>6</option>
-                    <option>7</option>
-                    <option>8</option>
-                    <option>9</option>
-                    <option>10</option>
-                    <option>11</option>
-                  </select>
-            </div>     
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 mt-2">
-                <label  class="col-sm-1 col-form-label ">Reseller:</label>
-            </div> 
-            <div class="col-sm-2">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>
-            
-
-        </div>
-        <div class="row">
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-2 mt-2">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                    <option>6</option>
-                    <option>7</option>
-                    <option>8</option>
-                    <option>9</option>
-                    <option>10</option>
-                    <option>11</option>
-                  </select>
-            </div>     
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 mt-2">
-                <label  class="col-sm-1 col-form-label ">Reseller:</label>
-            </div> 
-            <div class="col-sm-2">
-                <select class="form-control" id="exampleFormControlSelect1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>  
-        </div>
-        <div class="row">
-            <label  class="col-sm-4 col-form-label ">Account history:</label>
-        </div>
-
-        <div class="row">
-            <label for="inputUsername" class="col-sm-1 col-form-label">Name:</label>
-            <div class="col-sm-3">
-                <input type="username" class="form-control" id="inputPassword" >
-            </div>
-            <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>   
-        </div>
-
-        <div class="row mt-1">
-            <label for="inputUsername" class="col-sm-1 col-form-label">Name:</label>
-            <div class="col-sm-3">
-                <input type="username" class="form-control" id="inputPassword" >
-            </div>
-            <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>   
-        </div>
-
-        <div class="row">
-            <label  class="col-sm-4 col-form-label ">Sim history:</label>
-        </div>
-
-        <div class="row">
-            <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
-            <div class="col-sm-3">
-                <input type="username" class="form-control" id="inputPassword" >
-            </div>
-            <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>   
-        </div>
-
-        <div class="row mt-1">
-            <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
-            <div class="col-sm-3">
-                <input type="username" class="form-control" id="inputPassword" >
-            </div>
-            <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-2 mt-2">
-                <input id="date" type="date" value="">
-            </div>
-            <div class="col-sm-1 ">
-                <button type="button" class="btn btn-primary">Add</button>
-            </div>   
+    </div>
+    <div class="row">
+        <label class="col-sm-5 col-form-label">Comment:</label>
+        <div class="container">
+            {% if is_edit %}
+            <textarea class="col-sm-8 form-control" rows="5" name="comment">{{account.comment}}</textarea>
+            {% else %}
+            <textarea class="col-sm-8 form-control" rows="5" name="comment"></textarea>
+            {% endif %}
         </div>
 
     </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label mt-2">Activation date:</label>
+        <div class="col-sm-2 mt-2">
+            {% if is_edit %}
+            <input id="date" type="date" value="{{account.activation_date.strftime('%Y-%m-%d')}}">
+            {% else %}
+            <input id="date" type="date" value="{{today.strftime('%Y-%m-%d')}}">
+            {% endif %}
+        </div>
+        <label class="col-sm-1 col-form-label mt-2">Month:</label>
+        <div class="col-sm-1 mt-2">
+            {% if is_edit %}
+            <input type="text" name="months" list="months-list" class="month-input" value="{{ account.months }}">
+            {% else %}
+            <input type="text" name="months" list="months-list" class="month-input">
+            {% endif %}
+            <datalist id="months-list">
+                <option value="1">
+                <option value="3">
+                <option value="6">
+                <option value="12">
+            </datalist>
+            <!-- <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>3</option>
+                <option>6</option>
+                <option>12</option>
+            </select> -->
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label mt-2">End date:</label>
+        <div class="col-sm-2 mt-2">
+            <input id="date" type="date" value="">
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-2 mt-2">
+            <input id="date" type="date" value="">
+        </div>
+        <div class="col-sm-2 mt-2">
+            <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>3</option>
+                <option>6</option>
+                <option>12</option>
+            </select>
+        </div>
+        <div class="col-sm-2 mt-2">
+            <input id="date" type="date" value="">
+        </div>
+        <div class="col-sm-1 mt-2">
+            <label class="col-sm-1 col-form-label ">Reseller:</label>
+        </div>
+        <div class="col-sm-2">
+            <select class="form-control" id="exampleFormControlSelect1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+        <div class="col-sm-1 ">
+            <button type="button" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-sm-4 col-form-label ">Account history:</label>
+    </div>
+
+    <div class="row">
+        <label for="inputUsername" class="col-sm-1 col-form-label">Name:</label>
+        <div class="col-sm-3">
+            <input type="username" class="form-control" id="inputPassword">
+        </div>
+        <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
+        <div class="col-sm-2 mt-2">
+            <input id="date" type="date" value="">
+        </div>
+        <div class="col-sm-1 ">
+            <button type="button" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <label class="col-sm-4 col-form-label ">Sim history:</label>
+    </div>
+
+    <div class="row">
+        <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
+        <div class="col-sm-3">
+            <input type="username" class="form-control" id="inputPassword">
+        </div>
+        <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
+        <div class="col-sm-2 mt-2">
+            <input id="date" type="date" value="">
+        </div>
+        <div class="col-sm-1 ">
+            <button type="button" class="btn btn-primary">Add</button>
+        </div>
+    </div>
+
+</div>
 
 {% endblock %}
-    
-   
-
