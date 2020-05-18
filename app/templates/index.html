@@ -11,6 +11,7 @@
   <!-- styles -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="static/jquery.dataTables.min.css">
   {% block links %}{% endblock %}
 
 </head>
@@ -34,10 +35,6 @@
             </div>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-1" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
         <form class="form-inline my-2 my-lg-0" action="/logout">
           <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
         </form>
@@ -96,6 +93,7 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
+  <script src="static/jquery.dataTables.min.js"></script>
   <!-- Main JavaScript -->
   <script src="static/main.js"></script>
 
