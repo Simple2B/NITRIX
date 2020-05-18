@@ -10,7 +10,7 @@ class User(db.Model, UserMixin, ModelMixin):
     """User entity"""
 
     TYPES = (
-        ("super_user", "Super user"),
+        ("super", "Super user"),
         ("admin", "Admin"),
         ("user", "User"),
     )

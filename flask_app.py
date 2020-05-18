@@ -16,10 +16,12 @@ def get_context():
 def create_database():
     """ build database """
     db.create_all()
+    user = User(name='admin', password='admin', user_type='super', activated=True)
+    user.save(non_commit=True)
     # add supper user acc
     for i in range(10):
-        user = User(name='admin-{}'.format(i), password='admin', user_type='super_user', activated=True)
-        user.save(non_commit=True)
+        User(name='user-{}'.format(i), password='user', user_type='user', activated=True).save(non_commit=True)
+        User(name='admin-{}'.format(i), password='admin', user_type='admin', activated=True).save(non_commit=True)
         product = Product(name='Kiev Star-{}'.format(i))
         product.save(non_commit=True)
         reseller = Reseller(name='Dima-{}'.format(i), comments='Good reseller')

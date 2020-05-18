@@ -1,9 +1,9 @@
 {% extends "base_add_edit.html" %}
 
 {% block content %}
-<div class="container bg-light mt-3">
+<!-- <div class="container bg-light mt-3"> -->
     <div class="row">
-        {% if is_edit %}
+        {% if form.is_edit %}
         <h2>Edit Account</h2>
         {% else %}
         <h2>New Account</h2>
@@ -11,30 +11,27 @@
     </div>
     <div class="row">
         <label class="col-sm-2 col-form-label">Account name:</label>
+        {{form.id(type='hidden')}}
         <div class="col-sm-5">
-            {% if is_edit %}
-            <input class="form-control" id="name" value="{{account.name}}">
+            {% if form.is_edit %}
+            {{form.name(class='form-control')}}
             {% else %}
-            <input class="form-control" id="name" placeholder="Account name">
+            <input class="form-control" name="name" placeholder="Account name">
             {% endif %}
         </div>
     </div>
     <div class="row">
         <label class="col-sm-2 col-form-label">SIM:</label>
         <div class="col-sm-5">
-            {% if is_edit %}
-            <input class="form-control" id="sim" value="{{account.sim}}">
-            {% else %}
-            <input class="form-control" id="sim" placeholder="SIM value">
-            {% endif %}
+            {{form.sim(class='form-control', placeholder="SIM value")}}
         </div>
     </div>
     <div class="row">
         <label class="col-sm-2 col-form-label">Product:</label>
         <div class="col-sm-5">
-            <select class="form-control" name="product">
-                {% for record in product.query.all() %}
-                {% if is_edit and record.id == account.product_id %}
+            <select class="form-control" name="product_id">
+                {% for record in form.products %}
+                {% if form.is_edit and record.id == form.product_id.data %}
                 <option value="{{record.id}}" selected>{{ record.name }}</option>
                 {% else %}
                 <option value="{{record.id}}">{{ record.name }}</option>
@@ -46,9 +43,9 @@
     <div class="row">
         <label class="col-sm-2 col-form-label">Reseller:</label>
         <div class="col-sm-5">
-            <select class="form-control" name="reseller">
-                {% for record in reseller.query.all() %}
-                {% if is_edit and record.id == account.reseller_id %}
+            <select class="form-control" name="reseller_id">
+                {% for record in form.resellers %}
+                {% if form.is_edit and record.id == form.reseller_id.data %}
                 <option value="{{record.id}}" selected>{{ record.name }}</option>
                 {% else %}
                 <option value="{{record.id}}">{{ record.name }}</option>
@@ -58,31 +55,22 @@
         </div>
     </div>
     <div class="row">
-        <label class="col-sm-5 col-form-label">Comment:</label>
+        <label class="col-sm-2 col-form-label">Comment:</label>
         <div class="container">
-            {% if is_edit %}
-            <textarea class="col-sm-8 form-control" rows="5" name="comment">{{account.comment}}</textarea>
-            {% else %}
-            <textarea class="col-sm-8 form-control" rows="5" name="comment"></textarea>
-            {% endif %}
+            {{form.comment(class='col-sm-7 form-control', rows="5")}}
         </div>
-
     </div>
     <div class="row">
         <label class="col-sm-2 col-form-label mt-2">Activation date:</label>
-        <div class="col-sm-2 mt-2">
-            {% if is_edit %}
-            <input id="date" type="date" value="{{account.activation_date.strftime('%Y-%m-%d')}}">
-            {% else %}
-            <input id="date" type="date" value="{{today.strftime('%Y-%m-%d')}}">
-            {% endif %}
+        <div class="col-sm-3 mt-2">
+            {{form.activation_date(class='form-control', type='date')}}
         </div>
         <label class="col-sm-1 col-form-label mt-2">Month:</label>
-        <div class="col-sm-1 mt-2">
-            {% if is_edit %}
-            <input type="text" name="months" list="months-list" class="month-input" value="{{ account.months }}">
+        <div class="col-sm-2 mt-2">
+            {% if form.is_edit %}
+            {{form.months(class='form-control', list="months-list")}}
             {% else %}
-            <input type="text" name="months" list="months-list" class="month-input">
+            <input name="months" list="months-list" class="form-control">
             {% endif %}
             <datalist id="months-list">
                 <option value="1">
@@ -90,18 +78,12 @@
                 <option value="6">
                 <option value="12">
             </datalist>
-            <!-- <select class="form-control" id="exampleFormControlSelect1">
-                <option>1</option>
-                <option>3</option>
-                <option>6</option>
-                <option>12</option>
-            </select> -->
         </div>
     </div>
     <div class="row">
         <label class="col-sm-2 col-form-label mt-2">End date:</label>
-        <div class="col-sm-2 mt-2">
-            <input id="date" type="date" value="">
+        <div class="col-sm-3 mt-2">
+            <input type="date" class="form-control" value="">
         </div>
     </div>
     <div class="row">
@@ -110,7 +92,7 @@
 
     <div class="row">
         <div class="col-sm-2 mt-2">
-            <input id="date" type="date" value="">
+            <input type="date" class="form-control" value="">
         </div>
         <div class="col-sm-2 mt-2">
             <select class="form-control" id="exampleFormControlSelect1">
@@ -121,10 +103,10 @@
             </select>
         </div>
         <div class="col-sm-2 mt-2">
-            <input id="date" type="date" value="">
+            <input type="date" class="form-control" value="">
         </div>
-        <div class="col-sm-1 mt-2">
-            <label class="col-sm-1 col-form-label ">Reseller:</label>
+        <div class="col-sm-1">
+            <label class="col-sm-1 col-form-label">Reseller:</label>
         </div>
         <div class="col-sm-2">
             <select class="form-control" id="exampleFormControlSelect1">
@@ -150,7 +132,7 @@
         </div>
         <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
         <div class="col-sm-2 mt-2">
-            <input id="date" type="date" value="">
+            <input type="date" class="form-control" value="">
         </div>
         <div class="col-sm-1 ">
             <button type="button" class="btn btn-primary">Add</button>
@@ -168,13 +150,12 @@
         </div>
         <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
         <div class="col-sm-2 mt-2">
-            <input id="date" type="date" value="">
+            <input type="date" class="form-control" value="">
         </div>
         <div class="col-sm-1 ">
             <button type="button" class="btn btn-primary">Add</button>
         </div>
     </div>
 
-</div>
-
+<!-- </div> -->
 {% endblock %}

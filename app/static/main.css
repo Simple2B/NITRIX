@@ -3,6 +3,14 @@
     border-radius: 0 !important;
 } */
 
-.month-input {
-    width: 50px;
+/* .month-input {
+    width: 70px;
+} */
+
+.form-horizontal .control-label{
+    text-align: left;
 }
+
+/* #date-input {
+    width: 150px;
+} */

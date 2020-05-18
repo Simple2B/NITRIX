@@ -27,7 +27,7 @@ class Account(db.Model, ModelMixin):
             'product': self.product.name,
             'reseller': self.reseller.name,
             'sim': self.sim,
-            'activation_date': self.activation_date,
+            'activation_date': self.activation_date.strftime("%Y-%m-%d"),
             'months': self.months
         }
 
