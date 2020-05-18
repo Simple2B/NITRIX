@@ -19,15 +19,16 @@ def create_database():
     # add supper user acc
     for i in range(10):
         user = User(name='admin-{}'.format(i), password='admin', user_type='super_user', activated=True)
-        user.save()
+        user.save(non_commit=True)
         product = Product(name='Kiev Star-{}'.format(i))
-        product.save()
+        product.save(non_commit=True)
         reseller = Reseller(name='Dima-{}'.format(i), comments='Good reseller')
-        reseller.save()
+        reseller.save(non_commit=True)
         acc = Account(name='Account A-{}'.format(i), sim='1234567890', comment='Comment', months=3)
         acc.product = product
         acc.reseller = reseller
-        acc.save()
+        acc.save(non_commit=True)
+    db.session.commit()
 
 
 @app.cli.command()
