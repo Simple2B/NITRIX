@@ -69,8 +69,12 @@
 
       {% for record in table_data %}
       <tr id="{{record.id}}">
-        {% for value in record.values() %}
-        <td>{{value}}</td>
+        {% for key in record %}
+        {% if key == 'name' %}
+        <td> <a href="{{ edit_href }}?id={{record['id']}}">{{ record[key] }}</a> </td>
+        {% else %}
+        <td>{{ record[key] }}</td>
+        {% endif %}
         {%endfor%}
       </tr>
       {%endfor%}
