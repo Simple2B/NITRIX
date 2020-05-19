@@ -1,0 +1,12 @@
+from flask_wtf import FlaskForm
+from wtforms import StringField, IntegerField, SelectField
+from wtforms.validators import DataRequired
+from wtforms.widgets import TextArea
+
+
+class ResellerForm(FlaskForm):
+    id = IntegerField("id", validators=[DataRequired()])
+    name = StringField("Reseller Name:", validators=[DataRequired()])
+    status = SelectField("Activated:", default='not_active',
+                         choices=[('not_active', 'Not Active'), ('active', 'Active')])
+    comments = StringField("Comment:", widget=TextArea())
