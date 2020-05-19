@@ -15,15 +15,17 @@ class Product(db.Model, ModelMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
+    months = db.Column(db.Integer, default=3)
     status = db.Column(Enum(Status), default=Status.active)
 
     def to_dict(self) -> dict:
         return {
             'id': self.id,
             'name': self.name,
+            'months': self.months,
             'status': self.status.value
         }
 
     @staticmethod
     def columns():
-        return ['ID', 'Name', 'Status']
+        return ['ID', 'Name', 'Available months', 'Status']
