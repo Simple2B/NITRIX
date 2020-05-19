@@ -9,8 +9,9 @@
     {% endif %}
 </div>
 <div class="row">
-    <label class="col-sm-2 col-form-label">Account name:</label>
     {{form.id(type='hidden')}}
+    <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
+    {{form.name.label(class="col-sm-2 col-form-label")}}
     <div class="col-sm-5">
         {% if form.is_edit %}
         {{form.name(class='form-control')}}
