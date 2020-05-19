@@ -1,27 +1,32 @@
+import enum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from .. import db
 from ..utils import ModelMixin
-from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy import Enum
 
 
 class User(db.Model, UserMixin, ModelMixin):
     """User entity"""
 
-    TYPES = (
-        ("super", "Super user"),
-        ("admin", "Admin"),
-        ("user", "User"),
-    )
+    __tablename__ = 'users'
 
-    __tablename__ = "users"
+    class Type(enum.Enum):
+        super_admin = 'super'
+        admin = 'admin'
+        user = 'user'
+
+    class Status(enum.Enum):
+        active = 'Active'
+        not_active = 'Not active'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
-    user_type = db.Column(ChoiceType(TYPES))
+    user_type = db.Column(Enum(Type))
     password_hash = db.Column(db.String(255), nullable=False)
-    activated = db.Column(db.Boolean, default=False)
+    password_val = db.Column(db.String(255), nullable=False)
+    activated = db.Column(Enum(Status), default=Status.active)
 
     @hybrid_property
     def password(self):
@@ -30,6 +35,7 @@ class User(db.Model, UserMixin, ModelMixin):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+        self.password_val = password
 
     @classmethod
     def authenticate(cls, user_name, password):
@@ -44,8 +50,8 @@ class User(db.Model, UserMixin, ModelMixin):
         return {
             'id': self.id,
             'name': self.name,
-            'type': self.user_type,
-            'status': 'active' if self.activated else 'not active'
+            'type': self.user_type.name,
+            'status': self.activated.name
         }
 
     @staticmethod
