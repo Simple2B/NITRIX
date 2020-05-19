@@ -1,4 +1,3 @@
-from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 
 from app.models import Account, Product, Reseller
@@ -43,6 +42,7 @@ def edit():
             "account_details.html",
             form=form
         )
+
 
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
