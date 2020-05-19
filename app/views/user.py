@@ -17,9 +17,9 @@ def edit():
         form = UserForm(
             id=user.id,
             name=user.name,
-            user_type=user.user_type,
+            user_type=user.user_type.name,
             password=user.password_val,
-            activated=user.activated
+            activated=user.activated.name
             )
         # form.products = Product.query.all()
         # form.resellers = Reseller.query.all()

@@ -18,9 +18,9 @@ def edit():
             id=product.id,
             name=product.name,
             months=product.months,
-            status=product.status
+            status=product.status.name
             )
-        
+
         form.is_edit = True
         form.save_route = url_for('product.save')
         return render_template(
