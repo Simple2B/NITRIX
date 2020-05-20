@@ -21,32 +21,35 @@ def edit():
             password=user.password_val,
             activated=user.activated.name
             )
-        # form.products = Product.query.all()
-        # form.resellers = Reseller.query.all()
+
         form.is_edit = True
         form.save_route = url_for('user.save')
         return render_template(
                 "user_edit.html",
                 form=form
             )
-    form = UserForm()
-    # form.products = Product.query.all()
-    # form.resellers = Reseller.query.all()
-    form.is_edit = False
-    form.save_route = url_for('user.save')
-    return render_template(
-            "user_edit.html",
-            form=form
-        )
+    else:
+        form = UserForm()
+        form.is_edit = False
+        print('form.user_type.data: ', form.user_type.data)
+        form.save_route = url_for('user.save')
+        return render_template(
+                "user_edit.html",
+                form=form
+            )
 
 
 @user_blueprint.route("/user_save", methods=["POST"])
 def save():
     form = UserForm(request.form)
+    print('request.form: ', request.form)
     if form.validate_on_submit():
-        user = User.query.filter(User.id == form.id.data).first()
-        for k in request.form.keys():
-            user.__setattr__(k, form.__getattribute__(k).data)
+        if form.id.data > 0:
+            user = User.query.filter(User.id == form.id.data).first()
+            for k in request.form.keys():
+                user.__setattr__(k, form.__getattribute__(k).data)
+        else:
+            user = User(name=form.name.data, password_val=form.password.data, activated=form.activated.data)
         user.save()
         return redirect(url_for('main.users'))
     else:

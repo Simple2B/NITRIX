@@ -65,7 +65,7 @@
     <div class="col-sm-3 mt-2">
         {{form.activation_date(class='form-control', type='date')}}
     </div>
-    <label class="col-sm-1 col-form-label mt-2">Month:</label>
+    <label class="col-sm-1 col-form-label mt-2">Months:</label>
     <div class="col-sm-2 mt-2">
         {% if form.is_edit %}
         {{form.months(class='form-control', list="months-list")}}
@@ -95,12 +95,17 @@
         <input type="date" class="form-control" value="">
     </div>
     <div class="col-sm-2 mt-2">
-        <select class="form-control" id="exampleFormControlSelect1">
-            <option>1</option>
-            <option>3</option>
-            <option>6</option>
-            <option>12</option>
-        </select>
+        {% if form.is_edit %}
+        {{form.months(class='form-control', list="months-list")}}
+        {% else %}
+        <input name="months" list="months-list" class="form-control">
+        {% endif %}
+        <datalist id="months-list">
+            <option value="1">
+            <option value="3">
+            <option value="6">
+            <option value="12">
+        </datalist>
     </div>
     <div class="col-sm-2 mt-2">
         <input type="date" class="form-control" value="">
