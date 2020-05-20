@@ -1,6 +1,7 @@
 from flask import render_template, Blueprint, redirect, url_for
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller
+from ..logger import log
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -16,6 +17,7 @@ def index():
 @main_blueprint.route('/accounts')
 @login_required
 def accounts():
+    log(log.DEBUG, '/accounts')
     return render_template(
         'index.html',
         main_content='Accounts',
@@ -27,6 +29,7 @@ def accounts():
 @main_blueprint.route('/users')
 @login_required
 def users():
+    log(log.DEBUG, '/users')
     return render_template(
         'index.html',
         main_content='Users',
@@ -38,6 +41,7 @@ def users():
 @main_blueprint.route('/resellers')
 @login_required
 def resellers():
+    log(log.DEBUG, '/resellers')
     return render_template(
         'index.html',
         main_content='Resellers',

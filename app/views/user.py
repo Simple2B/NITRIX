@@ -1,13 +1,14 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import User
 from app.forms import UserForm
-
+from ..logger import log
 
 user_blueprint = Blueprint('user', __name__)
 
 
 @user_blueprint.route("/user_edit")
 def edit():
+    log(log.DEBUG, '/user_edit')
     if 'id' in request.args:
         id = int(request.args['id'])
         user = User.query.filter(User.id == id).first()
@@ -42,6 +43,7 @@ def edit():
 
 @user_blueprint.route("/user_save", methods=["POST"])
 def save():
+    log(log.DEBUG, '/user_save')
     form = UserForm(request.form)
     if form.validate_on_submit():
         user = User.query.filter(User.id == form.id.data).first()

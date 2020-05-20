@@ -16,10 +16,12 @@ def create_app(environment="development"):
     from .views import main_blueprint, auth_blueprint, account_blueprint
     from .views import product_blueprint, reseller_blueprint, user_blueprint
     from .models import User
+    from .logger import log
 
     # Instantiate app.
     app = Flask(__name__)
-
+    log.set_level(log.DEBUG)
+    log(log.DEBUG, 'start server')
     # Set app config.
     env = os.environ.get("FLASK_ENV", environment)
     app.config.from_object(config[env])
