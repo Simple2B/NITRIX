@@ -19,6 +19,7 @@ def client():
 
 
 def register(user_name, password='password'):
+    # noinspection PyArgumentList
     user = User(name=user_name, password=password)
     user.save()
 
