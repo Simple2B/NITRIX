@@ -46,7 +46,9 @@ def save():
         for k in request.form.keys():
             reseller.__setattr__(k, form.__getattribute__(k).data)
         reseller.save()
+        log(log.INFO, "Reseller was saved")
         return redirect(url_for('main.resellers'))
     else:
         flash('Form validation error', 'danger')
+        log(log.WARNING, "Form validation error")
     return redirect(url_for('reseller.edit', id=form.id.data))

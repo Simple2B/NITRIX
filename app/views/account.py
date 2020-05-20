@@ -15,6 +15,7 @@ def edit():
         account = Account.query.filter(Account.id == id).first()
         if account is None:
             flash("Wrong account id.", "danger")
+            log(log.ERROR, 'Wrong account id.')
             return redirect(url_for('main.accounts'))
         form = AccountForm(
             id=account.id,
@@ -47,14 +48,16 @@ def edit():
 
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
-    log(log.DEBUG, '/account_save')
+    log(log.DEBUG, "/account_save")
     form = AccountForm(request.form)
     if form.validate_on_submit():
         account = Account.query.filter(Account.id == form.id.data).first()
         for k in request.form.keys():
             account.__setattr__(k, form.__getattribute__(k).data)
         account.save()
+        log(log.INFO, "Account data was saved")
         return redirect(url_for('main.accounts'))
     else:
         flash('Form validation error', 'danger')
+        log(log.WARNING, "Form validation error")
     return redirect(url_for('account.edit', id=form.id.data))

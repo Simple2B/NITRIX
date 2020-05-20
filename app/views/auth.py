@@ -19,6 +19,7 @@ def login():
             flash("Login successful.", "success")
             return redirect(url_for("main.index"))
         flash("Wrong user name or password.", "danger")
+        log(log.WARNING, "Invalid user data.")
     return render_template("login.html", form=form)
 
 
@@ -28,4 +29,5 @@ def logout():
     log(log.DEBUG, '/logout')
     logout_user()
     flash("You were logged out.", "info")
+    log(log.INFO, 'User logged out.')
     return redirect(url_for("auth.login"))

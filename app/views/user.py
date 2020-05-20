@@ -14,6 +14,7 @@ def edit():
         user = User.query.filter(User.id == id).first()
         if user is None:
             flash("Wrong account id.", "danger")
+            log(log.WARNING, "Wrong account id.")
             return redirect(url_for('main.accounts'))
         form = UserForm(
             id=user.id,
@@ -50,7 +51,9 @@ def save():
         for k in request.form.keys():
             user.__setattr__(k, form.__getattribute__(k).data)
         user.save()
+        log(log.INFO, "User-{} was saved".format(user.id))
         return redirect(url_for('main.users'))
     else:
         flash('Form validation error', 'danger')
+        log(log.WARNING, "Form validation error")
     return redirect(url_for('user.edit', id=form.id.data))

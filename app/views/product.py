@@ -14,6 +14,7 @@ def edit():
         product = Product.query.filter(Product.id == id).first()
         if product is None:
             flash("Wrong account id.", "danger")
+            log(log.WARNING, "Invalid id")
             return redirect(url_for('main.products'))
         form = ProductForm(
             id=product.id,
@@ -46,7 +47,9 @@ def save():
         for k in request.form.keys():
             product.__setattr__(k, form.__getattribute__(k).data)
         product.save()
+        log(log.INFO, "Product-{} was saved".format(product.id))
         return redirect(url_for('main.products'))
     else:
         flash('Form validation error', 'danger')
+        log(log.WARNING, "Form validation error")
     return redirect(url_for('product.edit', id=form.id.data))
