@@ -3,6 +3,7 @@ __pycache__/
 
 # ignore files
 .env
+.idea/
 
 ### Flask ###
 instance/*

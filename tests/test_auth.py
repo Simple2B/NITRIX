@@ -19,7 +19,7 @@ def client():
 
 
 def register(user_name, password='password'):
-    user = User(name=user_name, password=password, activated=True)
+    user = User(name=user_name, password=password)
     user.save()
 
 
