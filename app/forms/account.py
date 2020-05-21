@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, DateField
+from wtforms import StringField, IntegerField, DateField, SubmitField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
@@ -14,3 +14,4 @@ class AccountForm(FlaskForm):
     comment = StringField("Comment", widget=TextArea())
     activation_date = DateField("Activation date", validators=[DataRequired()], default=datetime.now)
     months = IntegerField("Month", [DataRequired()])
+    submit = SubmitField("Save")

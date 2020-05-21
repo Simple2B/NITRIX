@@ -46,8 +46,16 @@
   <div class="container bg-light mt-3">
       {% block account_details %}
       {% endblock %}
-      <div class="mt-4">
-        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
+      <div class="row">
+        <div class="mt-4 col-sm-1">
+          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save">Save</button>
+        </div>
+        <div class="mt-4 col-sm-3">
+          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
+        </div>
+        <div class="mt-4 col-sm-2">
+          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
+        </div>
       </div>
 
     </div>

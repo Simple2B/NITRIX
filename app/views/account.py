@@ -84,6 +84,10 @@ def save():
                               activation_date=form.activation_date.data,
                               months=form.months.data)
         account.save()
+        if request.form['submit'] == 'save_and_add':
+            return redirect(url_for('account.edit'))
+        if request.form['submit'] == 'save_and_edit':
+            return redirect(url_for('account.edit', id=account.id))
         return redirect(url_for('main.accounts'))
     else:
         flash('Form validation error', 'danger')
