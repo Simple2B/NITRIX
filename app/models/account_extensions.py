@@ -1,6 +1,7 @@
 from ..database import db
 from datetime import datetime
 from app.utils import ModelMixin
+from sqlalchemy.orm import relationship
 
 
 class AccountExtension(db.Model, ModelMixin):
@@ -13,3 +14,4 @@ class AccountExtension(db.Model, ModelMixin):
     extension_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
+    reseller = relationship('Reseller')
