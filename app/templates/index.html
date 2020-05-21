@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  <div class="container">
+  <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="/">NITRIX</a>
       <div class="navbar-collapse" id="navbarSupportedContent">
@@ -34,6 +34,7 @@
               <a class="dropdown-item" href="{{url_for('main.products')}}">Products</a>
             </div>
           </li>
+          <a class="navbar-brand" href="{{edit_href}}">+{{main_content[:-1]}}</a>
         </ul>
         <form class="form-inline my-2 my-lg-0" action="/logout">
           <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>

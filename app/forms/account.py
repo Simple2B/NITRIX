@@ -6,7 +6,7 @@ from wtforms.widgets import TextArea
 
 
 class AccountForm(FlaskForm):
-    id = IntegerField("id", validators=[DataRequired()])
+    id = IntegerField("id", validators=[DataRequired()], default=-1)
     name = StringField("Account Name:", validators=[DataRequired()])
     product_id = IntegerField("Product", validators=[DataRequired()])
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])

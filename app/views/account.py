@@ -33,24 +33,34 @@ def edit():
                 "account_details.html",
                 form=form
             )
-    form = AccountForm()
-    form.products = Product.query.all()
-    form.resellers = Reseller.query.all()
-    form.is_edit = False
-    form.save_route = url_for('account.save')
-    return render_template(
-            "account_details.html",
-            form=form
-        )
+    else:
+        form = AccountForm()
+        form.products = Product.query.all()
+        form.resellers = Reseller.query.all()
+        form.is_edit = False
+        form.save_route = url_for('account.save')
+        return render_template(
+                "account_details.html",
+                form=form
+            )
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
     form = AccountForm(request.form)
     if form.validate_on_submit():
-        account = Account.query.filter(Account.id == form.id.data).first()
-        for k in request.form.keys():
-            account.__setattr__(k, form.__getattribute__(k).data)
+        if form.id.data > 0:
+            account = Account.query.filter(Account.id == form.id.data).first()
+            for k in request.form.keys():
+                account.__setattr__(k, form.__getattribute__(k).data)
+        else:
+            account = Account(name=form.name.data,
+                                product_id=form.product_id.data,
+                                reseller_id=form.reseller_id.data,
+                                sim=form.sim.data, 
+                                comment=form.comment.data, 
+                                activation_date=form.activation_date.data, 
+                                months=form.months.data )
         account.save()
         return redirect(url_for('main.accounts'))
     else:

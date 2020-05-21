@@ -19,7 +19,8 @@ def client():
 
 
 def register(user_name, password='password'):
-    user = User(name=user_name, password=password, activated=True)
+    # noinspection PyArgumentList
+    user = User(name=user_name, password=password)
     user.save()
 
 

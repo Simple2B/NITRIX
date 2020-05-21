@@ -23,9 +23,9 @@ class User(db.Model, UserMixin, ModelMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
-    user_type = db.Column(Enum(Type))
-    password_hash = db.Column(db.String(255), nullable=False)
-    password_val = db.Column(db.String(255), nullable=False)
+    user_type = db.Column(Enum(Type), default=Type.user)
+    password_hash = db.Column(db.String(255))
+    password_val = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
 
     @hybrid_property
@@ -50,7 +50,7 @@ class User(db.Model, UserMixin, ModelMixin):
         return {
             'id': self.id,
             'name': self.name,
-            'type': self.user_type.name,
+            'type': (self.user_type.name if self.user_type else 'None'),
             'status': self.activated.name
         }
 

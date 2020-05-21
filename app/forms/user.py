@@ -4,15 +4,14 @@ from wtforms.validators import DataRequired
 
 
 class UserForm(FlaskForm):
-    id = IntegerField("id", validators=[DataRequired()])
+    id = IntegerField("id", validators=[DataRequired()], default=-1)
     name = StringField("User Name:", validators=[DataRequired()])
-    user_type = SelectField("User type:", validators=[DataRequired()],
-                            default='user',
+    user_type = SelectField("User type:", default='user',
                             choices=[
                                     ('super_admin', 'Super Admin'),
                                     ('admin', 'Admin'),
                                     ('user', 'User')
                                     ])
     password = StringField("Password:", validators=[DataRequired()])
-    activated = SelectField("Activated:", default='not_active',
+    activated = SelectField("Activated:", default='active',
                             choices=[('not_active', 'Not Active'), ('active', 'Active')])
