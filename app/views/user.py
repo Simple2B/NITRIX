@@ -42,10 +42,12 @@ def edit():
 @user_blueprint.route("/user_save", methods=["POST"])
 def save():
     form = UserForm(request.form)
-    print('request.form: ', request.form)
     if form.validate_on_submit():
         if form.id.data > 0:
             user = User.query.filter(User.id == form.id.data).first()
+            if user is None:
+                flash("Wrong user id.", "danger")
+                return redirect(url_for('main.users'))
             for k in request.form.keys():
                 user.__setattr__(k, form.__getattribute__(k).data)
         else:

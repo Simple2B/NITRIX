@@ -44,7 +44,7 @@ def save():
         if form.id.data > 0:
             product = Product.query.filter(Product.id == form.id.data).first()
             if product is None:
-                flash("Wrong account id.", "danger")
+                flash("Wrong product id.", "danger")
                 return redirect(url_for('main.products'))
             for k in request.form.keys():
                 product.__setattr__(k, form.__getattribute__(k).data)
