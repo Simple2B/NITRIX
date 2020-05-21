@@ -30,6 +30,7 @@ def edit():
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.is_edit = True
         form.save_route = url_for('account.save')
+        form.reseller_name = account.reseller.name
         return render_template(
                 "account_details.html",
                 form=form
@@ -73,12 +74,17 @@ def save():
 def ext_add():
     form = AccountExtensionForm(request.form)
     if form.validate_on_submit():
+        account = Account.query.filter(Account.id == form.id.data).first()
         account_ext = AccountExtension()
-        account_ext.account_id = form.id.data
-        account_ext.reseller_id = form.reseller_id.data
-        account_ext.months = form.months.data
-        account_ext.extension_date = form.extension_date.data
+        account_ext.account_id = account.id
+        account_ext.reseller_id = account.reseller_id
+        account_ext.months = account.months
+        account_ext.extension_date = account.activation_date
         account_ext.save()
+        account.reseller_id = form.reseller_id.data
+        account.months = form.months.data
+        account.activation_date = form.extension_date.data
+        account.save()
         return redirect(url_for('account.edit', id=form.id.data))
     else:
         flash('Form validation error', 'danger')

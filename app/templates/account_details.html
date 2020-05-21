@@ -44,7 +44,10 @@
     <div class="row">
         <label class="col-sm-2 col-form-label">Reseller:</label>
         <div class="col-sm-5">
-            <select class="form-control" name="reseller_id">
+            {% if form.is_edit %}
+            <div class="form-control"> {{ form.reseller_name }} </div> 
+            {% else %}
+            <select class="form-control" name="reseller_id" >
                 {% for record in form.resellers %}
                 {% if form.is_edit and record.id == form.reseller_id.data %}
                 <option value="{{record.id}}" selected>{{ record.name }}</option>
@@ -53,6 +56,8 @@
                 {% endif %}
                 {% endfor %}
             </select>
+            {% endif %}
+            
         </div>
     </div>
     <div class="row">
@@ -64,14 +69,14 @@
     <div class="row">
         <label class="col-sm-2 col-form-label mt-2">Activation date:</label>
         <div class="col-sm-3 mt-2">
-            {{form.activation_date(class='form-control', type='date')}}
+            {{form.activation_date(class='form-control', type='date', readonly=form.is_edit )}}
         </div>
         <label class="col-sm-1 col-form-label mt-2">Months:</label>
         <div class="col-sm-2 mt-2">
             {% if form.is_edit %}
-            {{form.months(class='form-control', list="months-list")}}
+            {{form.months(class='form-control', id='months', readonly=True)}}
             {% else %}
-            <input name="months" list="months-list" class="form-control">
+            <input name="months"  id="months" list="months-list" class="form-control">
             {% endif %}
             <datalist id="months-list">
                 <option value="1">
@@ -88,6 +93,8 @@
         </div>
     </div>
 </form>
+
+{% if form.is_edit %}
 <div class="row">
     <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
 </div>
@@ -152,13 +159,6 @@
     </div>
 </form>
 
-
-
-
-
-
-
-
 <div class="row">
     <label class="col-sm-4 col-form-label ">Account history:</label>
 </div>
@@ -194,7 +194,7 @@
         <button type="button" class="btn btn-primary">Add</button>
     </div>
 </div>
-
+{% endif %}
 {% endblock %}
 
 {% block javascript%}
