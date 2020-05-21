@@ -1,7 +1,7 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User, Account, Product, Reseller
+from app.models import User, Account, Product, Reseller, AccountExtension
 
 app = create_app()
 
@@ -17,6 +17,8 @@ def create_database():
     """ build database """
     db.create_all()
     user = User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active)
+    acc0 = Account(name='Account 0', sim='1234567890', comment='Comment', reseller_id=1, product_id=1, months=3)
+    acc0.save()
     user.save(non_commit=True)
     # add supper user acc
     for i in range(10):
@@ -32,6 +34,9 @@ def create_database():
         acc.product = product
         acc.reseller = reseller
         acc.save(non_commit=True)
+    AccountExtension(account_id=acc0.id, reseller_id=1, months=2).save(non_commit=True)
+    AccountExtension(account_id=acc0.id, reseller_id=2, months=4).save(non_commit=True)
+    AccountExtension(account_id=acc0.id, reseller_id=3, months=7).save(non_commit=True)
     db.session.commit()
 
 
