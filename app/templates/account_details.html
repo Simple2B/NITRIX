@@ -45,7 +45,8 @@
         <label class="col-sm-2 col-form-label">Reseller:</label>
         <div class="col-sm-5">
             {% if form.is_edit %}
-            <div class="form-control"> {{ form.reseller_name }} </div> 
+            <div class="form-control"> {{ form.reseller_name }} </div>
+            {{form.reseller_id(type="hidden")}}
             {% else %}
             <select class="form-control" name="reseller_id" >
                 {% for record in form.resellers %}
@@ -57,7 +58,7 @@
                 {% endfor %}
             </select>
             {% endif %}
-            
+
         </div>
     </div>
     <div class="row">
@@ -95,6 +96,7 @@
 </form>
 
 {% if form.is_edit %}
+<br>
 <div class="row">
     <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
 </div>
@@ -115,7 +117,7 @@
         <label class="col-sm-1 col-form-label ">Reseller:</label>
     </div>
     <div class="col-sm-2 mt-2 form-control">
-        {{ acc_ext.reseller.name }}    
+        {{ acc_ext.reseller.name }}
     </div>
 </div>
 {% endfor %}
@@ -124,7 +126,7 @@
 <form action="{{ url_for('account.ext_add') }}" method="POST">
     {{form.id(type='hidden')}}
     <div class="row">
-        <div class="col-sm-2 mt-2">
+        <div class="col-sm-3 mt-2">
             <input type="date" class="form-control" name="extension_date" value="">
         </div>
         <div class="col-sm-2 mt-2">
@@ -158,42 +160,38 @@
 
     </div>
 </form>
-
+<br>
 <div class="row">
     <label class="col-sm-4 col-form-label ">Account history:</label>
 </div>
-
+{%for change in form.name_changes %}
 <div class="row">
-    <label for="inputUsername" class="col-sm-1 col-form-label">Name:</label>
+    <label class="col-sm-1 col-form-label">Name:</label>
+
+    <div class="col-sm-3 form-control"> {{change.value_str}} </div>
+    <label class="col-sm-2 col-form-label">Change date:</label>
     <div class="col-sm-3">
-        <input type="username" class="form-control" id="inputPassword">
-    </div>
-    <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
+        <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
     </div>
 </div>
+{% endfor %}
 
+<br>
 <div class="row">
-    <label class="col-sm-4 col-form-label ">Sim history:</label>
+    <label class="col-sm-4 col-form-label ">SIM history:</label>
 </div>
 
+{%for change in form.sim_changes %}
 <div class="row">
-    <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
+    <label class="col-sm-1 col-form-label">SIM:</label>
+
+    <div class="col-sm-3 form-control"> {{change.value_str}} </div>
+    <label class="col-sm-2 col-form-label">Change date:</label>
     <div class="col-sm-3">
-        <input type="username" class="form-control" id="inputPassword1">
-    </div>
-    <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
+        <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
     </div>
 </div>
+{% endfor %}
 {% endif %}
 {% endblock %}
 
