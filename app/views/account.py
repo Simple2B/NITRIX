@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 
-from app.models import Account, Product, Reseller
-from app.forms import AccountForm
+from app.models import Account, Product, Reseller, AccountExtension
+from app.forms import AccountForm, AccountExtensionForm
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -27,6 +27,7 @@ def edit():
             )
         form.products = Product.query.all()
         form.resellers = Reseller.query.all()
+        form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.is_edit = True
         form.save_route = url_for('account.save')
         return render_template(
@@ -63,6 +64,22 @@ def save():
                                 months=form.months.data )
         account.save()
         return redirect(url_for('main.accounts'))
+    else:
+        flash('Form validation error', 'danger')
+    return redirect(url_for('account.edit', id=form.id.data))
+
+
+@account_blueprint.route("/account_ext_add", methods=["POST"])
+def ext_add():
+    form = AccountExtensionForm(request.form)
+    if form.validate_on_submit():
+        account_ext = AccountExtension()
+        account_ext.account_id = form.id.data
+        account_ext.reseller_id = form.reseller_id.data
+        account_ext.months = form.months.data
+        account_ext.extension_date = form.extension_date.data
+        account_ext.save()
+        return redirect(url_for('account.edit', id=form.id.data))
     else:
         flash('Form validation error', 'danger')
     return redirect(url_for('account.edit', id=form.id.data))

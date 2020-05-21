@@ -42,17 +42,42 @@
   {% endif %}
   {% endwith %}
 
+  {% if form.__class__.__name__ == "AccountForm" %}
+  <div class="container bg-light mt-3">
+      {% block account_details %}
+      {% endblock %}
+      <div class="mt-4">
+        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
+      </div>
 
-  <form action="{{form.save_route}}" method="POST">
+    </div>
+  {% else %}
+  <form action="{{form.save_route}}" method="POST" id="main-form">
     <div class="container bg-light mt-3">
       {% block content %}
       {% endblock %}
       <div class="mt-4">
-        <button class="btn btn-outline-success" type="submit">Save</button>
+        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
       </div>
 
     </div>
   </form>
+  {% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

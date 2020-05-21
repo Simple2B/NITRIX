@@ -24,8 +24,8 @@ class Account(db.Model, ModelMixin):
         return {
             'id': self.id,
             'name': self.name,
-            'product': self.product.name,
-            'reseller': self.reseller.name,
+            'product': self.product.name if self.product else '-=NONE=-',
+            'reseller': self.reseller.name if self.reseller else '-=NONE=-',
             'sim': self.sim,
             'activation_date': self.activation_date.strftime("%Y-%m-%d"),
             'months': self.months

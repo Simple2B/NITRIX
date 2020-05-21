@@ -1,6 +1,7 @@
 {% extends "base_add_edit.html" %}
 
-{% block content %}
+{% block account_details %}
+<form action="{{form.save_route}}" method="POST" id="main-form">
 <div class="row">
     {% if form.is_edit %}
     <h2>Edit Account</h2>
@@ -86,46 +87,79 @@
         <input type="date" class="form-control" id="endDate" readonly>
     </div>
 </div>
+</form>
 <div class="row">
     <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
 </div>
 
+
+
+<form  action="{{ url_for('account.ext_add') }}" method="POST">
+    {{form.id(type='hidden')}}
+    <div class="row">
+        <div class="col-sm-2 mt-2">
+            <input type="date" class="form-control" name="extension_date" value="">
+        </div>
+        <div class="col-sm-2 mt-2">
+            <input name="months" list="months-list" class="form-control">
+
+            <datalist id="month-list">
+                <option value="1">
+                <option value="3">
+                <option value="6">
+                <option value="12">
+            </datalist>
+        </div> 
+        
+        <div class="col-sm-1">
+            <label class="col-sm-1 col-form-label">Reseller:</label>
+        </div>
+        <div class="col-sm-2">
+            <select class="form-control" name="reseller_id">
+                {% for record in form.resellers %}
+                <option value="{{record.id}}">{{ record.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="sm-2">
+            <button class="btn btn-primary" type="submit">Add</button>
+        </div>
+        
+    </div>
+</form>
+
+{%for acc_ext in form.extensions %}
 <div class="row">
     <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
+        <h6 class="form-control">
+            {{acc_ext.extension_date.strftime("%Y-%m-%d")}}
+        </h6>
     </div>
-    <div class="col-sm-2 mt-2">
-        {% if form.is_edit %}
-        {{form.months(class='form-control', list="months-list")}}
-        {% else %}
-        <input name="months" list="months-list" class="form-control">
-        {% endif %}
-        <datalist id="months-list">
-            <option value="1">
-            <option value="3">
-            <option value="6">
-            <option value="12">
-        </datalist>
-    </div>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
+    <div class="col-sm-2 mt-2 form-control">
+        {{ acc_ext.months}}
+    </div> 
+    
     <div class="col-sm-1">
         <label class="col-sm-1 col-form-label">Reseller:</label>
     </div>
     <div class="col-sm-2">
-        <select class="form-control" id="exampleFormControlSelect1">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-        </select>
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
+            {% for record in form.resellers %}
+            {%if record.id == acc_ext.reseller_id %}
+                <h6 class="form-control">
+                    {{record.name}}
+                </h6>
+            {% endif%}  
+            {% endfor %}    
+        
     </div>
 </div>
+{% endfor %}
+
+
+
+
+
+
 <div class="row">
     <label class="col-sm-4 col-form-label ">Account history:</label>
 </div>
@@ -151,7 +185,7 @@
 <div class="row">
     <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
     <div class="col-sm-3">
-        <input type="username" class="form-control" id="inputPassword">
+        <input type="username" class="form-control" id="inputPassword1">
     </div>
     <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
     <div class="col-sm-2 mt-2">
