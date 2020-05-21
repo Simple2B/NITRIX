@@ -2,14 +2,14 @@ from flask import render_template, Blueprint, request, flash, redirect, url_for
 
 from app.models import Account, Product, Reseller
 from app.forms import AccountForm
-from ..logger import log
+from app.logger import log
 
 account_blueprint = Blueprint('account', __name__)
 
 
 @account_blueprint.route("/account_details")
 def edit():
-    log(log.DEBUG, '/account_details')
+    log(log.INFO, '/account_details')
     if 'id' in request.args:
         id = int(request.args['id'])
         account = Account.query.filter(Account.id == id).first()
@@ -48,7 +48,7 @@ def edit():
 
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
-    log(log.DEBUG, "/account_save")
+    log(log.INFO, "/account_save")
     form = AccountForm(request.form)
     if form.validate_on_submit():
         account = Account.query.filter(Account.id == form.id.data).first()
@@ -59,5 +59,5 @@ def save():
         return redirect(url_for('main.accounts'))
     else:
         flash('Form validation error', 'danger')
-        log(log.WARNING, "Form validation error")
+        log(log.ERROR, "Form validation error")
     return redirect(url_for('account.edit', id=form.id.data))

@@ -21,7 +21,7 @@ def create_app(environment="development"):
     # Instantiate app.
     app = Flask(__name__)
     log.set_level(log.DEBUG)
-    log(log.DEBUG, 'start server')
+    log(log.INFO, 'start server')
     # Set app config.
     env = os.environ.get("FLASK_ENV", environment)
     app.config.from_object(config[env])

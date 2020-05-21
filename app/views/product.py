@@ -1,14 +1,14 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import Product
 from app.forms import ProductForm
-from ..logger import log
+from app.logger import log
 
 product_blueprint = Blueprint('product', __name__)
 
 
 @product_blueprint.route("/product_details")
 def edit():
-    log(log.DEBUG, '/product_details')
+    log(log.INFO, '/product_details')
     if 'id' in request.args:
         id = int(request.args['id'])
         product = Product.query.filter(Product.id == id).first()
@@ -40,7 +40,7 @@ def edit():
 
 @product_blueprint.route("/product_save", methods=["POST"])
 def save():
-    log(log.DEBUG, '/product_save')
+    log(log.INFO, '/product_save')
     form = ProductForm(request.form)
     if form.validate_on_submit():
         product = Product.query.filter(Product.id == form.id.data).first()

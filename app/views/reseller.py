@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import Reseller
 from app.forms import ResellerForm
-from ..logger import log
+from app.logger import log
 
 
 reseller_blueprint = Blueprint('reseller', __name__)
@@ -9,7 +9,7 @@ reseller_blueprint = Blueprint('reseller', __name__)
 
 @reseller_blueprint.route("/reseller_edit")
 def edit():
-    log(log.DEBUG, '/reseller_edit')
+    log(log.INFO, '/reseller_edit')
     if 'id' in request.args:
         id = int(request.args['id'])
         reseller = Reseller.query.filter(Reseller.id == id).first()
@@ -39,7 +39,7 @@ def edit():
 
 @reseller_blueprint.route("/reseller_save", methods=["POST"])
 def save():
-    log(log.DEBUG, '/reseller_save')
+    log(log.INFO, '/reseller_save')
     form = ResellerForm(request.form)
     if form.validate_on_submit():
         reseller = Reseller.query.filter(Reseller.id == form.id.data).first()
@@ -50,5 +50,5 @@ def save():
         return redirect(url_for('main.resellers'))
     else:
         flash('Form validation error', 'danger')
-        log(log.WARNING, "Form validation error")
+        log(log.ERROR, "Form validation error")
     return redirect(url_for('reseller.edit', id=form.id.data))

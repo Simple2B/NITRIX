@@ -3,14 +3,14 @@ from flask_login import login_user, logout_user, login_required
 
 from ..models import User
 from ..forms import LoginForm
-from ..logger import log
+from app.logger import log
 
 auth_blueprint = Blueprint("auth", __name__)
 
 
 @auth_blueprint.route("/login", methods=["GET", "POST"])
 def login():
-    log(log.DEBUG, '/login')
+    log(log.INFO, '/login')
     form = LoginForm(request.form)
     if form.validate_on_submit():
         user = User.authenticate(form.user_name.data, form.password.data)
