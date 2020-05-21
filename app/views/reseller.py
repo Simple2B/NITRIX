@@ -42,6 +42,9 @@ def save():
     if form.validate_on_submit():
         if form.id.data > 0:
             reseller = Reseller.query.filter(Reseller.id == form.id.data).first()
+            if reseller is None:
+                flash("Wrong reseller id.", "danger")
+                return redirect(url_for("main.resellers"))
             for k in request.form.keys():
                 reseller.__setattr__(k, form.__getattribute__(k).data)
         else:

@@ -59,7 +59,7 @@ def test_save_product(client):
         data=dict(id=2, name='BAD PRODUCT NAME', months='3', status='not_active'),
         follow_redirects=True
     )
-    assert b'Wrong account id' in response.data
+    assert b'Wrong product id.' in response.data
     # send wrong form data
     response = client.post(
         '/product_save',
