@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import User
 from app.forms import UserForm
-from app.logger  import log
+from app.logger import log
 
 user_blueprint = Blueprint('user', __name__)
 
