@@ -49,37 +49,37 @@
             {% endif %}
             {% endwith %}
           </div>
-              <!-- Flash Messages -->
-        {% if form.__class__.__name__ == "AccountForm" %}
-        <div class="container px-0">
-            {% block account_details %}
-            {% endblock %}
-            <div class="card-footer mt-4  d-flex justify-content-around">
-              <div class="row py-2" >
-                <div class="pr-4">
-                  <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save">Save</button>
-                </div>
-                <div class="pr-4">
-                  <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
-                </div>
-                <div>
-                  <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
+          <!-- Flash Messages -->
+          {% if form.__class__.__name__ == "AccountForm" %}
+          <div class="container px-0">
+              {% block account_details %}
+              {% endblock %}
+              <div class="card-footer mt-4  d-flex justify-content-around">
+                <div class="row py-2" >
+                  <div class="pr-4">
+                    <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save">Save</button>
+                  </div>
+                  <div class="pr-4">
+                    <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
+                  </div>
+                  <div>
+                    <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
+                  </div>
                 </div>
               </div>
-            </div>
-        </div>
-      </div>
-      {% else %}
-        <form action="{{form.save_route}}" method="POST" id="main-form">
-          <div class="container bg-light mt-3">
-            {% block content %}
-            {% endblock %}
-            <div class="card-footer mt-4 py-0">
-              <button class="btn btn-primary " type="submit" form="main-form">Save</button>
-            </div>
           </div>
-        </form>
-        {% endif %}
+          {% else %}
+          <form action="{{form.save_route}}" method="POST" id="main-form">
+            <div class="container mt-3 px-0">
+              {% block content %}
+              {% endblock %}
+              <div class="card-footer d-flex  mt-2 mt-4 py-2">
+                <button class="btn btn-primary " type="submit" form="main-form">Save</button>
+              </div>
+            </div>
+          </form>
+          {% endif %}
+      </div>
     </div>
 
         <div class="fixed-bottom bg-dark text-white">2020</div>

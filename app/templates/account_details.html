@@ -144,7 +144,7 @@
                     <label class="col-form-label ">Reseller:</label>
                 </div>
                 <div class="col-sm-2 mt-2 px-0 mx-3">
-                    <select class="form-control" name="reseller_id">
+                    <select class="form-control pr-1" name="reseller_id">
                         {% for record in form.resellers %}
                         {% if record.id == form.reseller_id.data %}
                         <option value="{{record.id}}" selected>{{ record.name }}</option>
