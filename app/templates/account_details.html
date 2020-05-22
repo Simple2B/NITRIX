@@ -126,7 +126,7 @@
 
         <form action="{{ url_for('account.ext_add') }}" method="POST">
             {{form.id(type='hidden')}}
-            <div class="row">
+            <div class="row   d-inline-flex">
                 <div class="col-sm-5 mt-2">
                     <input type="date" class="form-control" name="extension_date" value="">
                 </div>
@@ -140,10 +140,10 @@
                     </datalist>
                 </div>
 
-                <div class="col-sm-2 mt-2">
+                <div class="col-sm-2 mt-2 pr-0 ">
                     <label class="col-form-label ">Reseller:</label>
                 </div>
-                <div class="col-sm-2 mt-2 px-0 mx-3">
+                <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
                     <select class="form-control pr-1" name="reseller_id">
                         {% for record in form.resellers %}
                         {% if record.id == form.reseller_id.data %}
@@ -154,9 +154,9 @@
                         {% endfor %}
 
                     </select>
-                </div>
-                <div class="row col-sm-11 col-sm-push-7 mt-4 px-0 d-flex flex-row-reverse">
-                    <button class="btn btn-primary btn-lg" type="submit">Add</button>
+                    <div class="d-flex justify-content-end my-3">
+                        <button class=" cl-sm-2 btn btn-primary" type="submit">Add</button>
+                    </div>
                 </div>
             </div>
 
