@@ -54,17 +54,17 @@
           <div class="container px-0">
               {% block account_details %}
               {% endblock %}
-              <div class="card-footer mt-4  d-flex justify-content-around">
-                <div class="row py-2" >
-                  <div class="pr-4">
-                    <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save">Save</button>
-                  </div>
-                  <div class="pr-4">
+              <div class="card-footer mt-4">
+                <div class="row" >
+                  <div class="col-sm-3 my-1 d-flex justify-content-around">
+                    <button class="btn btn-primary " type="submit" name="submit" form="main-form" value="save">Save</button>
+                </div>
+                <div class="col-sm-5 my-1 d-flex justify-content-around">
                     <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
-                  </div>
-                  <div>
+                </div>
+                <div class="col-sm-4 my-1 d-flex justify-content-around">
                     <button class="btn btn-primary" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
-                  </div>
+                </div>
                 </div>
               </div>
           </div>
