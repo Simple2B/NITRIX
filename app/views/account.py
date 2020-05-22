@@ -2,6 +2,7 @@ from flask import render_template, Blueprint, request, flash, redirect, url_for
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges
 from app.forms import AccountForm, AccountExtensionForm
+from ..database import db
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -25,8 +26,8 @@ def edit():
             activation_date=account.activation_date,
             months=account.months
             )
-        form.products = Product.query.all()
-        form.resellers = Reseller.query.all()
+        form.products = Product.query.filter(Product.deleted == False)
+        form.resellers = Reseller.query.filter(Reseller.deleted == False)
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.name_changes = AccountChanges.query.filter(
             AccountChanges.account_id == form.id.data).filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
@@ -34,6 +35,7 @@ def edit():
             AccountChanges.account_id == form.id.data).filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
         form.is_edit = True
         form.save_route = url_for('account.save')
+        form.delete_route = url_for('account.delete')
         form.reseller_name = account.reseller.name
         return render_template(
                 "account_details.html",
@@ -45,6 +47,7 @@ def edit():
         form.resellers = Reseller.query.all()
         form.is_edit = False
         form.save_route = url_for('account.save')
+        form.delete_route = url_for('account.delete')
         return render_template(
                 "account_details.html",
                 form=form
@@ -113,3 +116,14 @@ def ext_add():
     else:
         flash('Form validation error', 'danger')
     return redirect(url_for('account.edit', id=form.id.data))
+
+
+@account_blueprint.route("/account_delete", methods=["GET"])
+def delete():
+    if 'id' in request.args:
+        account_id = int(request.args['id'])
+        Account.query.filter(Account.id == account_id).delete()
+        db.session.commit()
+        return redirect(url_for('main.accounts'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.accounts'))

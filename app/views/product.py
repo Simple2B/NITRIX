@@ -23,6 +23,7 @@ def edit():
 
         form.is_edit = True
         form.save_route = url_for('product.save')
+        form.delete_route = url_for('product.delete')
         return render_template(
                 "product_add_edit.html",
                 form=form
@@ -31,6 +32,7 @@ def edit():
         form = ProductForm()
         form.is_edit = False
         form.save_route = url_for('product.save')
+        form.delete_route = url_for('product.delete')
         return render_template(
                 "product_add_edit.html",
                 form=form
@@ -55,3 +57,15 @@ def save():
     else:
         flash('Form validation error', 'danger')
     return redirect(url_for('product.edit', id=form.id.data))
+
+
+@product_blueprint.route("/product_delete", methods=["GET"])
+def delete():
+    if 'id' in request.args:
+        product_id = int(request.args['id'])
+        product = Product.query.filter(Product.id == product_id).first()
+        product.deleted = True
+        product.save()
+        return redirect(url_for('main.products'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.products'))

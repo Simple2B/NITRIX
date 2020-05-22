@@ -22,6 +22,7 @@ def edit():
             )
         form.is_edit = True
         form.save_route = url_for('reseller.save')
+        form.delete_route = url_for('reseller.delete')
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -30,6 +31,7 @@ def edit():
         form = ResellerForm()
         form.is_edit = False
         form.save_route = url_for('reseller.save')
+        form.delete_route = url_for('reseller.delete')
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -54,3 +56,16 @@ def save():
     else:
         flash('Form validation error', 'danger')
     return redirect(url_for('reseller.edit', id=form.id.data))
+
+
+@reseller_blueprint.route("/reseller_delete", methods=["GET"])
+def delete():
+    if 'id' in request.args:
+        reseller_id = int(request.args['id'])
+        reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
+        reseller.deleted = True
+        reseller.save()
+        return redirect(url_for('main.resellers'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.resellers'))
+

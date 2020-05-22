@@ -10,5 +10,11 @@ class ModelMixin(object):
             db.session.commit()
         return self
 
+    def delete(self, non_commit=False):
+        db.session.delete(self)
+        if not non_commit:
+            db.session.commit()
+        return self
+
 
 # Add your own utility classes and functions here.
