@@ -18,6 +18,12 @@
 body{
     padding-bottom: 50px;
 }
- container{
-     background-color: grey;
+div.card-body{
+     background-color: rgb(235, 235, 235);
+ }
+ div.card-footer{
+    background-color: rgb(202, 202, 202);
+ }
+ div.card-header{
+    background-color: rgb(202, 202, 202);
  }
