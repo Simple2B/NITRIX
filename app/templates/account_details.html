@@ -10,7 +10,7 @@
             <h2>New Account</h2>
             {% endif %}
         </div>
-        <div class="row">
+        <div class="row pt-3">
             {{form.id(type='hidden')}}
             <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
             {{form.name.label(class="col-sm-2 col-form-label")}}
@@ -22,13 +22,13 @@
                 {% endif %}
             </div>
         </div>
-        <div class="row">
+        <div class="row pt-3">
             <label class="col-sm-2 col-form-label">SIM:</label>
             <div class="col-sm-5">
                 {{form.sim(class='form-control', placeholder="SIM value")}}
             </div>
         </div>
-        <div class="row">
+        <div class="row pt-3">
             <label class="col-sm-2 col-form-label">Product:</label>
             <div class="col-sm-5">
                 <select class="form-control" name="product_id">
@@ -42,7 +42,7 @@
                 </select>
             </div>
         </div>
-        <div class="row">
+        <div class="row pt-3">
             <label class="col-sm-2 col-form-label">Reseller:</label>
             <div class="col-sm-5">
                 {% if form.is_edit %}
@@ -62,7 +62,7 @@
 
             </div>
         </div>
-        <div class="row">
+        <div class="row pt-3">
             <label class="col-sm-2 col-form-label">Comment:</label>
             <div class="container">
                 {{form.comment(class='col-sm-7 form-control', rows="5")}}
@@ -74,7 +74,7 @@
                 {{form.activation_date(class='form-control', type='date', readonly=form.is_edit )}}
             </div>
             <label class="col-sm-1 col-form-label mt-2">Months:</label>
-            <div class="col-sm-2 mt-2">
+            <div class="col-sm-1 mt-2 pr-1">
                 {% if form.is_edit %}
                 {{form.months(class='form-control', id='months', readonly=True)}}
                 {% else %}
