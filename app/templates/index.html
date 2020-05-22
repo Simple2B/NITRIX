@@ -27,16 +27,30 @@
               aria-haspopup="true" aria-expanded="false">
               {{ main_content }}
             </a>
+            {% if current_user.user_type.name == "super_admin" %}
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="{{url_for('main.accounts')}}">Accounts</a>
               <a class="dropdown-item" href="{{url_for('main.resellers')}}">Resellers</a>
               <a class="dropdown-item" href="{{url_for('main.users')}}">Users</a>
               <a class="dropdown-item" href="{{url_for('main.products')}}">Products</a>
             </div>
+            {% elif current_user.user_type.name == "admin" %}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{url_for('main.accounts')}}">Accounts</a>
+              <a class="dropdown-item" href="{{url_for('main.resellers')}}">Resellers</a>
+              <a class="dropdown-item" href="{{url_for('main.products')}}">Products</a>
+            </div>
+            {% elif current_user.user_type.name == "user" %}
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{url_for('main.accounts')}}">Accounts</a>
+            </div>
+            {% endif %}
+
+
           </li>
           
           {% if current_user.user_type.name == "super_admin" %}
-          <a class="nav-link " href="{{edit_href}}">+ {{main_content[:-1]}}</a>
+          <a class="nav-link" href="{{edit_href}}">+ {{main_content[:-1]}}</a>
           {% elif current_user.user_type.name == "admin" and main_content == 'Resellers' %}
           <a class="nav-link " href="{{url_for('reseller.edit')}}">+ Reseller</a>
           {% elif current_user.user_type.name == "user" and main_content == 'Accounts' %}
