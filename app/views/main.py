@@ -8,7 +8,7 @@ main_blueprint = Blueprint('main', __name__)
 @main_blueprint.route('/')
 @login_required
 def index():
-    if current_user.user_type in ('super_user', 'admin'):
+    if current_user.user_type.name =='super_admin':
         return redirect(url_for("main.users"))
     return redirect(url_for("main.accounts"))
 

@@ -64,9 +64,21 @@
     <div class="container bg-light mt-3">
       {% block content %}
       {% endblock %}
+
+      {% if current_user.user_type.name == "super_admin" %}
       <div class="mt-4">
         <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
       </div>
+      {% elif current_user.user_type.name == "admin" and form.save_route == url_for('reseller.save') %}
+      <div class="mt-4">
+        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
+      </div>
+      {% elif current_user.user_type.name == "user" and form.save_route == url_for('account.save') %}
+      <div class="mt-4">
+        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
+      </div>
+      {% endif %}
+
 
     </div>
   </form>

@@ -13,7 +13,7 @@ class User(db.Model, UserMixin, ModelMixin):
     __tablename__ = 'users'
 
     class Type(enum.Enum):
-        super_admin = 'super'
+        super_admin = 'super_admin'
         admin = 'admin'
         user = 'user'
 
