@@ -1,0 +1,52 @@
+{% extends "base_add_edit.html" %}
+
+{% block content %}
+    <div class="container mt-3">
+        <div class="card  bg-light">
+          <div class="card-body">
+            <form>
+              {% if form.is_edit %}
+                <h2>User edit</h2>
+              {% else %}
+                <h2>New User</h2>
+              {% endif %}
+                <div class="form-group row">
+                  {{form.id(type='hidden')}}
+                  {{form.name.label(class="col-sm-2 col-form-label")}}
+                    <div class="col-sm-5">
+                      {% if form.is_edit %}
+                      {{form.name(class='form-control')}}
+                      {% else %}
+                      <input class="form-control" name="name" placeholder="User name">
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    {{form.user_type.label(class="col-sm-2 col-form-label")}}
+                      <div class="col-sm-5">
+                        {{form.user_type(class='form-control', placeholder="User type")}}
+                        
+                      </div>
+                    </div>
+                <div class="form-group row">
+                  {{form.password.label(class="col-sm-2 col-form-label")}}
+                  <div class="col-sm-5">
+                    {% if form.is_edit %}
+                    {{form.password(class='form-control', type="password")}}
+                    {% else %}
+                    <input  type="password"   class="form-control" name="password" placeholder="********">
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="form-group row">
+                  {{form.activated.label(class="col-sm-2 col-form-label")}}
+                    <div class="col-sm-5">
+                      {{form.activated(class='form-control')}}
+                    </div>
+                  </div>
+
+              </form>
+          </div>
+        </div>
+      </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{
+    "python.linting.flake8Enabled": true,
+    "cSpell.words": [
+        "NITRIX",
+        "noqa",
+        "wtforms"
+    ]
+}
