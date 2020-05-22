@@ -56,6 +56,9 @@
         <div class="mt-4 col-sm-2">
           <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
         </div>
+        <div class="col-sm-1 mt-4">
+          <a type="" href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger">Delete</a>
+        </div>
       </div>
 
     </div>
@@ -66,8 +69,13 @@
       {% endblock %}
 
       {% if current_user.user_type.name == "super_admin" %}
-      <div class="mt-4">
-        <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
+      <div class="row">
+      <div class="col-sm-1 mt-4 ">
+        <button class="btn btn-success" type="submit" form="main-form">Save</button>
+      </div>
+      <div class="col-sm-1 mt-4">
+        <a type="" href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger">Delete</a>
+      </div>
       </div>
       {% elif current_user.user_type.name == "admin" and form.save_route == url_for('reseller.save') %}
       <div class="mt-4">
