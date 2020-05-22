@@ -16,18 +16,22 @@
 </head>
 
 <body>
-  <div class="container col-sm-9 col-sm-offset-9">
-    <div class="container" style="background-color: rgb(223, 223, 223)">
-      <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand"  href="/">NITRIX</a>
-        <div class="collapse" id="navbarSupportedContent">
-          <form class="form-inline my-2 my-lg-0" action="/logout">
-            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
-          </form>
-        </div>
-      </nav>
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header px-0 py-0">
+      <div class="container" style="background-color: rgb(223, 223, 223)">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <a class="navbar-brand"  href="/">NITRIX</a>
+          <div class="collapse" id="navbarSupportedContent">
+            <form class="form-inline my-2 my-lg-0" action="/logout">
+              <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
+            </form>
+          </div>
+        </nav>
+      </div>
     </div>
-    <!-- Flash Messages -->
+    <dic class="card-body px-0 py-0">
+          <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
@@ -43,21 +47,22 @@
     {% endwith %}
 
     {% if form.__class__.__name__ == "AccountForm" %}
-    <div class="container bg-light mt-3">
+    <div class="container bg-secondary px-0">
         {% block account_details %}
         {% endblock %}
-        <div class="container pb-4 mt-4"  style="background-color: rgb(223, 223, 223)">
+        <div class="card-footer mt-4">
           <div class="row" >
-            <div class="mt-4 col-sm-4">
+            <div class="col-sm-3">
               <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save">Save</button>
             </div>
-            <div class="mt-4 col-sm-4">
+            <div class="col-sm-3">
               <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
             </div>
-            <div class="mt-4 col-sm-2">
+            <div class="col-sm-3">
               <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
             </div>
           </div>
+        </div>
         </div>
       </div>
     {% else %}
@@ -65,13 +70,13 @@
       <div class="container bg-light mt-3">
         {% block content %}
         {% endblock %}
-        <div class="container mt-4">
+        <div class="card-footer mt-4 py-0">
           <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
         </div>
-
       </div>
     </form>
     {% endif %}
+    </dic>
 
     <div class="fixed-bottom bg-dark text-white">2020</div>
 
@@ -87,6 +92,8 @@
     {% block javascript %}
     {% endblock %}
   </div>
+
+</div>
 
 </body>
 
