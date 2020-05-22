@@ -166,7 +166,7 @@
             <label class="col-sm-4 col-form-label ">Account history:</label>
         </div>
         {%for change in form.name_changes %}
-        <div class="row">
+        <div class="row mt-2">
             <label class="col-sm-2 col-form-label">Name:</label>
 
             <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
@@ -183,7 +183,7 @@
         </div>
 
         {%for change in form.sim_changes %}
-        <div class="row">
+        <div class="row mt-2">
             <label class="col-sm-2 col-form-label">SIM:</label>
 
             <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
