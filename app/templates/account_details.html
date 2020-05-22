@@ -13,8 +13,8 @@
         <div class="row pt-4 pl-3">
             {{form.id(type='hidden')}}
             <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
-            {{form.name.label(class="col-sm-2 col-form-label")}}
-            <div class="col-sm-5">
+            {{form.name.label(class="col-sm-3 col-form-label")}}
+            <div class="col-sm-4">
                 {% if form.is_edit %}
                 {{form.name(class='form-control')}}
                 {% else %}
@@ -23,14 +23,14 @@
             </div>
         </div>
         <div class="row pt-3 pl-3">
-            <label class="col-sm-2 col-form-label">SIM:</label>
-            <div class="col-sm-5">
+            <label class="col-sm-3 col-form-label">SIM:</label>
+            <div class="col-sm-4">
                 {{form.sim(class='form-control', placeholder="SIM value")}}
             </div>
         </div>
         <div class="row pt-3 pl-3">
-            <label class="col-sm-2 col-form-label">Product:</label>
-            <div class="col-sm-5">
+            <label class="col-sm-3 col-form-label">Product:</label>
+            <div class="col-sm-4">
                 <select class="form-control" name="product_id">
                     {% for record in form.products %}
                     {% if form.is_edit and record.id == form.product_id.data %}
@@ -43,8 +43,8 @@
             </div>
         </div>
         <div class="row pt-3 pl-3">
-            <label class="col-sm-2 col-form-label">Reseller:</label>
-            <div class="col-sm-5">
+            <label class="col-sm-3 col-form-label">Reseller:</label>
+            <div class="col-sm-4">
                 {% if form.is_edit %}
                 <div class="form-control"> {{ form.reseller_name }} </div>
                 {{form.reseller_id(type="hidden")}}
@@ -63,18 +63,18 @@
             </div>
         </div>
         <div class="row pt-3 pl-3">
-            <label class="col-sm-2 col-form-label">Comment:</label>
+            <label class="col-sm-3 col-form-label">Comment:</label>
             <div class="container">
                 {{form.comment(class='col-sm-7 form-control', rows="5")}}
             </div>
         </div>
         <div class="row pl-3 pt-3">
-            <label class="col-sm-2 col-form-label mt-2">Activation date:</label>
-            <div class="col-sm-3 mt-2">
+            <label class="col-sm-3 col-form-label mt-2">Activation date:</label>
+            <div class="col-sm-4 mt-2">
                 {{form.activation_date(class='form-control', type='date', readonly=form.is_edit )}}
             </div>
             <label class="col-form-label mt-2 pl-3">Months:</label>
-            <div class="col-sm-1 mt-2">
+            <div class="col-sm-2 mt-2">
                 {% if form.is_edit %}
                 {{form.months(class='form-control', id='months', readonly=True)}}
                 {% else %}
@@ -89,8 +89,8 @@
             </div>
         </div>
         <div class="row pl-3 pt-3">
-            <label class="col-sm-2 col-form-label mt-2">End date:</label>
-            <div class="col-sm-3 mt-2">
+            <label class="col-sm-3 col-form-label mt-2">End date:</label>
+            <div class="col-sm-4 mt-2">
                 <input type="date" class="form-control" id="endDate" readonly>
             </div>
         </div>
@@ -99,13 +99,13 @@
         {% if form.is_edit %}
         <br>
         <div class="row">
-            <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
+            <label class="col-sm col-form-label mt-2">Extension date:</label>
         </div>
 
 
         {%for acc_ext in form.extensions %}
         <div class="row">
-            <div class="col-sm-2 mt-2">
+            <div class="col-sm-5 mt-2">
                 <h6 class="form-control">
                     {{acc_ext.extension_date.strftime("%Y-%m-%d")}}
                 </h6>
@@ -114,7 +114,7 @@
                 {{ acc_ext.months}}
             </div>
 
-            <div class="col-sm-1 mt-2">
+            <div class="col-sm-2 mt-2">
                 <label class="col-form-label ">Reseller:</label>
             </div>
             <div class="col-sm-2 mt-2 mx-3 form-control">
@@ -127,7 +127,7 @@
         <form action="{{ url_for('account.ext_add') }}" method="POST">
             {{form.id(type='hidden')}}
             <div class="row">
-                <div class="col-sm-2 mt-2">
+                <div class="col-sm-5 mt-2">
                     <input type="date" class="form-control" name="extension_date" value="">
                 </div>
                 <div class="col-sm-1 mt-2 mx-3 px-0 ">
@@ -140,7 +140,7 @@
                     </datalist>
                 </div>
 
-                <div class="col-sm-1 mt-2">
+                <div class="col-sm-2 mt-2">
                     <label class="col-form-label ">Reseller:</label>
                 </div>
                 <div class="col-sm-2 mt-2 px-0 mx-3">
@@ -155,11 +155,11 @@
 
                     </select>
                 </div>
-                <div class="sm-2 mt-2">
-                    <button class="btn btn-primary" type="submit">Add</button>
+                <div class="row col-sm-11 col-sm-push-7 mt-4 px-0 d-flex flex-row-reverse">
+                    <button class="btn btn-primary btn-lg" type="submit">Add</button>
                 </div>
-
             </div>
+
         </form>
         <br>
         <div class="row">
@@ -167,11 +167,11 @@
         </div>
         {%for change in form.name_changes %}
         <div class="row">
-            <label class="col-sm-1 col-form-label">Name:</label>
+            <label class="col-sm-2 col-form-label">Name:</label>
 
             <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
-            <label class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-3">
+            <label class="d-inline-flex  col-form-label">Change date:</label>
+            <div class="col-sm-4">
                 <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
             </div>
         </div>
@@ -184,11 +184,11 @@
 
         {%for change in form.sim_changes %}
         <div class="row">
-            <label class="col-sm-1 col-form-label">SIM:</label>
+            <label class="col-sm-2 col-form-label">SIM:</label>
 
             <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
-            <label class="col-sm-2 col-form-label">Change date:</label>
-            <div class="col-sm-3">
+            <label class="d-inline-flex  col-form-label">Change date:</label>
+            <div class="col-sm-4">
                 <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
             </div>
         </div>

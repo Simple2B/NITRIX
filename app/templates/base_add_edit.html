@@ -17,9 +17,9 @@
 
 <body>
 <div class="container" >
-  <div class="row">
+  <div class="row ">
     <div class="col-lg-2"></div>
-    <div class="col-lg-8">
+    <div class="col-lg-8 d-inline-flex ">
       <div class="card">
         <div class="card-header px-0 py-0">
           <div class="container" style="background-color: rgb(223, 223, 223)">
@@ -34,27 +34,28 @@
           </div>
         </div>
         <div class="card-body px-0 py-0">
+          <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismisible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                <span class="sr-only">Close</span>
+              </button>
+              {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+          </div>
               <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismisible">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            <span class="sr-only">Close</span>
-          </button>
-          {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-
         {% if form.__class__.__name__ == "AccountForm" %}
-        <div class="container bg-secondary px-0">
+        <div class="container px-0">
             {% block account_details %}
             {% endblock %}
-            <div class="card-footer mt-4">
-              <div class="row col-sm-8" >
+            <div class="card-footer mt-4  d-flex justify-content-around">
+              <div class="row" >
                 <div class="pr-4">
                   <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save">Save</button>
                 </div>
