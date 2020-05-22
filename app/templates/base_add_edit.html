@@ -17,7 +17,7 @@
 </head>
 
 <body>
-  <div>
+  <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="/">NITRIX</a>
       <div class="collapse" id="navbarSupportedContent">
@@ -46,25 +46,26 @@
   <div class="container bg-light mt-3">
       {% block account_details %}
       {% endblock %}
-      <div class="row">
-        <div class="mt-4 col-sm-1">
-          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save">Save</button>
-        </div>
-        <div class="mt-4 col-sm-3">
-          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
-        </div>
-        <div class="mt-4 col-sm-2">
-          <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
+      <div class="container">
+        <div class="row">
+          <div class="mt-4 col-sm-1">
+            <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save">Save</button>
+          </div>
+          <div class="mt-4 col-sm-3">
+            <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_add">Save and add another</button>
+          </div>
+          <div class="mt-4 col-sm-2">
+            <button class="btn btn-outline-success" type="submit" name="submit" form="main-form" value="save_and_edit">Save and edit</button>
+          </div>
         </div>
       </div>
-
     </div>
   {% else %}
   <form action="{{form.save_route}}" method="POST" id="main-form">
     <div class="container bg-light mt-3">
       {% block content %}
       {% endblock %}
-      <div class="mt-4">
+      <div class="container mt-4">
         <button class="btn btn-outline-success" type="submit" form="main-form">Save</button>
       </div>
 
