@@ -17,6 +17,7 @@ class Product(db.Model, ModelMixin):
     name = db.Column(db.String(60), unique=True, nullable=False)
     months = db.Column(db.Integer, default=3)
     status = db.Column(Enum(Status), default=Status.active)
+    deleted = db.Column(db.Boolean, default=False)
 
     def to_dict(self) -> dict:
         return {

@@ -2,7 +2,7 @@
 
 {% block account_details %}
 <form action="{{form.save_route}}" method="POST" id="main-form">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row pt-3 pl-4">
             {% if form.is_edit %}
             <h2>Edit Account</h2>
@@ -64,7 +64,7 @@
         </div>
         <div class="row pt-3 pl-3">
             <label class="col-sm-3 col-form-label">Comment:</label>
-            <div class="container">
+            <div class="container-fluid">
                 {{form.comment(class='col-sm-7 form-control', rows="5")}}
             </div>
         </div>
@@ -95,31 +95,33 @@
             </div>
         </div>
     </form>
-    <div class="container">
+    <div class="container-fluid">
         {% if form.is_edit %}
         <br>
         <div class="row">
-            <label class="col-sm col-form-label mt-2">Extension date:</label>
+            <label class="col-sm col-form-label mt-2">Extension history:</label>
         </div>
-
 
         {%for acc_ext in form.extensions %}
         <div class="row">
-            <div class="col-sm-5 mt-2">
+            <div class="col-sm-4 mt-2">
                 <h6 class="form-control">
                     {{acc_ext.extension_date.strftime("%Y-%m-%d")}}
                 </h6>
             </div>
-            <div class="col-sm-1 mt-2 mx-3 form-control">
+            <div class="col-sm-1 mt-2 form-control">
                 {{ acc_ext.months}}
             </div>
 
             <div class="col-sm-2 mt-2">
                 <label class="col-form-label ">Reseller:</label>
             </div>
-            <div class="col-sm-2 mt-2 mx-3 form-control">
+            <div class="col-sm-2 mt-2 form-control">
                 {{ acc_ext.reseller.name }}
             </div>
+            <!-- <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div> -->
         </div>
         {% endfor %}
 
@@ -127,10 +129,10 @@
         <form action="{{ url_for('account.ext_add') }}" method="POST">
             {{form.id(type='hidden')}}
             <div class="row   d-inline-flex">
-                <div class="col-sm-5 mt-2">
+                <div class="col-sm-4 mt-2">
                     <input type="date" class="form-control" name="extension_date" value="">
                 </div>
-                <div class="col-sm-1 mt-2 mx-3 px-0 ">
+                <div class="col-sm-1 mt-2 px-0 ">
                     <input name="months" list="months-list" class="form-control">
                     <datalist id="month-list">
                         <option value="1">
@@ -140,11 +142,11 @@
                     </datalist>
                 </div>
 
-                <div class="col-sm-2 mt-2 pr-0 ">
+                <div class="col-sm-2 mt-2 pr-0">
                     <label class="col-form-label ">Reseller:</label>
                 </div>
-                <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
-                    <select class="form-control pr-1" name="reseller_id">
+                <div class="col-sm-2 mt-2 px-0 pr-0">
+                    <select class="form-control" name="reseller_id">
                         {% for record in form.resellers %}
                         {% if record.id == form.reseller_id.data %}
                         <option value="{{record.id}}" selected>{{ record.name }}</option>
@@ -154,9 +156,9 @@
                         {% endfor %}
 
                     </select>
-                    <div class="d-flex justify-content-end my-3">
-                        <button class=" cl-sm-2 btn btn-primary" type="submit">Add</button>
-                    </div>
+                </div>
+                <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
+                    <button class="btn btn-primary" type="submit">Add</button>
                 </div>
             </div>
 

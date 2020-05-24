@@ -8,7 +8,7 @@ main_blueprint = Blueprint('main', __name__)
 @main_blueprint.route('/')
 @login_required
 def index():
-    if current_user.user_type in ('super_user', 'admin'):
+    if current_user.user_type.name =='super_admin':
         return redirect(url_for("main.users"))
     return redirect(url_for("main.accounts"))
 
@@ -41,7 +41,7 @@ def resellers():
     return render_template(
         'index.html',
         main_content='Resellers',
-        table_data=[i.to_dict() for i in Reseller.query.all()],
+        table_data=[i.to_dict() for i in Reseller.query.filter(Reseller.deleted == False)],
         columns=Reseller.columns(),
         edit_href=url_for('reseller.edit'))
 
@@ -52,6 +52,6 @@ def products():
     return render_template(
         'index.html',
         main_content='Products',
-        table_data=[p.to_dict() for p in Product.query.all()],
+        table_data=[p.to_dict() for p in Product.query.filter(Product.deleted == False)],
         columns=Product.columns(),
         edit_href=url_for('product.edit'))

@@ -17,6 +17,7 @@ class Reseller(db.Model, ModelMixin):
     name = db.Column(db.String(60), unique=True, nullable=False)
     status = db.Column(Enum(Status), default=Status.active)
     comments = db.Column(db.String(60))
+    deleted = db.Column(db.Boolean, default=False)
 
     def to_dict(self) -> dict:
         return {
