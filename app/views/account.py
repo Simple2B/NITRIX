@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 
-from app.models import Account, Product, Reseller, AccountExtension, AccountChanges
+from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
 from app.forms import AccountForm, AccountExtensionForm
 from ..database import db
 from app.logger import log
@@ -31,6 +31,7 @@ def edit():
             )
         form.products = Product.query.filter(Product.deleted == False)  # noqa E712
         form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+        form.phones = Phone.query.filter(Phone.deleted == False) # noqa E712
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.name_changes = AccountChanges.query.filter(
             AccountChanges.account_id == form.id.data).filter(
@@ -50,6 +51,7 @@ def edit():
         form = AccountForm()
         form.products = Product.query.all()
         form.resellers = Reseller.query.all()
+        form.phones = Phone.query.all()
         form.is_edit = False
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')
