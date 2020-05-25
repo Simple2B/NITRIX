@@ -35,9 +35,9 @@ def change_password():
         user_name = request.form["user_name"]
         old_password = request.form["old_password"]
         new_password = request.form["new_password"]
-        reapet_new_password = request.form["reapet_new_password"]
+        repeat_new_password = request.form["repeat_new_password"]
 
-        if new_password != reapet_new_password:
+        if new_password != repeat_new_password:
             flash("Wrong user name or password.", "danger")
             return redirect(url_for("auth.change_password"))
 

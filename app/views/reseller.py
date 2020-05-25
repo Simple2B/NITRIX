@@ -73,4 +73,3 @@ def delete():
         return redirect(url_for('main.resellers'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.resellers'))
-

@@ -29,13 +29,15 @@ def edit():
             activation_date=account.activation_date,
             months=account.months
             )
-        form.products = Product.query.filter(Product.deleted == False)
-        form.resellers = Reseller.query.filter(Reseller.deleted == False)
+        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
+        form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.name_changes = AccountChanges.query.filter(
-            AccountChanges.account_id == form.id.data).filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
+            AccountChanges.account_id == form.id.data).filter(
+                AccountChanges.change_type == AccountChanges.ChangeType.name)
         form.sim_changes = AccountChanges.query.filter(
-            AccountChanges.account_id == form.id.data).filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
+            AccountChanges.account_id == form.id.data).filter(
+                AccountChanges.change_type == AccountChanges.ChangeType.sim)
         form.is_edit = True
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')

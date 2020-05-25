@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired
 
 
 class ChangePasswordForm(FlaskForm):
-    user_name = StringField("Name:", [DataRequired()])
+    user_name = StringField("Name", [DataRequired()])
     old_password = PasswordField("Old password", [DataRequired()])
     new_password = PasswordField("New password", [DataRequired()])
-    reapet_new_password = PasswordField("Reapet new password", [DataRequired()])
+    repeat_new_password = PasswordField("Repeat new password", [DataRequired()])
