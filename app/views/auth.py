@@ -29,10 +29,34 @@ def logout():
     return redirect(url_for("auth.login"))
 
 
-@auth_blueprint.route("/change_password")
+@auth_blueprint.route("/change_password", methods=["POST", "GET"])
 def change_password():
-    form = ChangePasswordForm()
-    return render_template("change_password.html", form=form)
+    if request.method == "POST":
+        user_name = request.form["user_name"]
+        old_password = request.form["old_password"]
+        new_password = request.form["new_password"]
+        reapet_new_password = request.form["reapet_new_password"]
+
+        if new_password != reapet_new_password:
+            flash("Wrong user name or password.", "danger")
+            return redirect(url_for("auth.change_password"))
+
+        user = User.authenticate(user_name, old_password)
+        if user is not None:
+            if check_password(new_password):
+                user.password = new_password
+                user.save()
+                flash("Password change was successful.", "success")
+                return redirect(url_for("auth.login"))
+            else:
+                flash("The password cannot be plain text (add at least one figure and Capital letter).", "danger")
+                return redirect(url_for("auth.change_password"))
+        else:
+            flash("Wrong data", "danger")
+            return redirect(url_for("auth.change_password"))
+    else:
+        form = ChangePasswordForm()
+        return render_template("change_password.html", form=form)
 
 
 def check_password(password):
