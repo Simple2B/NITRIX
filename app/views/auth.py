@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request
 from flask_login import login_user, logout_user, login_required
 
-from ..models import User
-from ..forms import LoginForm
-from ..forms import ChangePasswordForm
+from app.models import User
+from app.forms import LoginForm
+from app.forms import ChangePasswordForm
+from app.logger import log
 
 auth_blueprint = Blueprint("auth", __name__)
 
@@ -11,6 +12,7 @@ auth_blueprint = Blueprint("auth", __name__)
 @auth_blueprint.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm(request.form)
+    log(log.INFO, '/login')
     if form.validate_on_submit():
         user = User.authenticate(form.user_name.data, form.password.data)
         if user is not None:
@@ -18,12 +20,14 @@ def login():
             flash("Login successful.", "success")
             return redirect(url_for("main.index"))
         flash("Wrong user name or password.", "danger")
+        log(log.WARNING, "Invalid user data")
     return render_template("login.html", form=form)
 
 
 @auth_blueprint.route("/logout")
 @login_required
 def logout():
+    log(log.INFO, '/logout')
     logout_user()
     flash("You were logged out.", "info")
     return redirect(url_for("auth.login"))
@@ -33,6 +37,7 @@ def logout():
 def change_password():
     if request.method == "POST":
         user_name = request.form["user_name"]
+        log(log.INFO, 'User: %s change password', user_name)
         old_password = request.form["old_password"]
         new_password = request.form["new_password"]
         repeat_new_password = request.form["repeat_new_password"]
@@ -53,8 +58,10 @@ def change_password():
                 return redirect(url_for("auth.change_password"))
         else:
             flash("Wrong data", "danger")
+            log(log.WARNING, '/logout Wrong data')
             return redirect(url_for("auth.change_password"))
     else:
+        log(log.INFO, '/change_password')
         form = ChangePasswordForm()
         return render_template("change_password.html", form=form)
 
