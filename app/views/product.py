@@ -19,7 +19,6 @@ def edit():
         form = ProductForm(
             id=product.id,
             name=product.name,
-            months=product.months,
             status=product.status.name
             )
 
