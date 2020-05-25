@@ -130,4 +130,5 @@ dmypy.json
 
 # SQLite data bases
 database-devel.sqlite3
+database-develop.sqlite3
 database-test.sqlite3
