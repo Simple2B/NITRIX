@@ -1,7 +1,7 @@
 from flask import render_template, Blueprint, redirect, url_for, send_from_directory
 from flask import current_app as app
 from flask_login import login_required, current_user
-from app.models import User, Product, Account, Reseller
+from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
 
 main_blueprint = Blueprint('main', __name__)
@@ -60,6 +60,17 @@ def products():
         table_data=[p.to_dict() for p in Product.query.filter(Product.deleted == False)],  # noqa E712
         columns=Product.columns(),
         edit_href=url_for('product.edit'))
+
+
+@main_blueprint.route('/phones')
+@login_required
+def phones():
+    return render_template(
+        'index.html',
+        main_content='Phones',
+        table_data=[p.to_dict() for p in Phone.query.filter(Phone.deleted == False)],  # noqa E712
+        columns=Phone.columns(),
+        edit_href=url_for('phone.edit'))
 
 
 @main_blueprint.route('/css/<path:filename>')

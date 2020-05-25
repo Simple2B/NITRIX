@@ -53,7 +53,7 @@ def save():
             for k in request.form.keys():
                 product.__setattr__(k, form.__getattribute__(k).data)
         else:
-            product = Product(name=form.name.data, months=form.months.data, status=form.status.data)
+            product = Product(name=form.name.data, status=form.status.data)
         product.save()
         log(log.INFO, "Product-{} was saved".format(product.id))
         return redirect(url_for('main.products'))
