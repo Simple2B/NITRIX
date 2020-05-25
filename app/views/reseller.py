@@ -17,7 +17,6 @@ def all_reseller_forms(reseller: Reseller):
             months=product.months,
             price=product.price
             )
-        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
         result += [form]
     return result
 
@@ -41,6 +40,7 @@ def edit():
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
         form.product_forms = all_reseller_forms(reseller)
+        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -72,7 +72,9 @@ def save():
             reseller = Reseller(name=form.name.data, status=form.status.data, comments=form.comments.data)
         reseller.save()
         log(log.INFO, "Reseller was saved")
-        return redirect(url_for('main.resellers'))
+        if form.id.data > 0:
+            return redirect(url_for('main.resellers'))
+        return redirect(url_for('reseller.edit', id=reseller.id))
     else:
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error")
@@ -96,11 +98,17 @@ def save_product():
     log(log.INFO, '/save_reseller_product')
     form = ResellerProductForm(request.form)
     if form.validate_on_submit():
-        product = ResellerProduct.query.filter(ResellerProduct.id == form.id.data).first()
-        if product is None:
-            flash("Wrong reseller product id.", "danger")
-            log(log.ERROR, "Wrong reseller product id=%d", form.id.data)
-            return redirect(url_for('reseller.edit', id=form.reseller_id.data))
+        if form.id.data < 0:
+            # new reseller product
+            log(log.INFO, 'new reseller product')
+            product = ResellerProduct()
+            product.reseller_id = form.reseller_id.data
+        else:
+            product = ResellerProduct.query.filter(ResellerProduct.id == form.id.data).first()
+            if product is None:
+                flash("Wrong reseller product id.", "danger")
+                log(log.ERROR, "Wrong reseller product id=%d", form.id.data)
+                return redirect(url_for('reseller.edit', id=form.reseller_id.data))
         product.product_id = form.product_id.data
         product.months = form.months.data
         product.price = form.price.data
