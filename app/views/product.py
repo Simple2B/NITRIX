@@ -28,7 +28,7 @@ def edit():
         return render_template(
                 "product_add_edit.html",
                 form=form
-           )
+            )
     else:
         form = ProductForm()
         form.is_edit = False

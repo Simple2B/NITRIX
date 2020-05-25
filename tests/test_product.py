@@ -39,7 +39,7 @@ def test_save_product(client):
     # add new product
     response = client.post(
         '/product_save',
-        data=dict(id=-1, name='TEST PRODUCT NAME', months='3', status='not_active'),
+        data=dict(id=-1, name='TEST PRODUCT NAME', status='active'),
         follow_redirects=True
     )
     assert response.status_code == 200
@@ -47,7 +47,7 @@ def test_save_product(client):
     # edit exists product
     response = client.post(
         '/product_save',
-        data=dict(id=1, name='ANOTHER PRODUCT NAME', months='3', status='not_active'),
+        data=dict(id=1, name='ANOTHER PRODUCT NAME', status='not_active'),
         follow_redirects=True
     )
     assert response.status_code == 200
@@ -56,14 +56,14 @@ def test_save_product(client):
     # save product with wrong id
     response = client.post(
         '/product_save',
-        data=dict(id=2, name='BAD PRODUCT NAME', months='3', status='not_active'),
+        data=dict(id=2, name='BAD PRODUCT NAME', status='not_active'),
         follow_redirects=True
     )
     assert b'Wrong product id.' in response.data
     # send wrong form data
     response = client.post(
         '/product_save',
-        data=dict(id=2, name='BAD PRODUCT NAME'),
+        data=dict(id=2),
         follow_redirects=True
     )
     assert b'Form validation error' in response.data
