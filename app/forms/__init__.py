@@ -5,3 +5,4 @@ from .product import ProductForm # noqa
 from .reseller import ResellerForm # noqa
 from .account_extention import AccountExtensionForm # noqa
 from .change_password import ChangePasswordForm  # noqa
+from .reseller_product import ResellerProductForm  # noqa

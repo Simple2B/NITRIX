@@ -2,6 +2,7 @@ import enum
 from ..database import db
 from sqlalchemy import Enum
 from app.utils import ModelMixin
+from sqlalchemy.orm import relationship
 
 
 class Reseller(db.Model, ModelMixin):
@@ -18,6 +19,7 @@ class Reseller(db.Model, ModelMixin):
     status = db.Column(Enum(Status), default=Status.active)
     comments = db.Column(db.String(60))
     deleted = db.Column(db.Boolean, default=False)
+    products = relationship('ResellerProduct')
 
     def to_dict(self) -> dict:
         return {

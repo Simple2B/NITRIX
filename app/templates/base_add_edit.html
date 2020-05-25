@@ -79,6 +79,19 @@
                 </div>
               </div>
             </div>
+            {% elif form.__class__.__name__ == "ResellerForm" %}
+            {% block reseller_edit %}
+            {% endblock %}
+            <div class="card-footer mt-6">
+              <div class="row">
+                <div class="col-sm-6 my-1 d-flex justify-content-around">
+                  <button class="btn btn-success " type="submit" form="main-form">Save</button>
+                </div>
+                <div class="col-sm-6 my-1 d-flex justify-content-around">
+                  <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger">Delete</a>
+                </div>
+              </div>
+            </div>
             {% else %}
             <form action="{{form.save_route}}" method="POST" id="main-form">
               {% block content %}
