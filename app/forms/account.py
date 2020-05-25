@@ -9,6 +9,7 @@ class AccountForm(FlaskForm):
     id = IntegerField("id", validators=[DataRequired()], default=-1)
     name = StringField("Account Name:", validators=[DataRequired()])
     product_id = IntegerField("Product", validators=[DataRequired()])
+    phone_id = IntegerField("Phone", validators=[DataRequired()])
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])
     sim = StringField("SIM", [DataRequired()])
     comment = StringField("Comment", widget=TextArea())

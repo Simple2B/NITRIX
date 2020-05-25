@@ -13,7 +13,7 @@ class Account(db.Model, ModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"))
-    phone_id = db.Column(db.Integer, db.ForeignKey("phones.id"))
+    phone_id = db.Column(db.Integer, db.ForeignKey("phones.id"), default=1)
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
     sim = db.Column(db.String(20))
     comment = db.Column(db.String(200))

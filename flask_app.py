@@ -1,7 +1,7 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User, Account, Product, Reseller, AccountExtension, ResellerProduct
+from app.models import User, Account, Product, Reseller, AccountExtension, ResellerProduct, Phone
 
 app = create_app()
 
@@ -16,9 +16,10 @@ def get_context():
 def create_database():
     """ build database """
     db.create_all()
+    Phone(name='None').save(False)
     user = User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active)
     acc0 = Account(name='Account 0', sim='1234567890', comment='Comment', reseller_id=1, product_id=1, months=3)
-    acc0.save()
+    acc0.save(False)
     user.save(False)
     # add supper user acc
     for i in range(3):
