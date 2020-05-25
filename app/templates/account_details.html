@@ -63,7 +63,7 @@
                 <div class="form-control"> {{ form.reseller_name }} </div>
                 {{form.reseller_id(type="hidden")}}
                 {% else %}
-                <select class="form-control" name="reseller_id" >
+                <select class="form-control" name="reseller_id">
                     {% for record in form.resellers %}
                     {% if form.is_edit and record.id == form.reseller_id.data %}
                     <option value="{{record.id}}" selected>{{ record.name }}</option>
@@ -92,7 +92,7 @@
                 {% if form.is_edit %}
                 {{form.months(class='form-control', id='months', readonly=True)}}
                 {% else %}
-                <input name="months"  id="months" list="months-list" class="form-control">
+                <input name="months" id="months" list="months-list" class="form-control">
                 {% endif %}
                 <datalist id="months-list">
                     <option value="1">
@@ -108,110 +108,122 @@
                 <input type="date" class="form-control" id="endDate" readonly>
             </div>
         </div>
+</form>
+<div class="container">
+    {% if form.is_edit %}
+    <div class="row">
+
+        <div class="col-sm-4"><label class="col-form-label">Extension date</label></div>
+        <div class="col-sm-2"><label class="col-form-label">Months</label></div>
+        <div class="col-sm-4"><label class="col-form-label">Reseller</label></div>
+    </div>
+
+    {%for acc_ext in form.extensions %}
+    <form action="{{ url_for('account.ext_save') }}" method="POST">
+        <input type="hidden" name="id" value="{{acc_ext.id}}">
+        <input type="hidden" name="account_id" value="{{form.id.data}}">
+        <div class="row mb-1">
+            <div class="col-sm-4">
+                <input type="date" class="form-control" name="extension_date" value="{{acc_ext.extension_date.strftime("%Y-%m-%d")}}">
+            </div>
+            <div class="col-sm-2">
+                <input class="form-control" name="months" list="months-list" value="{{acc_ext.months}}">
+                <datalist id="month-list">
+                    <option value="1">
+                    <option value="3">
+                    <option value="6">
+                    <option value="12">
+                </datalist>
+            </div>
+            <div class="col-sm-4">
+                <select class="form-control" name="reseller_id">
+                    {% for record in form.resellers %}
+                    {% if record.id == acc_ext.reseller_id %}
+                    <option value="{{record.id}}" selected>{{ record.name }}</option>
+                    {% else %}
+                    <option value="{{record.id}}">{{ record.name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-success" type="submit">Save</button>
+            </div>
+        </div>
     </form>
-    <div class="container-fluid">
-        {% if form.is_edit %}
-        <br>
+    {% endfor %}
+
+    <form action="{{ url_for('account.ext_save') }}" method="POST">
+        <input type="hidden" name="id" value="-1">
+        <input type="hidden" name="account_id" value="{{form.id.data}}">
         <div class="row">
-            <label class="col-sm col-form-label mt-2">Extension history:</label>
-        </div>
-
-        {%for acc_ext in form.extensions %}
-        <div class="row">
-            <div class="col-sm-4 mt-2">
-                <h6 class="form-control">
-                    {{acc_ext.extension_date.strftime("%Y-%m-%d")}}
-                </h6>
-            </div>
-            <div class="col-sm-1 mt-2 form-control">
-                {{ acc_ext.months}}
-            </div>
-
-            <div class="col-sm-2 mt-2">
-                <label class="col-form-label ">Reseller:</label>
-            </div>
-            <div class="col-sm-2 mt-2 form-control">
-                {{ acc_ext.reseller.name }}
-            </div>
-            <!-- <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
-                <button class="btn btn-primary" type="submit">Save</button>
-            </div> -->
-        </div>
-        {% endfor %}
-
-
-        <form action="{{ url_for('account.ext_add') }}" method="POST">
-            {{form.id(type='hidden')}}
-            <div class="row   d-inline-flex">
-                <div class="col-sm-4 mt-2">
-                    <input type="date" class="form-control" name="extension_date" value="">
-                </div>
-                <div class="col-sm-1 mt-2 px-0 ">
-                    <input name="months" list="months-list" class="form-control">
-                    <datalist id="month-list">
-                        <option value="1">
-                        <option value="3">
-                        <option value="6">
-                        <option value="12">
-                    </datalist>
-                </div>
-
-                <div class="col-sm-2 mt-2 pr-0">
-                    <label class="col-form-label ">Reseller:</label>
-                </div>
-                <div class="col-sm-2 mt-2 px-0 pr-0">
-                    <select class="form-control" name="reseller_id">
-                        {% for record in form.resellers %}
-                        {% if record.id == form.reseller_id.data %}
-                        <option value="{{record.id}}" selected>{{ record.name }}</option>
-                        {% else %}
-                        <option value="{{record.id}}">{{ record.name }}</option>
-                        {% endif %}
-                        {% endfor %}
-
-                    </select>
-                </div>
-                <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
-                    <button class="btn btn-primary" type="submit">Add</button>
-                </div>
-            </div>
-
-        </form>
-        <br>
-        <div class="row mb-2">
-            <label class="col-sm-4 col-form-label ">Account history:</label>
-        </div>
-        {%for change in form.name_changes %}
-        <div class="row mt-2">
-            <label class="col-sm-2 col-form-label">Name:</label>
-
-            <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
-            <label class="d-inline-flex  col-form-label">Change date:</label>
             <div class="col-sm-4">
-                <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+                <input type="date" class="form-control" name="extension_date" value="">
             </div>
-        </div>
-        {% endfor %}
+            <div class="col-sm-2">
+                <input name="months" list="months-list" class="form-control">
+                <datalist id="month-list">
+                    <option value="1">
+                    <option value="3">
+                    <option value="6">
+                    <option value="12">
+                </datalist>
+            </div>
 
-        <br>
-        <div class="row mb-2">
-            <label class="col-sm-4 col-form-label ">SIM history:</label>
-        </div>
-
-        {%for change in form.sim_changes %}
-        <div class="row mt-2">
-            <label class="col-sm-2 col-form-label">SIM:</label>
-
-            <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
-            <label class="d-inline-flex  col-form-label">Change date:</label>
             <div class="col-sm-4">
-                <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+                <select class="form-control" name="reseller_id">
+                    {% for record in form.resellers %}
+                    {% if record.id == form.reseller_id.data %}
+                    <option value="{{record.id}}" selected>{{ record.name }}</option>
+                    {% else %}
+                    <option value="{{record.id}}">{{ record.name }}</option>
+                    {% endif %}
+                    {% endfor %}
+
+                </select>
+            </div>
+            <div class="col-sm-2">
+                <button class="btn btn-primary" type="submit">Add</button>
             </div>
         </div>
-        {% endfor %}
-        {% endif %}
+
+    </form>
+    <br>
+    <div class="row">
+        <label class="col-sm-4 col-form-label ">Account history:</label>
+    </div>
+    {%for change in form.name_changes %}
+    <div class="row mt-2">
+        <label class="col-sm-2 col-form-label">Name:</label>
+
+        <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
+        <label class="d-inline-flex  col-form-label">Change date:</label>
+        <div class="col-sm-4">
+            <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
         </div>
     </div>
+    {% endfor %}
+
+    <br>
+    <div class="row">
+        <label class="col-sm-4 col-form-label ">SIM history:</label>
+    </div>
+
+    {%for change in form.sim_changes %}
+    <div class="row  mb-2">
+        <label class="col-sm-2 col-form-label">SIM:</label>
+
+        <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
+        <label class="d-inline-flex  col-form-label">Change date:</label>
+        <div class="col-sm-4">
+            <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% endif %}
+</div>
+</div>
 
 {% endblock %}
 

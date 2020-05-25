@@ -115,24 +115,32 @@ def save():
 
 
 @account_blueprint.route("/account_ext_add", methods=["POST"])
-def ext_add():
+def ext_save():
     form = AccountExtensionForm(request.form)
     if form.validate_on_submit():
-        account = Account.query.filter(Account.id == form.id.data).first()
-        account_ext = AccountExtension()
-        account_ext.account_id = account.id
-        account_ext.reseller_id = account.reseller_id
-        account_ext.months = account.months
-        account_ext.extension_date = account.activation_date
-        account_ext.save()
-        account.reseller_id = form.reseller_id.data
-        account.months = form.months.data
-        account.activation_date = form.extension_date.data
-        account.save()
-        return redirect(url_for('account.edit', id=form.id.data))
+        account = Account.query.filter(Account.id == request.form['account_id']).first()
+        if form.id.data < 0:
+            account_ext = AccountExtension()
+            account_ext.account_id = account.id
+            account_ext.reseller_id = account.reseller_id
+            account_ext.months = account.months
+            account_ext.extension_date = account.activation_date
+            account_ext.save()
+            account.reseller_id = form.reseller_id.data
+            account.months = form.months.data
+            account.activation_date = form.extension_date.data
+            account.save()
+        else:
+            account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
+            account_ext.reseller_id = form.reseller_id.data
+            account_ext.months = form.months.data
+            account_ext.extension_date = form.extension_date.data
+            account_ext.save()
+
+        return redirect(url_for('account.edit', id=request.form['account_id']))
     else:
         flash('Form validation error', 'danger')
-    return redirect(url_for('account.edit', id=form.id.data))
+    return redirect(url_for('account.edit', id=request.form['account_id']))
 
 
 @account_blueprint.route("/account_delete", methods=["GET"])
