@@ -1,13 +1,16 @@
 """Flask-app factory"""
 import os
+from datetime import timedelta
 
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from flask_login import LoginManager
 from werkzeug.exceptions import HTTPException
 from .database import db
 
 # instantiate extensions
 login_manager = LoginManager()
+login_manager.needs_refresh_message = (u"Session timedout, please re-login")
+login_manager.needs_refresh_message_category = "info"
 
 
 def create_app(environment="development"):
@@ -52,5 +55,10 @@ def create_app(environment="development"):
     @app.errorhandler(HTTPException)
     def handle_http_error(exc):
         return render_template("error.html", error=exc), exc.code
+
+    @app.before_request
+    def before_request():
+        session.permanent = True
+        app.permanent_session_lifetime = timedelta(minutes=30)
 
     return app

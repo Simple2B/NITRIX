@@ -1,4 +1,5 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask_login import current_user
 from app.models import User
 from app.forms import UserForm
 from app.logger import log
@@ -10,6 +11,8 @@ user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route("/user_edit")
 def edit():
+    if current_user.user_type.name not in ['super_admin']:
+        return redirect(url_for("main.index"))
     log(log.INFO, '/user_edit')
     if 'id' in request.args:
         id = int(request.args['id'])
@@ -46,6 +49,8 @@ def edit():
 
 @user_blueprint.route("/user_save", methods=["POST"])
 def save():
+    if current_user.user_type.name not in ['super_admin']:
+        return redirect(url_for("main.index"))
     log(log.INFO, '/user_save')
     form = UserForm(request.form)
     if form.validate_on_submit():
@@ -70,6 +75,8 @@ def save():
 
 @user_blueprint.route("/user_delete", methods=["GET"])
 def delete():
+    if current_user.user_type.name not in ['super_admin']:
+        return redirect(url_for("main.index"))
     if 'id' in request.args:
         user_id = int(request.args['id'])
         User.query.filter(User.id == user_id).delete()

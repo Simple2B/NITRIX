@@ -31,10 +31,14 @@
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="{{url_for('main.accounts')}}">Accounts</a>
+                {% if current_user.user_type.name in ['admin', 'super_admin'] %}
                 <a class="dropdown-item" href="{{url_for('main.resellers')}}">Resellers</a>
-                <a class="dropdown-item" href="{{url_for('main.users')}}">Users</a>
                 <a class="dropdown-item" href="{{url_for('main.products')}}">Products</a>
                 <a class="dropdown-item" href="{{url_for('main.phones')}}">Phones</a>
+                {% if current_user.user_type.name == 'super_admin' %}
+                <a class="dropdown-item" href="{{url_for('main.users')}}">Users</a>
+                {% endif %}
+                {% endif %}
               </div>
             </li>
             <div class="row">

@@ -2,7 +2,7 @@ import io
 import csv
 import datetime
 from flask import render_template, Blueprint, redirect, url_for, send_from_directory
-from flask import current_app as app, make_response, send_file, request
+from flask import current_app as app, send_file, request
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
@@ -34,6 +34,8 @@ def accounts():
 @login_required
 def users():
     log(log.INFO, '/users')
+    if current_user.user_type.name != 'super_admin':
+        return redirect(url_for("main.index"))
     return render_template(
         'index.html',
         main_content='Users',
@@ -46,6 +48,8 @@ def users():
 @login_required
 def resellers():
     log(log.INFO, '/resellers')
+    if current_user.user_type.name not in ['super_admin', 'admin']:
+        return redirect(url_for("main.index"))
     return render_template(
         'index.html',
         main_content='Resellers',
@@ -57,6 +61,8 @@ def resellers():
 @main_blueprint.route('/products')
 @login_required
 def products():
+    if current_user.user_type.name not in ['super_admin', 'admin']:
+        return redirect(url_for("main.index"))
     return render_template(
         'index.html',
         main_content='Products',
@@ -68,6 +74,8 @@ def products():
 @main_blueprint.route('/phones')
 @login_required
 def phones():
+    if current_user.user_type.name not in ['super_admin', 'admin']:
+        return redirect(url_for("main.index"))
     return render_template(
         'index.html',
         main_content='Phones',
