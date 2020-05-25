@@ -9,6 +9,12 @@ from app.logger import log
 account_blueprint = Blueprint('account', __name__)
 
 
+def all_phones():
+    phones = Phone.query.filter(Phone.deleted == False)  # noqa E712
+    phones = phones.filter(Phone.status == Phone.Status.active)  # noqa E712
+    return phones
+
+
 @account_blueprint.route("/account_details")
 def edit():
     log(log.INFO, '/account_details')
@@ -32,7 +38,7 @@ def edit():
             )
         form.products = Product.query.filter(Product.deleted == False)  # noqa E712
         form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
-        form.phones = Phone.query.filter(Phone.deleted == False).filter(Phone.status == Phone.Status.active)  # noqa E712
+        form.phones = all_phones()
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
         form.name_changes = AccountChanges.query.filter(
             AccountChanges.account_id == form.id.data).filter(
