@@ -11,6 +11,8 @@ class BaseConfig(object):
     SECRET_KEY = os.environ.get('SECRET_KEY', 'Ensure you set a secret key, this is important!')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
+    CSS_FOLDER = 'css'
+    JAVASCRIPT_FOLDER = 'js'
 
     @staticmethod
     def configure(app):
@@ -23,7 +25,7 @@ class DevelopmentConfig(BaseConfig):
 
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'DEVEL_DATABASE_URL', 'sqlite:///' + os.path.join(base_dir, 'database-devel.sqlite3'))
+        'DEVELOP_DATABASE_URL', 'sqlite:///' + os.path.join(base_dir, 'database-develop.sqlite3'))
 
 
 class TestingConfig(BaseConfig):

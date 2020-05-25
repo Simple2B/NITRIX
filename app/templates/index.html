@@ -11,8 +11,8 @@
   <!-- styles -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <link rel="stylesheet" href="static/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="../static/main.css">
+  <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="/css/main.css">
   {% block links %}{% endblock %}
 
 </head>
@@ -50,7 +50,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category }} alert-dismisible">
+    <div class="alert alert-{{ category }} alert-dismissible">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         <span class="sr-only">Close</span>
@@ -100,9 +100,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
       integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
       crossorigin="anonymous"></script>
-    <script src="static/jquery.dataTables.min.js"></script>
+    <script src="js/jquery.dataTables.min.js"></script>
     <!-- Main JavaScript -->
-    <script src="static/main.js"></script>
+    <script src="js/main.js"></script>
 
   </div>
 
