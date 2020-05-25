@@ -25,17 +25,20 @@ def edit():
 
         form.is_edit = True
         form.save_route = url_for('product.save')
+        form.delete_route = url_for('product.delete')
+        return render_template(
+                "product_add_edit.html",
+                form=form
+           )
+    else:
+        form = ProductForm()
+        form.is_edit = False
+        form.save_route = url_for('product.save')
+        form.delete_route = url_for('product.delete')
         return render_template(
                 "product_add_edit.html",
                 form=form
             )
-    form = ProductForm()
-    form.is_edit = False
-    form.save_route = url_for('product.save')
-    return render_template(
-            "product_add_edit.html",
-            form=form
-        )
 
 
 @product_blueprint.route("/product_save", methods=["POST"])
@@ -43,9 +46,15 @@ def save():
     log(log.INFO, '/product_save')
     form = ProductForm(request.form)
     if form.validate_on_submit():
-        product = Product.query.filter(Product.id == form.id.data).first()
-        for k in request.form.keys():
-            product.__setattr__(k, form.__getattribute__(k).data)
+        if form.id.data > 0:
+            product = Product.query.filter(Product.id == form.id.data).first()
+            if product is None:
+                flash("Wrong product id.", "danger")
+                return redirect(url_for('main.products'))
+            for k in request.form.keys():
+                product.__setattr__(k, form.__getattribute__(k).data)
+        else:
+            product = Product(name=form.name.data, months=form.months.data, status=form.status.data)
         product.save()
         log(log.INFO, "Product-{} was saved".format(product.id))
         return redirect(url_for('main.products'))
@@ -53,3 +62,15 @@ def save():
         flash('Form validation error', 'danger')
         log(log.WARNING, "Form validation error")
     return redirect(url_for('product.edit', id=form.id.data))
+
+
+@product_blueprint.route("/product_delete", methods=["GET"])
+def delete():
+    if 'id' in request.args:
+        product_id = int(request.args['id'])
+        product = Product.query.filter(Product.id == product_id).first()
+        product.deleted = True
+        product.save()
+        return redirect(url_for('main.products'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.products'))

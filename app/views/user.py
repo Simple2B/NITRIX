@@ -2,6 +2,8 @@ from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import User
 from app.forms import UserForm
 from app.logger import log
+from ..database import db
+
 
 user_blueprint = Blueprint('user', __name__)
 
@@ -23,23 +25,23 @@ def edit():
             password=user.password_val,
             activated=user.activated.name
             )
-        # form.products = Product.query.all()
-        # form.resellers = Reseller.query.all()
+
         form.is_edit = True
         form.save_route = url_for('user.save')
+        form.delete_route = url_for('user.delete')
         return render_template(
                 "user_edit.html",
                 form=form
             )
-    form = UserForm()
-    # form.products = Product.query.all()
-    # form.resellers = Reseller.query.all()
-    form.is_edit = False
-    form.save_route = url_for('user.save')
-    return render_template(
-            "user_edit.html",
-            form=form
-        )
+    else:
+        form = UserForm()
+        form.is_edit = False
+        form.save_route = url_for('user.save')
+        form.delete_route = url_for('user.delete')
+        return render_template(
+                "user_edit.html",
+                form=form
+            )
 
 
 @user_blueprint.route("/user_save", methods=["POST"])
@@ -47,9 +49,16 @@ def save():
     log(log.INFO, '/user_save')
     form = UserForm(request.form)
     if form.validate_on_submit():
-        user = User.query.filter(User.id == form.id.data).first()
-        for k in request.form.keys():
-            user.__setattr__(k, form.__getattribute__(k).data)
+        if form.id.data > 0:
+            user = User.query.filter(User.id == form.id.data).first()
+            if user is None:
+                flash("Wrong user id.", "danger")
+                return redirect(url_for('main.users'))
+            for k in request.form.keys():
+                user.__setattr__(k, form.__getattribute__(k).data)
+        else:
+            user = User(name=form.name.data, activated=form.activated.data)
+            user.password = form.password.data
         user.save()
         log(log.INFO, "User-{} was saved".format(user.id))
         return redirect(url_for('main.users'))
@@ -57,3 +66,14 @@ def save():
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error")
     return redirect(url_for('user.edit', id=form.id.data))
+
+
+@user_blueprint.route("/user_delete", methods=["GET"])
+def delete():
+    if 'id' in request.args:
+        user_id = int(request.args['id'])
+        User.query.filter(User.id == user_id).delete()
+        db.session.commit()
+        return redirect(url_for('main.users'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.users'))

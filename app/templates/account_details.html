@@ -1,161 +1,203 @@
 {% extends "base_add_edit.html" %}
 
-{% block content %}
-<div class="row">
-    {% if form.is_edit %}
-    <h2>Edit Account</h2>
-    {% else %}
-    <h2>New Account</h2>
-    {% endif %}
-</div>
-<div class="row">
-    {{form.id(type='hidden')}}
-    <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
-    {{form.name.label(class="col-sm-2 col-form-label")}}
-    <div class="col-sm-5">
-        {% if form.is_edit %}
-        {{form.name(class='form-control')}}
-        {% else %}
-        <input class="form-control" name="name" placeholder="Account name">
-        {% endif %}
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label">SIM:</label>
-    <div class="col-sm-5">
-        {{form.sim(class='form-control', placeholder="SIM value")}}
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label">Product:</label>
-    <div class="col-sm-5">
-        <select class="form-control" name="product_id">
-            {% for record in form.products %}
-            {% if form.is_edit and record.id == form.product_id.data %}
-            <option value="{{record.id}}" selected>{{ record.name }}</option>
+{% block account_details %}
+<form action="{{form.save_route}}" method="POST" id="main-form">
+    <div class="container-fluid">
+        <div class="row pt-3 pl-4">
+            {% if form.is_edit %}
+            <h2>Edit Account</h2>
             {% else %}
-            <option value="{{record.id}}">{{ record.name }}</option>
+            <h2>New Account</h2>
             {% endif %}
-            {%endfor%}
-        </select>
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label">Reseller:</label>
-    <div class="col-sm-5">
-        <select class="form-control" name="reseller_id">
-            {% for record in form.resellers %}
-            {% if form.is_edit and record.id == form.reseller_id.data %}
-            <option value="{{record.id}}" selected>{{ record.name }}</option>
-            {% else %}
-            <option value="{{record.id}}">{{ record.name }}</option>
-            {% endif %}
-            {% endfor %}
-        </select>
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label">Comment:</label>
-    <div class="container">
-        {{form.comment(class='col-sm-7 form-control', rows="5")}}
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label mt-2">Activation date:</label>
-    <div class="col-sm-3 mt-2">
-        {{form.activation_date(class='form-control', type='date')}}
-    </div>
-    <label class="col-sm-1 col-form-label mt-2">Month:</label>
-    <div class="col-sm-2 mt-2">
+        </div>
+        <div class="row pt-4 pl-3">
+            {{form.id(type='hidden')}}
+            <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
+            {{form.name.label(class="col-sm-3 col-form-label")}}
+            <div class="col-sm-4">
+                {% if form.is_edit %}
+                {{form.name(class='form-control')}}
+                {% else %}
+                <input class="form-control" name="name" placeholder="Account name">
+                {% endif %}
+            </div>
+        </div>
+        <div class="row pt-3 pl-3">
+            <label class="col-sm-3 col-form-label">SIM:</label>
+            <div class="col-sm-4">
+                {{form.sim(class='form-control', placeholder="SIM value")}}
+            </div>
+        </div>
+        <div class="row pt-3 pl-3">
+            <label class="col-sm-3 col-form-label">Product:</label>
+            <div class="col-sm-4">
+                <select class="form-control" name="product_id">
+                    {% for record in form.products %}
+                    {% if form.is_edit and record.id == form.product_id.data %}
+                    <option value="{{record.id}}" selected>{{ record.name }}</option>
+                    {% else %}
+                    <option value="{{record.id}}">{{ record.name }}</option>
+                    {% endif %}
+                    {%endfor%}
+                </select>
+            </div>
+        </div>
+        <div class="row pt-3 pl-3">
+            <label class="col-sm-3 col-form-label">Reseller:</label>
+            <div class="col-sm-4">
+                {% if form.is_edit %}
+                <div class="form-control"> {{ form.reseller_name }} </div>
+                {{form.reseller_id(type="hidden")}}
+                {% else %}
+                <select class="form-control" name="reseller_id" >
+                    {% for record in form.resellers %}
+                    {% if form.is_edit and record.id == form.reseller_id.data %}
+                    <option value="{{record.id}}" selected>{{ record.name }}</option>
+                    {% else %}
+                    <option value="{{record.id}}">{{ record.name }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                {% endif %}
+
+            </div>
+        </div>
+        <div class="row pt-3 pl-3">
+            <label class="col-sm-3 col-form-label">Comment:</label>
+            <div class="container-fluid">
+                {{form.comment(class='col-sm-7 form-control', rows="5")}}
+            </div>
+        </div>
+        <div class="row pl-3 pt-3">
+            <label class="col-sm-3 col-form-label mt-2">Activation date:</label>
+            <div class="col-sm-4 mt-2">
+                {{form.activation_date(class='form-control', type='date', readonly=form.is_edit )}}
+            </div>
+            <label class="col-form-label mt-2 pl-3">Months:</label>
+            <div class="col-sm-3 mt-2">
+                {% if form.is_edit %}
+                {{form.months(class='form-control', id='months', readonly=True)}}
+                {% else %}
+                <input name="months"  id="months" list="months-list" class="form-control">
+                {% endif %}
+                <datalist id="months-list">
+                    <option value="1">
+                    <option value="3">
+                    <option value="6">
+                    <option value="12">
+                </datalist>
+            </div>
+        </div>
+        <div class="row pl-3 pt-3">
+            <label class="col-sm-3 col-form-label mt-2">End date:</label>
+            <div class="col-sm-4 mt-2">
+                <input type="date" class="form-control" id="endDate" readonly>
+            </div>
+        </div>
+    </form>
+    <div class="container-fluid">
         {% if form.is_edit %}
-        {{form.months(class='form-control', list="months-list")}}
-        {% else %}
-        <input name="months" list="months-list" class="form-control">
+        <br>
+        <div class="row">
+            <label class="col-sm col-form-label mt-2">Extension history:</label>
+        </div>
+
+        {%for acc_ext in form.extensions %}
+        <div class="row">
+            <div class="col-sm-4 mt-2">
+                <h6 class="form-control">
+                    {{acc_ext.extension_date.strftime("%Y-%m-%d")}}
+                </h6>
+            </div>
+            <div class="col-sm-1 mt-2 form-control">
+                {{ acc_ext.months}}
+            </div>
+
+            <div class="col-sm-2 mt-2">
+                <label class="col-form-label ">Reseller:</label>
+            </div>
+            <div class="col-sm-2 mt-2 form-control">
+                {{ acc_ext.reseller.name }}
+            </div>
+            <!-- <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div> -->
+        </div>
+        {% endfor %}
+
+
+        <form action="{{ url_for('account.ext_add') }}" method="POST">
+            {{form.id(type='hidden')}}
+            <div class="row   d-inline-flex">
+                <div class="col-sm-4 mt-2">
+                    <input type="date" class="form-control" name="extension_date" value="">
+                </div>
+                <div class="col-sm-1 mt-2 px-0 ">
+                    <input name="months" list="months-list" class="form-control">
+                    <datalist id="month-list">
+                        <option value="1">
+                        <option value="3">
+                        <option value="6">
+                        <option value="12">
+                    </datalist>
+                </div>
+
+                <div class="col-sm-2 mt-2 pr-0">
+                    <label class="col-form-label ">Reseller:</label>
+                </div>
+                <div class="col-sm-2 mt-2 px-0 pr-0">
+                    <select class="form-control" name="reseller_id">
+                        {% for record in form.resellers %}
+                        {% if record.id == form.reseller_id.data %}
+                        <option value="{{record.id}}" selected>{{ record.name }}</option>
+                        {% else %}
+                        <option value="{{record.id}}">{{ record.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+
+                    </select>
+                </div>
+                <div class="col-sm-2 mt-2 px-0 ml-3 pr-0">
+                    <button class="btn btn-primary" type="submit">Add</button>
+                </div>
+            </div>
+
+        </form>
+        <br>
+        <div class="row mb-2">
+            <label class="col-sm-4 col-form-label ">Account history:</label>
+        </div>
+        {%for change in form.name_changes %}
+        <div class="row mt-2">
+            <label class="col-sm-2 col-form-label">Name:</label>
+
+            <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
+            <label class="d-inline-flex  col-form-label">Change date:</label>
+            <div class="col-sm-4">
+                <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+            </div>
+        </div>
+        {% endfor %}
+
+        <br>
+        <div class="row mb-2">
+            <label class="col-sm-4 col-form-label ">SIM history:</label>
+        </div>
+
+        {%for change in form.sim_changes %}
+        <div class="row mt-2">
+            <label class="col-sm-2 col-form-label">SIM:</label>
+
+            <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
+            <label class="d-inline-flex  col-form-label">Change date:</label>
+            <div class="col-sm-4">
+                <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+            </div>
+        </div>
+        {% endfor %}
         {% endif %}
-        <datalist id="months-list">
-            <option value="1">
-            <option value="3">
-            <option value="6">
-            <option value="12">
-        </datalist>
+        </div>
     </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label mt-2">End date:</label>
-    <div class="col-sm-3 mt-2">
-        <input type="date" class="form-control" id="endDate" readonly>
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-2 col-form-label mt-2">Extension date:</label>
-</div>
-
-<div class="row">
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-2 mt-2">
-        <select class="form-control" id="exampleFormControlSelect1">
-            <option>1</option>
-            <option>3</option>
-            <option>6</option>
-            <option>12</option>
-        </select>
-    </div>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-1">
-        <label class="col-sm-1 col-form-label">Reseller:</label>
-    </div>
-    <div class="col-sm-2">
-        <select class="form-control" id="exampleFormControlSelect1">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-        </select>
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
-    </div>
-</div>
-<div class="row">
-    <label class="col-sm-4 col-form-label ">Account history:</label>
-</div>
-
-<div class="row">
-    <label for="inputUsername" class="col-sm-1 col-form-label">Name:</label>
-    <div class="col-sm-3">
-        <input type="username" class="form-control" id="inputPassword">
-    </div>
-    <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
-    </div>
-</div>
-
-<div class="row">
-    <label class="col-sm-4 col-form-label ">Sim history:</label>
-</div>
-
-<div class="row">
-    <label for="inputUsername" class="col-sm-1 col-form-label">Sim:</label>
-    <div class="col-sm-3">
-        <input type="username" class="form-control" id="inputPassword">
-    </div>
-    <label for="inputUsername" class="col-sm-2 col-form-label">Change date:</label>
-    <div class="col-sm-2 mt-2">
-        <input type="date" class="form-control" value="">
-    </div>
-    <div class="col-sm-1 ">
-        <button type="button" class="btn btn-primary">Add</button>
-    </div>
-</div>
 
 {% endblock %}
 
