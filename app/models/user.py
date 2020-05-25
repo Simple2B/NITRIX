@@ -27,6 +27,7 @@ class User(db.Model, UserMixin, ModelMixin):
     password_hash = db.Column(db.String(255))
     password_val = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
+    deleted = db.Column(db.Boolean, default=False)
 
     @hybrid_property
     def password(self):

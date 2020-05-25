@@ -19,9 +19,11 @@ class Account(db.Model, ModelMixin):
     comment = db.Column(db.String(200))
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
+    deleted = db.Column(db.Boolean, default=False)
     product = relationship('Product')
     phone = relationship('Phone')
     reseller = relationship('Reseller')
+
 
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:

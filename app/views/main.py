@@ -1,5 +1,8 @@
+import io
+import csv
+import datetime
 from flask import render_template, Blueprint, redirect, url_for, send_from_directory
-from flask import current_app as app
+from flask import current_app as app, make_response, send_file, request
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
@@ -71,6 +74,55 @@ def phones():
         table_data=[p.to_dict() for p in Phone.query.filter(Phone.deleted == False)],  # noqa E712
         columns=Phone.columns(),
         edit_href=url_for('phone.edit'))
+
+
+@main_blueprint.route('/report')
+@login_required
+def report():
+    log(log.INFO, 'report')
+
+    if 'content' not in request.args:
+        return
+
+    content = request.args['content']
+
+    Class = {
+        'Users': User,
+        'Products': Product,
+        'Accounts': Account,
+        'Phones': Phone,
+        'Resellers': Reseller
+    }[content]
+
+    entities = Class.query.filter(Class.deleted == False)  # noqa
+
+    if not entities:
+        log(log.INFO, 'no entities')
+        return
+
+    proxy = io.StringIO()
+    writer = csv.writer(proxy)
+    row = [v for v in entities[0].to_dict().keys()]
+    writer.writerow(row)
+    for entity in entities:
+        row = [v for v in entity.to_dict().values()]
+        writer.writerow(row)
+
+    # Creating the byteIO object from the StringIO Object
+    mem = io.BytesIO()
+    mem.write(proxy.getvalue().encode('utf-8'))
+    mem.seek(0)
+    proxy.close()
+
+    now = datetime.datetime.now()
+    return send_file(
+        mem,
+        as_attachment=True,
+        attachment_filename='{content}_{now}.csv'.format(content=content, now=now.strftime("%Y-%m-%d-%H-%M-%S")),
+        mimetype='text/csv',
+        cache_timeout=0,
+        last_modified=now
+    )
 
 
 @main_blueprint.route('/css/<path:filename>')
