@@ -85,12 +85,12 @@
         <div class="row pl-3 pt-3">
             <label class="col-sm-3 col-form-label mt-2">Activation date:</label>
             <div class="col-sm-4 mt-2">
-                {{form.activation_date(class='form-control', type='date', readonly=form.is_edit )}}
+                {{form.activation_date(class='form-control', type='date' )}}
             </div>
             <label class="col-form-label mt-2 pl-3">Months:</label>
             <div class="col-sm-3 mt-2">
                 {% if form.is_edit %}
-                {{form.months(class='form-control', id='months', readonly=True)}}
+                {{form.months(class='form-control', id='months')}}
                 {% else %}
                 <input name="months" id="months" list="months-list" class="form-control">
                 {% endif %}
@@ -103,8 +103,8 @@
             </div>
         </div>
         <div class="row pl-3 pt-3">
-            <label class="col-sm-3 col-form-label mt-2">End date:</label>
-            <div class="col-sm-4 mt-2">
+            <label class="col-sm-3 col-form-label mb-4">End date:</label>
+            <div class="col-sm-4 mb-4">
                 <input type="date" class="form-control" id="endDate" readonly>
             </div>
         </div>
@@ -113,9 +113,10 @@
     {% if form.is_edit %}
     <div class="row">
 
-        <div class="col-sm-4"><label class="col-form-label">Extension date</label></div>
+        <div class="col-sm-3"><label class="col-form-label">Extension date</label></div>
         <div class="col-sm-2"><label class="col-form-label">Months</label></div>
-        <div class="col-sm-4"><label class="col-form-label">Reseller</label></div>
+        <div class="col-sm-3"><label class="col-form-label">End date</label></div>
+        <div class="col-sm-2"><label class="col-form-label">Reseller</label></div>
     </div>
 
     {%for acc_ext in form.extensions %}
@@ -123,7 +124,7 @@
         <input type="hidden" name="id" value="{{acc_ext.id}}">
         <input type="hidden" name="account_id" value="{{form.id.data}}">
         <div class="row mb-1">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <input type="date" class="form-control" name="extension_date" value="{{acc_ext.extension_date.strftime("%Y-%m-%d")}}">
             </div>
             <div class="col-sm-2">
@@ -135,7 +136,10 @@
                     <option value="12">
                 </datalist>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-3">
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-sm-3">
                 <select class="form-control" name="reseller_id">
                     {% for record in form.resellers %}
                     {% if record.id == acc_ext.reseller_id %}
@@ -146,8 +150,8 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-sm-2">
-                <button class="btn btn-success" type="submit">Save</button>
+            <div class="col-sm-1">
+                <button class="btn btn-success " type="submit">Save</button>
             </div>
         </div>
     </form>
@@ -157,7 +161,7 @@
         <input type="hidden" name="id" value="-1">
         <input type="hidden" name="account_id" value="{{form.id.data}}">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-3">
                 <input type="date" class="form-control" name="extension_date" value="">
             </div>
             <div class="col-sm-2">
@@ -169,8 +173,12 @@
                     <option value="12">
                 </datalist>
             </div>
+            <div class="col-sm-3">
+                <input type="date" class="form-control" readonly>
+            </div>
 
-            <div class="col-sm-4">
+
+            <div class="col-sm-3">
                 <select class="form-control" name="reseller_id">
                     {% for record in form.resellers %}
                     {% if record.id == form.reseller_id.data %}
@@ -182,7 +190,7 @@
 
                 </select>
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
                 <button class="btn btn-primary" type="submit">Add</button>
             </div>
         </div>
