@@ -103,8 +103,10 @@ def save():
                               activation_date=form.activation_date.data,
                               months=form.months.data)
 
-
         account.save()
+        reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
+        reseller.last_activity = datetime.now()
+        reseller.save()
         log(log.INFO, "Account data was saved")
         if request.form['submit'] == 'save_and_add':
             return redirect(url_for('account.edit'))
