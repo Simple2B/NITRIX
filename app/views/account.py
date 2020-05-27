@@ -4,6 +4,7 @@ from app.models import Account, Product, Reseller, AccountExtension, AccountChan
 from app.forms import AccountForm, AccountExtensionForm
 from ..database import db
 from app.logger import log
+from datetime import datetime
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -101,7 +102,11 @@ def save():
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
                               months=form.months.data)
+
         account.save()
+        reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
+        reseller.last_activity = datetime.now()
+        reseller.save()
         log(log.INFO, "Account data was saved")
         if request.form['submit'] == 'save_and_add':
             return redirect(url_for('account.edit'))
