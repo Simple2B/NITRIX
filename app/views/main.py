@@ -141,3 +141,8 @@ def css(filename):
 @main_blueprint.route('/js/<path:filename>')
 def javascript(filename):
     return send_from_directory(app.config['JAVASCRIPT_FOLDER'], filename)
+
+
+@main_blueprint.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory(app.config['IMAGES_FOLDER'], filename)

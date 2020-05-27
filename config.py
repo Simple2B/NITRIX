@@ -13,6 +13,8 @@ class BaseConfig(object):
     WTF_CSRF_ENABLED = False
     CSS_FOLDER = 'css'
     JAVASCRIPT_FOLDER = 'js'
+    IMAGES_FOLDER = 'images'
+
 
     @staticmethod
     def configure(app):
