@@ -15,7 +15,6 @@ class BaseConfig(object):
     JAVASCRIPT_FOLDER = 'js'
     IMAGES_FOLDER = 'images'
 
-
     @staticmethod
     def configure(app):
         # Implement this method to do further configuration on your app.
