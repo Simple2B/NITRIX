@@ -71,6 +71,33 @@ def edit():
             )
 
 
+def add_ninja_product(account: Account):
+    reseller_product = ResellerProduct.query.filter(
+        ResellerProduct.reseller_id == account.reseller_id
+        ).filter(
+            ResellerProduct.product_id == account.product_id
+        ).filter(
+            ResellerProduct.months == account.months
+        ).first()
+    notes = 'Account: {} for {} months'.format(account.name, account.months)
+    if reseller_product:
+        ninja.add_product(product_key=reseller_product.product.name, notes=notes, cost=reseller_product.price)
+    else:
+        # Locking for this product in NITRIX reseller
+        reseller_product = ResellerProduct.query.filter(
+            ResellerProduct.reseller_id == 1
+        ).filter(
+            ResellerProduct.product_id == account.product_id
+        ).filter(
+            ResellerProduct.months == account.months
+        ).first()
+        if reseller_product:
+            ninja.add_product(
+                product_key=reseller_product.product.name, notes=notes, cost=reseller_product.price)
+        else:
+            ninja.add_product(product_key=account.product.name, notes=notes, cost=0)
+
+
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
     log(log.INFO, "/account_save")
@@ -106,19 +133,9 @@ def save():
                 comment=form.comment.data,
                 activation_date=form.activation_date.data,
                 months=form.months.data)
+            account.save()
             # Register product in Invoice Ninja
-            reseller_product = ResellerProduct.query.filter(
-                ResellerProduct.reseller_id == int(form.reseller_id.data)
-                ).filter(
-                    ResellerProduct.product_id == int(form.product_id.data)
-                ).filter(
-                    ResellerProduct.months == int(form.months.data)
-                ).first()
-            if reseller_product:
-                notes = 'Account: {} for {} months'.format(form.name.data, int(form.months.data))
-                ninja.add_product(product_key=account.product.name, notes=notes, cost=reseller_product.price)
-
-        account.save()
+            add_ninja_product(account)
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
         reseller.save()
@@ -151,16 +168,7 @@ def ext_save():
             account.activation_date = form.extension_date.data
             account.save()
             # Register product in Invoice Ninja
-            reseller_product = ResellerProduct.query.filter(
-                ResellerProduct.reseller_id == account_ext.reseller_id
-                ).filter(
-                    ResellerProduct.product_id == account.product
-                ).filter(
-                    ResellerProduct.months == account_ext.months
-                ).first()
-            if reseller_product:
-                notes = 'Account: {} for {} months'.format(account.name, int(account_ext.months))
-                ninja.add_product(product_key=account.product.name, notes=notes, cost=reseller_product.price)
+            add_ninja_product(account)
         else:
             account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
             account_ext.reseller_id = form.reseller_id.data

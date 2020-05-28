@@ -11,6 +11,7 @@ TEST_PRODUCT_COST = 55.55
 load_dotenv()
 NINJA_TOKEN = os.environ.get('NINJA_API_TOKEN', '')
 
+
 def cleanup(api):
     for client in api.clients:
         if TEST_CLIENT_NAME == client.name:
