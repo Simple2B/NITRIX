@@ -10,6 +10,13 @@ from datetime import datetime
 account_blueprint = Blueprint('account', __name__)
 
 
+def check_months(month, acc):
+    # Check that moths must be in 1-12
+    if not 0 < month <= 12:
+        flash('Mohths must be in 1-12', 'danger')
+        return redirect(url_for('account.edit', id=acc))
+
+
 def all_phones():
     phones = Phone.query.filter(Phone.deleted == False)  # noqa E712
     phones = phones.filter(Phone.status == Phone.Status.active)  # noqa E712
@@ -104,13 +111,18 @@ def save():
                               months=form.months.data)
         # Check that sim must contain only digits
         if not account.sim.isdigit():
-            flash('Sim must contains only digits!', 'danger')
+            flash('Sim value  must contains only digits!', 'danger')
+            return redirect(url_for('account.edit', id=account.id))
+        # Check that sim value  in has 19-20 numbers
+        if not len(account.sim) in (19, 20):
+            flash('Sim value  must contains 19-20 numbers!', 'danger')
             return redirect(url_for('account.edit', id=account.id))
         # Check that months must be in 1-12
-        if not 0 < account.months <= 12:
-            flash('Mohths must be in 1-12', 'danger')
-            return redirect(url_for('account.edit', id=account.id))
+        # if not 0 < account.months <= 12:
+        #     flash('Mohths must be in 1-12', 'danger')
+        #     return redirect(url_for('account.edit', id=account.id))
 
+        check_months(account.months, account.id)
         account.save()
 
         # Сhange Resellers last activity
@@ -144,10 +156,11 @@ def ext_save():
             account_ext.save()
             account.reseller_id = form.reseller_id.data
             account.months = form.months.data
-            # Check that months must be in 1-12
-            if not 0 < account.months <= 12:
-                flash('Mohths must be in 1-12', 'danger')
-                return redirect(url_for('account.edit', id=account.id))
+            # # Check that months must be in 1-12
+            # if not 0 < account.months <= 12:
+            #     flash('Mohths must be in 1-12', 'danger')
+            #     return redirect(url_for('account.edit', id=account.id))
+            check_months(account.months, account.id)
             account.activation_date = form.extension_date.data
             account.save()
         else:
@@ -156,9 +169,10 @@ def ext_save():
             account_ext.months = form.months.data
             account_ext.extension_date = form.extension_date.data
             # Check that months must be in 1-12
-            if not 0 < account_ext.months <= 12:
-                flash('Mohths must be in 1-12', 'danger')
-                return redirect(url_for('account.edit', id=account.id))
+            # if not 0 < account_ext.months <= 12:
+            #     flash('Mohths must be in 1-12', 'danger')
+            #     return redirect(url_for('account.edit', id=account.id))
+            check_months(account_ext.months, account.id)
             account_ext.save()
 
         return redirect(url_for('account.edit', id=request.form['account_id']))

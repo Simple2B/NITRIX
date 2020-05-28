@@ -73,7 +73,6 @@
                     {% endfor %}
                 </select>
                 {% endif %}
-
             </div>
         </div>
         <div class="row pt-3 pl-3">
@@ -112,13 +111,11 @@
 <div class="container">
     {% if form.is_edit %}
     <div class="row">
-
         <div class="col-sm-3"><label class="col-form-label">Extension date</label></div>
         <div class="col-sm-2"><label class="col-form-label">Months</label></div>
         <div class="col-sm-3"><label class="col-form-label">End date</label></div>
         <div class="col-sm-2"><label class="col-form-label">Reseller</label></div>
     </div>
-
     {%for acc_ext in form.extensions %}
     <form action="{{ url_for('account.ext_save') }}" method="POST">
         <input type="hidden" name="id" value="{{acc_ext.id}}">
@@ -156,7 +153,6 @@
         </div>
     </form>
     {% endfor %}
-
     <form action="{{ url_for('account.ext_save') }}" method="POST">
         <input type="hidden" name="id" value="-1">
         <input type="hidden" name="account_id" value="{{form.id.data}}">
@@ -176,8 +172,6 @@
             <div class="col-sm-3">
                 <input type="date" id="endDateExt"class="form-control" readonly>
             </div>
-
-
             <div class="col-sm-3">
                 <select class="form-control" name="reseller_id">
                     {% for record in form.resellers %}
@@ -187,14 +181,12 @@
                     <option value="{{record.id}}">{{ record.name }}</option>
                     {% endif %}
                     {% endfor %}
-
                 </select>
             </div>
             <div class="col-sm-1">
                 <button class="btn btn-primary" type="submit">Add</button>
             </div>
         </div>
-
     </form>
     <br>
     <div class="row">
@@ -203,7 +195,6 @@
     {%for change in form.name_changes %}
     <div class="row mt-2">
         <label class="col-sm-2 col-form-label">Name:</label>
-
         <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
         <label class="d-inline-flex  col-form-label">Change date:</label>
         <div class="col-sm-4">
@@ -211,16 +202,13 @@
         </div>
     </div>
     {% endfor %}
-
     <br>
     <div class="row">
         <label class="col-sm-4 col-form-label ">SIM history:</label>
     </div>
-
     {%for change in form.sim_changes %}
     <div class="row  mb-2">
         <label class="col-sm-2 col-form-label">SIM:</label>
-
         <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
         <label class="d-inline-flex  col-form-label">Change date:</label>
         <div class="col-sm-4">
@@ -228,11 +216,9 @@
         </div>
     </div>
     {% endfor %}
-
     {% endif %}
 </div>
 </div>
-
 {% endblock %}
 
 {% block javascript%}
