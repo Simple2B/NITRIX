@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="/css/main.css">
   {% block links %}{% endblock %}
-
 </head>
 
 <body>
@@ -78,7 +77,6 @@
           </tr>
         </thead>
         <tbody>
-
           {% for record in table_data %}
           <tr id="{{record.id}}">
             {% for key in record %}
@@ -93,24 +91,13 @@
         </tbody>
       </table>
     </div>
-
-
-
-
-
-
-
-
-
-
+      <!-- Futer -->
     <div class="fixed-bottom bg-dark text-white">
       NITRIX-2020
     <a  href="{{url_for('auth.logout')}}">Logout</a>
       </div>
-
     </div>
-
-
+      <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
       crossorigin="anonymous"></script>
@@ -123,9 +110,6 @@
     <script src="js/jquery.dataTables.min.js"></script>
     <!-- Main JavaScript -->
     <script src="js/main.js"></script>
-
   </div>
-
 </body>
-
 </html>
