@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="/css/main.css">
   {% block links %}{% endblock %}
-
 </head>
 
 <body>
@@ -47,15 +46,9 @@
                 <button class="btn btn-outline-success my-sm-0" type="submit">new</button>
               </div>
             </form>
-            <div class="col">
-              <a class="btn btn-outline-info my-sm-0" href="{{url_for('main.report', content=main_content)}}">report</a>
-            </div>
-
           </div>
           </ul>
-          <form class="form-inline my-2 my-lg-0" action="/logout">
-            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Logout</button>
-          </form>
+            <a class="text_right" href="{{url_for('main.report', content=main_content)}}">report</a>
         </div>
       </nav>
     </div>
@@ -84,7 +77,6 @@
           </tr>
         </thead>
         <tbody>
-
           {% for record in table_data %}
           <tr id="{{record.id}}">
             {% for key in record %}
@@ -99,11 +91,13 @@
         </tbody>
       </table>
     </div>
-
-
-
-    <div class="fixed-bottom bg-dark text-white">2020</div>
-
+      <!-- Futer -->
+    <div class="fixed-bottom bg-dark text-white">
+      NITRIX-2020
+    <a  href="{{url_for('auth.logout')}}">Logout</a>
+      </div>
+    </div>
+      <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
       crossorigin="anonymous"></script>
@@ -116,9 +110,6 @@
     <script src="js/jquery.dataTables.min.js"></script>
     <!-- Main JavaScript -->
     <script src="js/main.js"></script>
-
   </div>
-
 </body>
-
 </html>
