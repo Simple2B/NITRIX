@@ -165,7 +165,7 @@
                 <input type="date" class="form-control" name="extension_date" value="">
             </div>
             <div class="col-sm-2">
-                <input name="months" list="months-list" class="form-control">
+                <input name="months" id="monthsExt" list="months-list" class="form-control">
                 <datalist id="month-list">
                     <option value="1">
                     <option value="3">
@@ -174,7 +174,7 @@
                 </datalist>
             </div>
             <div class="col-sm-3">
-                <input type="date" class="form-control" readonly>
+                <input type="date" id="endDateExt"class="form-control" readonly>
             </div>
 
 
@@ -237,4 +237,5 @@
 
 {% block javascript%}
 <script src="js/account_edit.js"></script>
+<script src="js/account_edit_extension.js"></script>
 {% endblock %}
