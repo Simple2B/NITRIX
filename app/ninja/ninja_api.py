@@ -1,10 +1,13 @@
 import os
 import requests
 import json
+from dotenv import load_dotenv
 
 from app.logger import log
 from .client import NinjaClient
 from .product import NinjaProduct
+
+load_dotenv()
 
 
 class NinjaApi(object):
