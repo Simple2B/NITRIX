@@ -1,7 +1,8 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User, Account, Product, Reseller, AccountExtension, ResellerProduct, Phone
+from app.models import User, Product, Reseller, ResellerProduct, Phone
+from app.ninja import api as ninja
 
 app = create_app()
 
@@ -17,38 +18,27 @@ def create_database():
     """ build database """
     db.create_all()
     Phone(name='None').save(False)
-    user = User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active)
-    acc0 = Account(name='Account 0', sim='1234567890', comment='Comment', reseller_id=1, product_id=1, months=3)
-    acc0.save(False)
-    user.save(False)
-    # add supper user acc
-    for i in range(3):
-        User(name='user-{}'.format(i), password='user', user_type=User.Type.user,
-             activated=User.Status.active).save(False)
-        User(name='admin-{}'.format(i),
-             password='admin', user_type=User.Type.admin, activated=User.Status.active).save(False)
-        product = Product(name='Kiev Star-{}'.format(i))
-        product.save(False)
-        reseller = Reseller(name='Dima-{}'.format(i), comments='Good reseller')
-        reseller.save(False)
-        acc = Account(name='Account A-{}'.format(i), sim='1234567890', comment='Comment', months=3)
-        acc.product = product
-        acc.reseller = reseller
-        acc.save(False)
-
-    product = Product(name='Product 1')
-    product.save(False)
-    product2 = Product(name='Product 2')
-    product.save(False)
-    reseller = Reseller(name='Reseller 1', comments='The best reseller')
-    reseller.save(False)
-    product1 = ResellerProduct(months = 1, price=16.78, product=product, reseller=reseller); product1.save(False)  # noqa
-    product2 = ResellerProduct(months = 2, price=26.78, product=product2, reseller=reseller); product2.save(False)  # noqa
-    product3 = ResellerProduct(months = 3, price=36.78, product=product, reseller=reseller); product3.save(False)  # noqa
-
-    AccountExtension(account_id=acc0.id, reseller_id=1, months=2).save(False)
-    AccountExtension(account_id=acc0.id, reseller_id=2, months=4).save(False)
-    AccountExtension(account_id=acc0.id, reseller_id=3, months=7).save(False)
+    User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
+    User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
+    reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
+    product_gold = Product(name='Gold').save(False)
+    product_silver = Product(name='Silver').save(False)
+    product_bronsa = Product(name='Bronsa').save(False)
+    ResellerProduct(months=1, price=6.78, product=product_gold, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=3, price=16.50, product=product_gold, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=6, price=30.45, product=product_gold, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=12, price=50.0, product=product_gold, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=1, price=4.25, product=product_silver, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=3, price=11.50, product=product_silver, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=6, price=19.45, product=product_silver, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=12, price=35.99, product=product_silver, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=1, price=2.50, product=product_bronsa, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=3, price=6.99, product=product_bronsa, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=6, price=12.45, product=product_bronsa, reseller=reseller_nitrix).save(False)
+    ResellerProduct(months=12, price=20.99, product=product_bronsa, reseller=reseller_nitrix).save(False)
+    ninja_client = ninja.add_client(name=reseller_nitrix.name)
+    if ninja_client:
+        reseller_nitrix.ninja_client_id = ninja_client.id
     db.session.commit()
 
 
