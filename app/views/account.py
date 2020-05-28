@@ -102,11 +102,17 @@ def save():
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
                               months=form.months.data)
-
-        account.save()
+       # Check that sim must contain only digits
+        if account.sim.isdigit():
+            account.save()
+        else:
+            flash('Sim must contain only digits!', 'danger')
+            return redirect(url_for('account.edit', id=account.id))
+        # Сhange Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
         reseller.save()
+
         log(log.INFO, "Account data was saved")
         if request.form['submit'] == 'save_and_add':
             return redirect(url_for('account.edit'))
