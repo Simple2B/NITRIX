@@ -21,6 +21,7 @@ class Reseller(db.Model, ModelMixin):
     comments = db.Column(db.String(60))
     deleted = db.Column(db.Boolean, default=False)
     last_activity = db.Column(db.DateTime, default=datetime.now)
+    ninja_client_id = db.Column(db.Integer)
     products = relationship('ResellerProduct')
 
     def to_dict(self) -> dict:

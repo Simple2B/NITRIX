@@ -2,6 +2,7 @@ from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import Reseller, Product, ResellerProduct
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
+from app.ninja import api as ninja
 
 
 reseller_blueprint = Blueprint('reseller', __name__)
@@ -69,7 +70,13 @@ def save():
             for k in request.form.keys():
                 reseller.__setattr__(k, form.__getattribute__(k).data)
         else:
-            reseller = Reseller(name=form.name.data, status=form.status.data, comments=form.comments.data)
+            ninja_client = ninja.add_client(name=form.name.data)
+            ninja_client_id = ninja_client.id if ninja_client else 0
+            reseller = Reseller(
+                name=form.name.data,
+                status=form.status.data,
+                comments=form.comments.data,
+                ninja_client_id=ninja_client_id)
         reseller.save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
@@ -88,6 +95,7 @@ def delete():
         reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
         reseller.deleted = True
         reseller.save()
+        ninja.delete_client(client_id=reseller.ninja_client_id)
         return redirect(url_for('main.resellers'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.resellers'))
