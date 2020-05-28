@@ -1,10 +1,12 @@
+from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
+from app.models import ResellerProduct
 from app.forms import AccountForm, AccountExtensionForm
 from ..database import db
 from app.logger import log
-from datetime import datetime
+from app.ninja import api as ninja
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -96,12 +98,25 @@ def save():
                 account.__setattr__(k, form.__getattribute__(k).data)
         else:
             # Add a new account
-            account = Account(name=form.name.data, product_id=form.product_id.data,
-                              reseller_id=form.reseller_id.data,
-                              sim=form.sim.data,
-                              comment=form.comment.data,
-                              activation_date=form.activation_date.data,
-                              months=form.months.data)
+            account = Account(
+                name=form.name.data,
+                product_id=form.product_id.data,
+                reseller_id=form.reseller_id.data,
+                sim=form.sim.data,
+                comment=form.comment.data,
+                activation_date=form.activation_date.data,
+                months=form.months.data)
+            # Register product in Invoice Ninja
+            reseller_product = ResellerProduct.query.filter(
+                ResellerProduct.reseller_id == int(form.reseller_id.data)
+                ).filter(
+                    ResellerProduct.product_id == int(form.product_id.data)
+                ).filter(
+                    ResellerProduct.months == int(form.months.data)
+                ).first()
+            if reseller_product:
+                notes = 'Account: {} for {} months'.format(form.name.data, int(form.months.data))
+                ninja.add_product(product_key=account.product.name, notes=notes, cost=reseller_product.price)
 
         account.save()
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
@@ -135,6 +150,17 @@ def ext_save():
             account.months = form.months.data
             account.activation_date = form.extension_date.data
             account.save()
+            # Register product in Invoice Ninja
+            reseller_product = ResellerProduct.query.filter(
+                ResellerProduct.reseller_id == account_ext.reseller_id
+                ).filter(
+                    ResellerProduct.product_id == account.product
+                ).filter(
+                    ResellerProduct.months == account_ext.months
+                ).first()
+            if reseller_product:
+                notes = 'Account: {} for {} months'.format(account.name, int(account_ext.months))
+                ninja.add_product(product_key=account.product.name, notes=notes, cost=reseller_product.price)
         else:
             account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
             account_ext.reseller_id = form.reseller_id.data
