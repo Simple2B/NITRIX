@@ -1,1 +1,1 @@
-from .ninja_app import NinjaApp  # noqa
+from .ninja_api import NinjaApi  # noqa

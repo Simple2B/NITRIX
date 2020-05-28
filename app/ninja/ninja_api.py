@@ -7,41 +7,53 @@ from .client import NinjaClient
 from .product import NinjaProduct
 
 
-class NinjaApp(object):
+class NinjaApi(object):
     """ Invoice Ninja API """
     def __init__(self):
         super().__init__()
         self.BASE_URL = os.environ.get(
             # NINJA_API_BASE_URL=http://ec2-52-14-0-156.us-east-2.compute.amazonaws.com:8080/api/v1/
-            'NINJA_API_BASE_URL', 'UNKNOWN')
+            'NINJA_API_BASE_URL', 'http://localhost/wrong_uri')
         self.NINJA_TOKEN = os.environ.get(
             'NINJA_API_TOKEN', 'UNKNOWN_TOKEN')
 
     def do_get(self, url: str):
         headers = {'X-Ninja-Token': self.NINJA_TOKEN}
-        response = requests.get(url, headers=headers)
+        try:
+            response = requests.get(url, headers=headers)
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, 'NinjaApi wrong NINJA_API_BASE_URL')
+            return None
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
-            log(log.ERROR, 'NinjaApp.HTTPError: %s', error)
+            log(log.ERROR, 'NinjaApi.HTTPError: %s', error)
         return response.json() if response.ok else None
 
     def do_post(self, url: str, **data):
         headers = {'X-Ninja-Token': self.NINJA_TOKEN}
-        response = requests.post(url, headers=headers, data=data)
+        try:
+            response = requests.post(url, headers=headers, data=data)
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, 'NinjaApi wrong NINJA_API_BASE_URL')
+            return None
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
-            log(log.ERROR, 'NinjaApp.HTTPError: %s', error)
+            log(log.ERROR, 'NinjaApi.HTTPError: %s', error)
         return response.json() if response.ok else None
 
     def do_delete(self, url: str):
         headers = {'X-Ninja-Token': self.NINJA_TOKEN}
-        response = requests.delete(url, headers=headers)
+        try:
+            response = requests.delete(url, headers=headers)
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, 'NinjaApi wrong NINJA_API_BASE_URL')
+            return None
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
-            log(log.ERROR, 'NinjaApp.HTTPError: %s', error)
+            log(log.ERROR, 'NinjaApi.HTTPError: %s', error)
         return response.ok
 
     def do_put(self, url: str, **data):
@@ -51,11 +63,15 @@ class NinjaApp(object):
             'Content-Type': 'application/json'
             }
         data = json.dumps(data)
-        response = requests.put(url, headers=headers, data=data)
+        try:
+            response = requests.put(url, headers=headers, data=data)
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, 'NinjaApi wrong NINJA_API_BASE_URL')
+            return None
         try:
             response.raise_for_status()
         except requests.HTTPError as error:
-            log(log.ERROR, 'NinjaApp.HTTPError: %s', error)
+            log(log.ERROR, 'NinjaApi.HTTPError: %s', error)
         return response.ok
 
     @property
@@ -63,9 +79,9 @@ class NinjaApp(object):
         """gets list of clients
             HTTP: GET ninja.test/api/v1/clients -H "X-Ninja-Token: TOKEN"
         """
-        log(log.DEBUG, 'NinjaApp.clients')
+        log(log.DEBUG, 'NinjaApi.clients')
         res = self.do_get(self.BASE_URL + 'clients')
-        return [NinjaClient(client_data) for client_data in res['data']]
+        return [NinjaClient(client_data) for client_data in res['data']] if res else []
 
     def get_client(self, client_id: int):
         """gets client by id
@@ -73,7 +89,7 @@ class NinjaApp(object):
         Arguments:
             client_id {int} -- Invoice Ninja Client ID
         """
-        log(log.DEBUG, 'NinjaApp.get_client %d', client_id)
+        log(log.DEBUG, 'NinjaApi.get_client %d', client_id)
         res = self.do_get('{}clients?id={}'.format(self.BASE_URL, client_id))
         if not res or not res['data']:
             return res
@@ -86,7 +102,7 @@ class NinjaApp(object):
         Arguments:
             name {str} -- Ninja Client Name
         """
-        log(log.DEBUG, 'NinjaApp.add_client %s', name)
+        log(log.DEBUG, 'NinjaApi.add_client %s', name)
         res = self.do_post(self.BASE_URL + 'clients', name=name)
         if not res or not res['data']:
             return res
@@ -98,7 +114,7 @@ class NinjaApp(object):
         Arguments:
             client_id {int} -- Invoice Ninja Client ID
         """
-        log(log.DEBUG, 'NinjaApp.delete_client %d', client_id)
+        log(log.DEBUG, 'NinjaApi.delete_client %d', client_id)
         return self.do_delete('{}clients/{}'.format(self.BASE_URL, client_id))
 
     @property
@@ -106,9 +122,9 @@ class NinjaApp(object):
         """gets list of clients
             HTTP: GET ninja.test/api/v1/products -H "X-Ninja-Token: TOKEN"
         """
-        log(log.DEBUG, 'NinjaApp.products')
+        log(log.DEBUG, 'NinjaApi.products')
         res = self.do_get(self.BASE_URL + 'products')
-        return [NinjaProduct(data) for data in res['data']]
+        return [NinjaProduct(data) for data in res['data']] if res else []
 
     def get_product(self, prod_id: int):
         """gets client by id
@@ -116,7 +132,7 @@ class NinjaApp(object):
         Arguments:
             client_id {int} -- Invoice Ninja Client ID
         """
-        log(log.DEBUG, 'NinjaApp.get_product %d', prod_id)
+        log(log.DEBUG, 'NinjaApi.get_product %d', prod_id)
         res = self.do_get('{}products?id={}'.format(self.BASE_URL, prod_id))
         if not res or not res['data']:
             return res
@@ -129,7 +145,7 @@ class NinjaApp(object):
         Arguments:
             name {str} -- Ninja Client Name
         """
-        log(log.DEBUG, 'NinjaApp.add_product %s, %s, %f, %f', notes, product_key, cost, qty)
+        log(log.DEBUG, 'NinjaApi.add_product %s, %s, %f, %f', notes, product_key, cost, qty)
         res = self.do_post(
             self.BASE_URL + 'products', notes=notes, product_key=product_key, cost=cost, qty=qty)
         if not res or not res['data']:
@@ -142,6 +158,6 @@ class NinjaApp(object):
         Arguments:
             prod_id {int} -- Invoice Ninja Product ID
         """
-        log(log.DEBUG, 'NinjaApp.delete_product %d', prod_id)
+        log(log.DEBUG, 'NinjaApi.delete_product %d', prod_id)
         return self.do_put(
             '{}products/{}?action=delete'.format(self.BASE_URL, prod_id), id=prod_id, product_key=product_key)
