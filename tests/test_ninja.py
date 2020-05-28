@@ -8,16 +8,20 @@ TEST_PRODUCT_NOTES = 'TEST PRODUCT NOTES'
 TEST_PRODUCT_COST = 55.55
 
 
-@pytest.fixture
-def app():
-    app = NinjaApp()
-    yield app
+def cleanup(app):
     for client in app.clients:
         if TEST_CLIENT_NAME == client.name:
             app.delete_client(client.id)
     for product in app.products:
         if TEST_PRODUCT_NAME == product.product_key:
             app.delete_product(product.id, product_key=TEST_PRODUCT_NAME)
+
+
+@pytest.fixture
+def app():
+    app = NinjaApp()
+    yield app
+    cleanup(app)
 
 
 def test_clients(app):
