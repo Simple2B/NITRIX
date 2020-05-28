@@ -1,5 +1,6 @@
+import os
 import pytest
-
+from dotenv import load_dotenv
 from app.ninja import NinjaApi
 
 TEST_CLIENT_NAME = 'TEST RESELLER NAME'
@@ -7,6 +8,8 @@ TEST_PRODUCT_NAME = 'TEST PRODUCT'
 TEST_PRODUCT_NOTES = 'TEST PRODUCT NOTES'
 TEST_PRODUCT_COST = 55.55
 
+load_dotenv()
+NINJA_TOKEN = os.environ.get('NINJA_API_TOKEN', '')
 
 def cleanup(api):
     for client in api.clients:
@@ -24,6 +27,7 @@ def api():
     cleanup(api)
 
 
+@pytest.mark.skipif(not NINJA_TOKEN, reason='unknown NINJA_TOKEN')
 def test_clients(api):
     client = api.add_client(TEST_CLIENT_NAME)
     clients = api.clients
@@ -34,12 +38,14 @@ def test_clients(api):
     assert client
 
 
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_add_delete_client(api):
     client = api.add_client(TEST_CLIENT_NAME)
     assert client and client.name == TEST_CLIENT_NAME
     assert api.delete_client(client.id)
 
 
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_products(api):
     product = api.add_product(product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST)
     products = api.products
@@ -50,6 +56,7 @@ def test_products(api):
     assert product
 
 
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_add_delete_product(api):
     product = api.add_product(product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST)
     assert product
