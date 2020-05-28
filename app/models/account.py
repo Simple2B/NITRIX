@@ -24,7 +24,6 @@ class Account(db.Model, ModelMixin):
     phone = relationship('Phone')
     reseller = relationship('Reseller')
 
-
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:
         month = sourcedate.month - 1 + months
