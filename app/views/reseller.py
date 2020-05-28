@@ -70,6 +70,12 @@ def save():
                 reseller.__setattr__(k, form.__getattribute__(k).data)
         else:
             reseller = Reseller(name=form.name.data, status=form.status.data, comments=form.comments.data)
+        # Check uniqueness of Reseller name
+        for resellers in Reseller.query.all():
+            if resellers.name == reseller.name:
+                flash("This name is already taken.", "danger")
+                return redirect(url_for('reseller.edit'))
+        # If this name is not used, then we save it
         reseller.save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
