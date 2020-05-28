@@ -102,12 +102,17 @@ def save():
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
                               months=form.months.data)
-       # Check that sim must contain only digits
-        if account.sim.isdigit():
-            account.save()
-        else:
-            flash('Sim must contain only digits!', 'danger')
+        # Check that sim must contain only digits
+        if not account.sim.isdigit():
+            flash('Sim must contains only digits!', 'danger')
             return redirect(url_for('account.edit', id=account.id))
+        # Check that months must be in 1-12
+        if not 0 < account.months <= 12:
+            flash('Mohths must be in 1-12', 'danger')
+            return redirect(url_for('account.edit', id=account.id))
+
+        account.save()
+
         # Сhange Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
@@ -139,6 +144,10 @@ def ext_save():
             account_ext.save()
             account.reseller_id = form.reseller_id.data
             account.months = form.months.data
+            # Check that months must be in 1-12
+            if not 0 < account.months <= 12:
+                flash('Mohths must be in 1-12', 'danger')
+                return redirect(url_for('account.edit', id=account.id))
             account.activation_date = form.extension_date.data
             account.save()
         else:
@@ -146,6 +155,10 @@ def ext_save():
             account_ext.reseller_id = form.reseller_id.data
             account_ext.months = form.months.data
             account_ext.extension_date = form.extension_date.data
+            # Check that months must be in 1-12
+            if not 0 < account_ext.months <= 12:
+                flash('Mohths must be in 1-12', 'danger')
+                return redirect(url_for('account.edit', id=account.id))
             account_ext.save()
 
         return redirect(url_for('account.edit', id=request.form['account_id']))

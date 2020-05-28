@@ -70,12 +70,11 @@ def save():
                 reseller.__setattr__(k, form.__getattribute__(k).data)
         else:
             reseller = Reseller(name=form.name.data, status=form.status.data, comments=form.comments.data)
-        # Check uniqueness of Reseller name
-        for resellers in Reseller.query.all():
-            if resellers.name == reseller.name:
-                flash("This name is already taken.", "danger")
-                return redirect(url_for('reseller.edit'))
-        # If this name is not used, then we save it
+            # Check uniqueness of Reseller name
+            for resellers in Reseller.query.all():
+                if resellers.name == reseller.name:
+                    flash("This name is already taken.", "danger")
+                    return redirect(url_for('reseller.edit'))
         reseller.save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
@@ -118,6 +117,10 @@ def save_product():
         product.product_id = form.product_id.data
         product.months = form.months.data
         product.price = form.price.data
+        # Check that months must be in 1-12
+        if not 0 < product.months <= 12:
+            flash('Mohths must be in 1-12', 'danger')
+            return redirect(url_for('reseller.edit', id=form.reseller_id.data))
         product.save()
     else:
         flash('Form validation error', 'danger')
