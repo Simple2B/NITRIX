@@ -35,16 +35,5 @@ $(document).ready(function() {
     });
 
 
-
-    // function update_end_date_ext_save() {
-    //     let endDate = new Date($('.form-control extension_datesave').val());
-    //     let month = +$('.form-control monthssave').val();
-    //     endDate.setMonth(endDate.getMonth() + month);
-    //     $(".form-control enddatesave")[0].valueAsDate = endDate;
-    // };
-
-    // $('.form-control extension_datesave').change(update_end_date_ext_save);
-    // $('.form-control monthssave').change(update_end_date_ext_save);
-    // update_end_date_ext_save();
 } );
 
