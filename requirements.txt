@@ -13,5 +13,4 @@ flake8
 pytest
 email_validator
 sqlalchemy_utils
-uwsgi
 requests
