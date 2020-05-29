@@ -158,7 +158,7 @@
         <input type="hidden" name="account_id" value="{{form.id.data}}">
         <div class="row">
             <div class="col-sm-3">
-                <input type="date" class="form-control" name="extension_date" value="">
+                <input type="date" class="form-control" id="extension_date" name="extension_date" value="">
             </div>
             <div class="col-sm-2">
                 <input name="months" id="monthsExt" list="months-list" class="form-control">
@@ -223,5 +223,4 @@
 
 {% block javascript%}
 <script src="js/account_edit.js"></script>
-<script src="js/account_edit_ext.js"></script>
 {% endblock %}
