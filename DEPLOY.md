@@ -38,8 +38,13 @@ Now, create python virtual environment:
 cd ~/NIRTIX
 virtualenv -p python3 .venv
 pip install -r requirements.txt
-deactivate
 ```
+
+For the first run need prepare database:
+```
+flask reset-db
+```
+
 
 ## Configure WSGI
 We use uWSGI service from python virtual environment.
