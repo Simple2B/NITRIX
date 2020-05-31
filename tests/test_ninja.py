@@ -1,7 +1,7 @@
 import os
 import pytest
 from dotenv import load_dotenv
-from app.ninja import NinjaApi
+from app.ninja import NinjaApi, NinjaInvoice
 
 TEST_CLIENT_NAME = 'TEST RESELLER NAME'
 TEST_PRODUCT_NAME = 'TEST PRODUCT'
@@ -65,3 +65,33 @@ def test_add_delete_product(api):
     assert product.notes == TEST_PRODUCT_NOTES
     assert product.cost == TEST_PRODUCT_COST
     assert api.delete_product(product.id, product_key=TEST_PRODUCT_NAME)
+
+
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
+def test_add_update_product(api):
+    product = api.add_product(product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST)
+    assert product
+    assert product.product_key == TEST_PRODUCT_NAME
+    assert product.notes == TEST_PRODUCT_NOTES
+    assert product.cost == TEST_PRODUCT_COST
+    res = api.update_product(
+        product.id,
+        product_key=TEST_PRODUCT_NAME*2,
+        notes=TEST_PRODUCT_NOTES*2,
+        cost=TEST_PRODUCT_COST*2)
+    assert res
+    # reload product form server
+    product = api.get_product(product.id)
+    assert product.product_key == TEST_PRODUCT_NAME*2
+    assert product.notes == TEST_PRODUCT_NOTES*2
+    assert product.cost == TEST_PRODUCT_COST*2
+    assert api.delete_product(product.id, product_key=product.product_key)
+
+
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
+def test_invoice(api):
+    invoices = NinjaInvoice.all()
+    assert invoices
+    invoice = invoices[0]
+    items = invoice.items
+    assert items
