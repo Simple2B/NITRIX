@@ -18,4 +18,5 @@ class ModelMixin(object):
         return self
 
 
-# Add your own utility classes and functions here.
+def ninja_product_name(product_name: str, months: int):
+    return f'{product_name} {months} Months'

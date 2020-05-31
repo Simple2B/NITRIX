@@ -155,6 +155,27 @@ class NinjaApi(object):
             return res
         return NinjaProduct(res['data'])
 
+    def update_product(self, prod_id: int, notes: str, product_key: str, cost: float, qty: float = 1.0):
+        """updates product by id
+
+        Arguments:
+            prod_id {int} -- product id
+            notes {str} -- notes
+            product_key {str} -- product name
+            cost {float} -- price
+
+        Keyword Arguments:
+            qty {float} -- quantity (default: {1.0})
+
+        Returns:
+            Product -- product
+        """
+        log(log.DEBUG, 'NinjaApi.update_product %d', prod_id)
+        return self.do_put(
+            '{}products/{}'.format(self.BASE_URL, prod_id),
+            id=prod_id, product_key=product_key, notes=notes,
+            cost=cost, qty=qty)
+
     def delete_product(self, prod_id: int, product_key: str):
         """deletes product by id (archive product)
 

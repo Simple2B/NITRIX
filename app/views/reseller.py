@@ -3,6 +3,7 @@ from app.models import Reseller, Product, ResellerProduct
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
+from app.utils import ninja_product_name
 
 
 reseller_blueprint = Blueprint('reseller', __name__)
@@ -100,7 +101,6 @@ def delete():
     flash('Wrong request', 'danger')
     return redirect(url_for('main.resellers'))
 
-
 @reseller_blueprint.route("/save_reseller_product", methods=["POST"])
 def save_product():
     log(log.INFO, '/save_reseller_product')
@@ -121,6 +121,21 @@ def save_product():
         product.months = form.months.data
         product.price = form.price.data
         product.save()
+        # Update Invoice Ninja
+        product_key = ninja_product_name(product.product.name, product.months)
+        if form.id.data < 0:
+            ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name, cost=product.price)
+            if ninja_product:
+                product.ninja_product_id = ninja_product.id
+                product.save()
+        else:
+            ninja_product = ninja.get_product(product.ninja_product_id)
+            if ninja_product:
+                ninja.update_product(
+                    ninja_product.id,
+                    product_key=product_key,
+                    notes=product.reseller.name,
+                    cost=product.price)
     else:
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error on /save_reseller_product")
