@@ -195,14 +195,17 @@ def ext_save():
             add_ninja_invoice(account)
         else:
             account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
-            account_ext.reseller_id = form.reseller_id.data
-            account_ext.months = form.months.data
-            account_ext.extension_date = form.extension_date.data
-            # Check that months must be in 1-12
-            if not 0 < account_ext.months <= 12:
-                flash('Mohths must be in 1-12', 'danger')
-                return redirect(url_for('account.edit', id=account.id))
-            account_ext.save()
+            if request.form['action'] == 'delete':
+                account_ext.delete()
+            else:
+                account_ext.reseller_id = form.reseller_id.data
+                account_ext.months = form.months.data
+                account_ext.extension_date = form.extension_date.data
+                # Check that months must be in 1-12
+                if not 0 < account_ext.months <= 12:
+                    flash('Mohths must be in 1-12', 'danger')
+                    return redirect(url_for('account.edit', id=account.id))
+                account_ext.save()
 
         return redirect(url_for('account.edit', id=request.form['account_id']))
     else:

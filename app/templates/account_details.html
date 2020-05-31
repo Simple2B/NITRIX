@@ -124,11 +124,11 @@
                 <input type="hidden" name="account_id" value="{{form.id.data}}">
                 <div class="row mb-1">
                     <div class="col-sm-3">
-                        <input type="date" class="form-control extension_datesave"
+                        <input type="date" class="form-control extension_datesave" name="extension_date"
                             value="{{acc_ext.extension_date.strftime("%Y-%m-%d")}}">
                     </div>
                     <div class="col-sm-2">
-                        <input class="form-control monthssave" list="months-list" value="{{acc_ext.months}}">
+                        <input class="form-control monthssave" list="months-list" name="months" value="{{acc_ext.months}}">
                         <datalist id="month-list">
                             <option value="1">
                             <option value="3">
@@ -150,9 +150,10 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-sm-1 mt-1">
-                        <button class="btn btn-success btn-sm" type="submit">Save</button>
-                    </div>
+                    <!-- <div class="col-sm-1 mt-1 row"> -->
+                        <button class="btn btn-success btn-sm" type="submit" name="action" value="save" title="Save">v</button>
+                        <button class="btn btn-danger btn-sm" type="submit" name="action" value="delete" title="Delete">-</button>
+                    <!-- </div> -->
                 </div>
             </form>
         </div>
@@ -187,9 +188,9 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-sm-1 mt-1">
+                <!-- <div class="col-sm-1 mt-1"> -->
                     <button class="btn btn-primary btn-sm" type="submit">Add</button>
-                </div>
+                <!-- </div> -->
             </div>
         </form>
         <br>
@@ -212,8 +213,8 @@
         </div>
         {%for change in form.sim_changes %}
         <div class="row  mb-2">
-            <label class="col-sm-2 col-form-label">SIM:</label>
-            <div class="col-sm-3 mx-3 form-control"> {{change.value_str}} </div>
+            <!-- <label class="col-sm-4 col-form-label">SIM:</label> -->
+            <div class="col-sm-5 mx-3 form-control"> {{change.value_str}} </div>
             <label class="d-inline-flex  col-form-label">Change date:</label>
             <div class="col-sm-4">
                 <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
