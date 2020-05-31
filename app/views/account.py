@@ -1,10 +1,13 @@
+from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
+from app.models import ResellerProduct
 from app.forms import AccountForm, AccountExtensionForm
 from ..database import db
 from app.logger import log
-from datetime import datetime
+from app.ninja import NinjaInvoice
+from app.utils import ninja_product_name
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -69,6 +72,41 @@ def edit():
             )
 
 
+def add_ninja_invoice(account: Account):
+    reseller_product = ResellerProduct.query.filter(
+        ResellerProduct.reseller_id == account.reseller_id
+        ).filter(
+            ResellerProduct.product_id == account.product_id
+        ).filter(
+            ResellerProduct.months == account.months
+        ).first()
+    if not reseller_product:
+        # Locking for this product in NITRIX reseller
+        reseller_product = ResellerProduct.query.filter(
+            ResellerProduct.reseller_id == 1
+        ).filter(
+            ResellerProduct.product_id == account.product_id
+        ).filter(
+            ResellerProduct.months == account.months
+        ).first()
+    # First day of month
+    invoice_date = datetime(account.activation_date.year, account.activation_date.month, 1)
+    invoice_date = invoice_date.strftime('%Y-%m-%d')
+    current_invoice = None
+    for invoice in NinjaInvoice.all():
+        if invoice.invoice_date == invoice_date:
+            # found invoice
+            current_invoice = invoice
+            break
+    else:
+        # need a new invoice
+        current_invoice = NinjaInvoice.add(account.reseller.ninja_client_id, invoice_date)
+    current_invoice.add_item(
+        ninja_product_name(account.product.name, account.months),
+        account.name,
+        cost=reseller_product.price if reseller_product else 0)
+
+
 @account_blueprint.route("/account_save", methods=["POST"])
 def save():
     log(log.INFO, "/account_save")
@@ -115,6 +153,7 @@ def save():
             flash('Mohths must be in 1-12', 'danger')
             return redirect(url_for('account.edit', id=account.id))
         account.save()
+        add_ninja_invoice(account)
         # Сhange Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
@@ -152,6 +191,8 @@ def ext_save():
                 return redirect(url_for('account.edit', id=account.id))
             account.activation_date = form.extension_date.data
             account.save()
+            # Register product in Invoice Ninja
+            add_ninja_invoice(account)
         else:
             account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
             account_ext.reseller_id = form.reseller_id.data
