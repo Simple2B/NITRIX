@@ -185,5 +185,3 @@ class NinjaApi(object):
         log(log.DEBUG, 'NinjaApi.delete_product %d', prod_id)
         return self.do_put(
             '{}products/{}?action=delete'.format(self.BASE_URL, prod_id), id=prod_id, product_key=product_key)
-
-
