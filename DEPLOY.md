@@ -30,7 +30,7 @@ sudo apt-get install nginx python3 virtualenv
 ```
 Set correct rights for the project folder:
 ```
-sudo chown -Rc inv:www-data ~/NITRIX
+sudo chgrp -R www-data NITRIX/
 sudo chmod -R 0755 ~/NITRIX
 ```
 Now, create python virtual environment:
