@@ -75,3 +75,7 @@ class NinjaInvoice(object):
         if not res or not res['data']:
             return res
         return NinjaInvoice(res['data'])
+
+    def delete(self):
+        log(log.DEBUG, 'NinjaInvoice.delete %d', self.id)
+        return api.do_delete('{}invoices/{}'.format(api.BASE_URL, self.id))

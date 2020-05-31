@@ -7,8 +7,8 @@ TEST_CLIENT_NAME = 'TEST RESELLER NAME'
 TEST_PRODUCT_NAME = 'TEST PRODUCT'
 TEST_PRODUCT_NOTES = 'TEST PRODUCT NOTES'
 TEST_PRODUCT_COST = 55.55
-TEST_INVOICE_DATE = '2020-02-01'
-TEST_INVOICE_DUE_DATE = '2020-02-29'
+TEST_INVOICE_DATE = '1980-02-01'
+TEST_INVOICE_DUE_DATE = '1980-02-29'
 
 load_dotenv()
 NINJA_TOKEN = os.environ.get('NINJA_API_TOKEN', '')
@@ -21,6 +21,9 @@ def cleanup(api):
     for product in api.products:
         if TEST_PRODUCT_NAME == product.product_key:
             api.delete_product(product.id, product_key=TEST_PRODUCT_NAME)
+    for invoice in NinjaInvoice.all():
+        if TEST_INVOICE_DATE == invoice.invoice_date:
+            invoice.delete()
 
 
 @pytest.fixture
@@ -96,6 +99,7 @@ def test_invoice(api):
     assert client and client.name == TEST_CLIENT_NAME
     invoice = NinjaInvoice.add(client.id, TEST_INVOICE_DATE, TEST_INVOICE_DUE_DATE)
     assert invoice
+    assert invoice.add_item(product_key=TEST_PRODUCT_NAME, notes='Account bubu', cost=TEST_PRODUCT_COST)
     invoices = NinjaInvoice.all()
     assert invoices
     invoice = invoices[0]
@@ -110,3 +114,12 @@ def test_invoice(api):
     assert invoice.add_item(product_key=TEST_PRODUCT_NAME, notes='Account bubu', cost=TEST_PRODUCT_COST)
     invoice = NinjaInvoice.get(invoice.id)
     assert invoice
+
+
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
+def test_invoice_create_delete(api):
+    client = api.add_client(TEST_CLIENT_NAME)
+    assert client and client.name == TEST_CLIENT_NAME
+    invoice = NinjaInvoice.add(client.id, TEST_INVOICE_DATE, TEST_INVOICE_DUE_DATE)
+    assert invoice
+    assert invoice.delete()
