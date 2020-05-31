@@ -55,7 +55,10 @@
       </div>
       <div class="col-sm-2"> {{prod_form.months(class="form-control")}} </div>
       <div class="col-sm-2"> {{prod_form.price(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.submit(class="btn btn-success")}} </div>
+      <div class="col-sm-2">
+        {{prod_form.submit(class="btn btn-success", value="v")}}
+        {{prod_form.submit(class="btn btn-danger", value="-")}}
+      </div>
     </div>
   </form>
   {% endfor %}

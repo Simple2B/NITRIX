@@ -123,25 +123,30 @@ def save_product():
                 flash("Wrong reseller product id.", "danger")
                 log(log.ERROR, "Wrong reseller product id=%d", form.id.data)
                 return redirect(url_for('reseller.edit', id=form.reseller_id.data))
-        product.product_id = form.product_id.data
-        product.months = form.months.data
-        product.price = form.price.data
-        product.save()
-        # Update Invoice Ninja
-        product_key = ninja_product_name(product.product.name, product.months)
-        if form.id.data < 0:
-            ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name, cost=product.price)
-            if ninja_product:
-                product.ninja_product_id = ninja_product.id
-                product.save()
-        else:
+        if request.form['submit'] == '-':
             ninja_product = ninja.get_product(product.ninja_product_id)
-            if ninja_product:
-                ninja.update_product(
-                    ninja_product.id,
-                    product_key=product_key,
-                    notes=product.reseller.name,
-                    cost=product.price)
+            ninja.delete_product(ninja_product.id, ninja_product.product_key)
+            product.delete()
+        else:
+            product.product_id = form.product_id.data
+            product.months = form.months.data
+            product.price = form.price.data
+            product.save()
+            # Update Invoice Ninja
+            product_key = ninja_product_name(product.product.name, product.months)
+            if form.id.data < 0:
+                ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name, cost=product.price)
+                if ninja_product:
+                    product.ninja_product_id = ninja_product.id
+                    product.save()
+            else:
+                ninja_product = ninja.get_product(product.ninja_product_id)
+                if ninja_product:
+                    ninja.update_product(
+                        ninja_product.id,
+                        product_key=product_key,
+                        notes=product.reseller.name,
+                        cost=product.price)
     else:
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error on /save_reseller_product")
