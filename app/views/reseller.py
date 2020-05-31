@@ -3,6 +3,7 @@ from app.models import Reseller, Product, ResellerProduct
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
+from app.utils import ninja_product_name
 
 
 reseller_blueprint = Blueprint('reseller', __name__)
@@ -99,11 +100,6 @@ def delete():
         return redirect(url_for('main.resellers'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.resellers'))
-
-
-def ninja_product_name(product_name: str, months: int):
-    return f'{product_name} {months} Months'
-
 
 @reseller_blueprint.route("/save_reseller_product", methods=["POST"])
 def save_product():
