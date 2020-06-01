@@ -94,7 +94,7 @@ def add_ninja_invoice(account: Account):
     invoice_date = invoice_date.strftime('%Y-%m-%d')
     current_invoice = None
     for invoice in NinjaInvoice.all():
-        if invoice.invoice_date == invoice_date:
+        if invoice.invoice_date == invoice_date and invoice.client_id == account.reseller.ninja_client_id:
             # found invoice
             current_invoice = invoice
             break
