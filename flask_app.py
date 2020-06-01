@@ -17,7 +17,7 @@ def get_context():
 def create_database():
     """ build database """
     def add_reseller_product(product, months, price, reseller):
-        reseller_product = ResellerProduct(months=1, price=6.78, product=product, reseller=reseller).save(False)
+        reseller_product = ResellerProduct(months=months, price=price, product=product, reseller=reseller).save(False)
         product_key = f'{product.name} {months} Months'
         ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=price)
         if ninja_product:
@@ -29,6 +29,9 @@ def create_database():
     User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
     User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
     reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
+    ninja_client = ninja.add_client(name=reseller_nitrix.name)
+    if ninja_client:
+        reseller_nitrix.ninja_client_id = ninja_client.id
     product_gold = Product(name='Gold').save(False)
     product_silver = Product(name='Silver').save(False)
     product_bronsa = Product(name='Bronsa').save(False)
@@ -44,9 +47,7 @@ def create_database():
     add_reseller_product(months=3, price=6.99, product=product_bronsa, reseller=reseller_nitrix)
     add_reseller_product(months=6, price=12.45, product=product_bronsa, reseller=reseller_nitrix)
     add_reseller_product(months=12, price=20.99, product=product_bronsa, reseller=reseller_nitrix)
-    ninja_client = ninja.add_client(name=reseller_nitrix.name)
-    if ninja_client:
-        reseller_nitrix.ninja_client_id = ninja_client.id
+
     db.session.commit()
 
 
