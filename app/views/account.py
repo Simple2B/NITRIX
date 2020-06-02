@@ -140,14 +140,6 @@ def save():
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
                               months=form.months.data)
-        # Check that sim must contain only digits
-        if not account.sim.isdigit():
-            flash('Sim value  must contains only digits!', 'danger')
-            return redirect(url_for('account.edit', id=account.id))
-        # Check that sim value  in has 19-20 numbers
-        if not len(account.sim) in (19, 20):
-            flash('Sim value  must contains 19-20 numbers!', 'danger')
-            return redirect(url_for('account.edit', id=account.id))
         # Check that months must be in 1-12
         if not 0 < account.months <= 12:
             flash('Mohths must be in 1-12', 'danger')
