@@ -1,5 +1,6 @@
 from app.logger import log
 from app.ninja import api
+from datetime import datetime
 
 
 class NinjaInvoice(object):
@@ -70,7 +71,7 @@ class NinjaInvoice(object):
         res = api.do_post(
             api.BASE_URL + 'invoices',
             client_id=client_id,
-            invoice_date=invoice_date,
+            invoice_date=datetime.now().strftime('%Y-%m-%d'),
             due_date=due_date)
         if not res or not res['data']:
             return res
