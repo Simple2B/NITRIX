@@ -19,6 +19,7 @@ def edit():
         form = PhoneForm(
             id=phone.id,
             name=phone.name,
+            price=phone.price,
             status=phone.status.name
             )
 
@@ -48,12 +49,12 @@ def save():
         if form.id.data > 0:
             phone = Phone.query.filter(Phone.id == form.id.data).first()
             if phone is None:
-                flash("Wrong product id.", "danger")
+                flash("Wrong phone id.", "danger")
                 return redirect(url_for('main.phones'))
             for k in request.form.keys():
                 phone.__setattr__(k, form.__getattribute__(k).data)
         else:
-            phone = Phone(name=form.name.data, status=form.status.data)
+            phone = Phone(name=form.name.data, price=form.price.data, status=form.status.data)
         phone.save()
         log(log.INFO, "Phone-{} was saved".format(phone.id))
         return redirect(url_for('main.phones'))

@@ -25,7 +25,7 @@ def create_database():
             reseller_product.save(False)
 
     db.create_all()
-    Phone(name='None').save(False)
+    Phone(name='None', price=0.00).save(False)
     User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
     User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
     reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
