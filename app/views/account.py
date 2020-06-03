@@ -136,6 +136,7 @@ def save():
             # Add a new account
             account = Account(name=form.name.data, product_id=form.product_id.data,
                               reseller_id=form.reseller_id.data,
+                              phone_id=form.phone_id.data,
                               sim=form.sim.data,
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
