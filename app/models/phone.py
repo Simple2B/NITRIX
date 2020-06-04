@@ -18,6 +18,7 @@ class Phone(db.Model, ModelMixin):
     status = db.Column(Enum(Status), default=Status.active)
     price = db.Column(db.Float, default=0.00)
     deleted = db.Column(db.Boolean, default=False)
+    ninja_product_id = db.Column(db.Integer, default=0)
 
     def to_dict(self) -> dict:
         return {

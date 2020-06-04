@@ -2,6 +2,8 @@ from flask import render_template, Blueprint, request, flash, redirect, url_for
 from app.models import Phone
 from app.forms import PhoneForm
 from app.logger import log
+from app.ninja import api as ninja
+
 
 phone_blueprint = Blueprint('phone', __name__)
 
@@ -56,6 +58,21 @@ def save():
         else:
             phone = Phone(name=form.name.data, price=form.price.data, status=form.status.data)
         phone.save()
+        # Update Invoice Ninja
+        product_key = phone.name
+        if form.id.data < 0:
+            ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=phone.price)
+            if ninja_product:
+                phone.ninja_product_id = ninja_product.id
+                phone.save()
+        else:
+            ninja_product = ninja.get_product(phone.ninja_product_id)
+            if ninja_product:
+                ninja.update_product(
+                    ninja_product.id,
+                    product_key=product_key,
+                    notes="Price",
+                    cost=phone.price)
         log(log.INFO, "Phone-{} was saved".format(phone.id))
         return redirect(url_for('main.phones'))
     else:
