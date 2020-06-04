@@ -105,6 +105,11 @@ def add_ninja_invoice(account: Account):
         ninja_product_name(account.product.name, account.months),
         account.name,
         cost=reseller_product.price if reseller_product else 0)
+    if account.phone.name != "None":
+        current_invoice.add_item(
+            account.phone.name,
+            account.name,
+            cost=account.phone.price)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
