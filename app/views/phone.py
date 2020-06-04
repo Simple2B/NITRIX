@@ -48,6 +48,11 @@ def save():
     log(log.INFO, '/phone_save')
     form = PhoneForm(request.form)
     if form.validate_on_submit():
+        # If we have this name in database
+        if Phone.query.filter(Phone.name == form.name.data).first():
+            phone = Phone.query.filter(Phone.name == form.name.data).first()
+            phone.delete = False
+
         if form.id.data > 0:
             phone = Phone.query.filter(Phone.id == form.id.data).first()
             if phone is None:
@@ -57,9 +62,13 @@ def save():
                 phone.__setattr__(k, form.__getattribute__(k).data)
         else:
             phone = Phone(name=form.name.data, price=form.price.data, status=form.status.data)
+            # Check uniqueness Phone name
+            if Phone.query.filter(Phone.name == phone.name).first():
+                flash('This name is already taken!Try again', 'danger')
+                return redirect(url_for('phone.edit', id=phone.id))
         phone.save()
         # Update Invoice Ninja
-        product_key = phone.name
+        product_key = f"Phone-{phone.name}"
         if form.id.data < 0:
             ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=phone.price)
             if ninja_product:
@@ -88,6 +97,10 @@ def delete():
         phone = Phone.query.filter(Phone.id == phone_id).first()
         phone.deleted = True
         phone.save()
+        # Delete in Invoice Ninja
+        ninja_product = ninja.get_product(phone.ninja_product_id)
+        ninja.delete_product(ninja_product.id, ninja_product.product_key)
+        phone.delete()
         return redirect(url_for('main.phones'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.phones'))

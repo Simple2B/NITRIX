@@ -71,7 +71,7 @@ class NinjaInvoice(object):
         res = api.do_post(
             api.BASE_URL + 'invoices',
             client_id=client_id,
-            invoice_date=datetime.now().strftime('%Y-%m-%d'),
+            invoice_date=invoice_date,
             due_date=due_date)
         if not res or not res['data']:
             return res

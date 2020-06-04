@@ -26,7 +26,7 @@ def create_database():
 
     def add_phone(name, price):
         phone = Phone(name=name, price=price).save(False)
-        product_key = f'{phone.name}'
+        product_key = f'Phone-{phone.name}'
         ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=price)
         if ninja_product:
             phone.ninja_product_id = ninja_product.id
