@@ -13,12 +13,15 @@ class Account(db.Model, ModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"))
+    phone_id = db.Column(db.Integer, db.ForeignKey("phones.id"), default=1)
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
     sim = db.Column(db.String(20))
     comment = db.Column(db.String(200))
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
+    deleted = db.Column(db.Boolean, default=False)
     product = relationship('Product')
+    phone = relationship('Phone')
     reseller = relationship('Reseller')
 
     @staticmethod
@@ -38,6 +41,7 @@ class Account(db.Model, ModelMixin):
             'id': self.id,
             'name': self.name,
             'product': self.product.name if self.product else '-=NONE=-',
+            'phone': self.phone.name if self.phone else '',
             'reseller': self.reseller.name if self.reseller else '-=NONE=-',
             'sim': self.sim,
             'expiration_date': self.expiration_date.strftime("%Y-%m-%d"),
@@ -47,4 +51,4 @@ class Account(db.Model, ModelMixin):
 
     @staticmethod
     def columns():
-        return ['ID', 'Name', 'Product', 'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months']
+        return ['ID', 'Name', 'Product', 'Phone', 'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months']

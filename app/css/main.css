@@ -1,0 +1,32 @@
+/* custom css */
+/* * {
+    border-radius: 0 !important;
+} */
+
+/* .month-input {
+    width: 70px;
+} */
+
+.form-horizontal .control-label{
+    text-align: left;
+}
+
+/* #date-input {
+    width: 150px;
+} */
+
+body{
+    padding-bottom: 50px;
+}
+div.card-body{
+     background-color: rgb(235, 235, 235);
+ }
+ div.card-footer{
+    background-color: rgb(202, 202, 202);
+ }
+ div.card-header{
+    background-color: rgb(202, 202, 202);
+ }
+ nav{
+    background-color: rgb(202, 202, 202);
+ }

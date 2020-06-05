@@ -1,7 +1,7 @@
 import pytest
 
 from app import db, create_app
-from app.models import Product
+from app.models import Phone
 from .test_auth import register, login
 
 
@@ -25,44 +25,44 @@ def client():
         app_ctx.pop()
 
 
-def test_edit_product(client):
-    response = client.get('/products')
+def test_edit_phone(client):
+    response = client.get('/phones')
     assert response.status_code == 200
-    product = Product(name='TEST PRODUCT NAME')
-    product.save()
-    response = client.get(f'/product_details?id={product.id}')
+    phone = Phone(name='TEST PHONE NAME', price=10.00)
+    phone.save()
+    response = client.get(f'/phone_details?id={phone.id}')
     assert response.status_code == 200
-    assert b'TEST PRODUCT NAME' in response.data
+    assert b'TEST PHONE NAME' in response.data
 
 
-def test_save_product(client):
-    # add new product
+def test_save_phone(client):
+    # add new phone
     response = client.post(
-        '/product_save',
-        data=dict(id=-1, name='TEST PRODUCT NAME', status='active'),
+        '/phone_save',
+        data=dict(id=-1, name='TEST PHONE NAME', price=10.00, status='active'),
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert b'TEST PRODUCT NAME' in response.data
-    # edit exists product
+    assert b'TEST PHONE NAME' in response.data
+    # edit exists phone
     response = client.post(
-        '/product_save',
-        data=dict(id=1, name='ANOTHER PRODUCT NAME', status='not_active'),
+        '/phone_save',
+        data=dict(id=1, name='ANOTHER PHONE NAME', price=5.00, status='not_active'),
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert b'TEST PRODUCT NAME' not in response.data
-    assert b'ANOTHER PRODUCT NAME' in response.data
-    # save product with wrong id
+    assert b'TEST PHONE NAME' not in response.data
+    assert b'ANOTHER PHONE NAME' in response.data
+    # save phone with wrong id
     response = client.post(
-        '/product_save',
-        data=dict(id=2, name='BAD PRODUCT NAME', status='not_active'),
+        '/phone_save',
+        data=dict(id=2, name='BAD PHONE NAME', status='not_active'),
         follow_redirects=True
     )
-    assert b'Wrong product id.' in response.data
+    assert b'Wrong phone id.' in response.data
     # send wrong form data
     response = client.post(
-        '/product_save',
+        '/phone_save',
         data=dict(id=2),
         follow_redirects=True
     )

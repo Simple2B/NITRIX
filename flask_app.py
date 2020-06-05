@@ -1,7 +1,8 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User, Account, Product, Reseller, AccountExtension
+from app.models import User, Product, Reseller, ResellerProduct, Phone
+from app.ninja import api as ninja
 
 app = create_app()
 
@@ -15,28 +16,48 @@ def get_context():
 
 def create_database():
     """ build database """
+    def add_reseller_product(product, months, price, reseller):
+        reseller_product = ResellerProduct(months=months, price=price, product=product, reseller=reseller).save(False)
+        product_key = f'{product.name} {months} Months'
+        ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=price)
+        if ninja_product:
+            reseller_product.ninja_product_id = ninja_product.id
+            reseller_product.save(False)
+
+    def add_phone(name, price):
+        phone = Phone(name=name, price=price).save(False)
+        product_key = f'Phone-{phone.name}'
+        ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=price)
+        if ninja_product:
+            phone.ninja_product_id = ninja_product.id
+            phone.save(False)
+
     db.create_all()
-    user = User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active)
-    acc0 = Account(name='Account 0', sim='1234567890', comment='Comment', reseller_id=1, product_id=1, months=3)
-    acc0.save()
-    user.save(non_commit=True)
-    # add supper user acc
-    for i in range(10):
-        User(name='user-{}'.format(i),
-             password='user', user_type=User.Type.user, activated=User.Status.active).save(non_commit=True)
-        User(name='admin-{}'.format(i),
-             password='admin', user_type=User.Type.admin, activated=User.Status.active).save(non_commit=True)
-        product = Product(name='Kiev Star-{}'.format(i))
-        product.save(non_commit=True)
-        reseller = Reseller(name='Dima-{}'.format(i), comments='Good reseller')
-        reseller.save(non_commit=True)
-        acc = Account(name='Account A-{}'.format(i), sim='1234567890', comment='Comment', months=3)
-        acc.product = product
-        acc.reseller = reseller
-        acc.save(non_commit=True)
-    AccountExtension(account_id=acc0.id, reseller_id=1, months=2).save(non_commit=True)
-    AccountExtension(account_id=acc0.id, reseller_id=2, months=4).save(non_commit=True)
-    AccountExtension(account_id=acc0.id, reseller_id=3, months=7).save(non_commit=True)
+    Phone(name='None', price=0.00).save(False)
+    User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
+    User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
+    reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
+    ninja_client = ninja.add_client(name=reseller_nitrix.name)
+    if ninja_client:
+        reseller_nitrix.ninja_client_id = ninja_client.id
+    product_gold = Product(name='Gold').save(False)
+    product_silver = Product(name='Silver').save(False)
+    product_bronsa = Product(name='Bronsa').save(False)
+    add_reseller_product(months=1, price=6.78, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=3, price=16.50, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=6, price=30.45, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=12, price=50.0, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=1, price=4.25, product=product_silver, reseller=reseller_nitrix)
+    add_reseller_product(months=3, price=11.50, product=product_silver, reseller=reseller_nitrix)
+    add_reseller_product(months=6, price=19.45, product=product_silver, reseller=reseller_nitrix)
+    add_reseller_product(months=12, price=35.99, product=product_silver, reseller=reseller_nitrix)
+    add_reseller_product(months=1, price=2.50, product=product_bronsa, reseller=reseller_nitrix)
+    add_reseller_product(months=3, price=6.99, product=product_bronsa, reseller=reseller_nitrix)
+    add_reseller_product(months=6, price=12.45, product=product_bronsa, reseller=reseller_nitrix)
+    add_reseller_product(months=12, price=20.99, product=product_bronsa, reseller=reseller_nitrix)
+    add_phone(name="Samsung", price=54.00)
+    add_phone(name="Nokia", price=38.00)
+    add_phone(name="Lg", price=30.00)
     db.session.commit()
 
 

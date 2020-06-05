@@ -27,9 +27,9 @@ def client():
 def test_edit_reseller(client):
     response = client.get('/resellers')
     assert response.status_code == 200
-    product = Reseller(name='TEST RESELLER NAME')
-    product.save()
-    response = client.get(f'/reseller_edit?id={product.id}')
+    reseller = Reseller(name='TEST RESELLER NAME')
+    reseller.save()
+    response = client.get(f'/reseller_edit?id={reseller.id}')
     assert response.status_code == 200
     assert b'TEST RESELLER NAME' in response.data
 
@@ -53,7 +53,7 @@ def test_save_reseller(client):
     assert b'TEST RESELLER NAME' not in response.data
     assert b'ANOTHER RESELLER NAME' in response.data
 
-    # save product with wrong id
+    # save reseller with wrong id
     response = client.post(
         '/reseller_save',
         data=dict(id=2, name='BAD RESELLER NAME', status='not_active'),
@@ -67,3 +67,21 @@ def test_save_reseller(client):
         follow_redirects=True
     )
     assert b'Form validation error' in response.data
+
+
+def test_save_reseller_with_same_name(client):
+    # add new reseller
+    response = client.post(
+        '/reseller_save',
+        data=dict(id=-1, name='TEST RESELLER NAME', status='not_active'),
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b'TEST RESELLER NAME' in response.data
+    # add reseller with the same name
+    response = client.post(
+        '/reseller_save',
+        data=dict(id=-1, name='TEST RESELLER NAME', status='not_active'),
+        follow_redirects=True
+    )
+    assert b'This name is already taken' in response.data
