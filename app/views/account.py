@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
-from datetime import datetime
+from flask_login import login_required
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
 from app.models import ResellerProduct
@@ -21,6 +21,7 @@ def all_phones():
 
 
 @account_blueprint.route("/account_details")
+@login_required
 def edit():
     log(log.INFO, '/account_details')
     if 'id' in request.args:
@@ -73,7 +74,7 @@ def edit():
             )
 
 
-def add_ninja_invoice(account: Account):
+def add_ninja_invoice(account: Account): # noqa E999
     reseller_product = ResellerProduct.query.filter(
         ResellerProduct.reseller_id == account.reseller_id
         ).filter(
@@ -115,6 +116,7 @@ def add_ninja_invoice(account: Account):
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
+@login_required
 def save():
     log(log.INFO, "/account_save")
     form = AccountForm(request.form)
@@ -172,6 +174,7 @@ def save():
 
 
 @account_blueprint.route("/account_ext_add", methods=["POST"])
+@login_required
 def ext_save():
     form = AccountExtensionForm(request.form)
     if form.validate_on_submit():
@@ -214,6 +217,7 @@ def ext_save():
 
 
 @account_blueprint.route("/account_delete", methods=["GET"])
+@login_required
 def delete():
     if 'id' in request.args:
         account_id = int(request.args['id'])

@@ -1,4 +1,5 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask_login import login_required
 from app.models import Phone
 from app.forms import PhoneForm
 from app.logger import log
@@ -9,6 +10,7 @@ phone_blueprint = Blueprint('phone', __name__)
 
 
 @phone_blueprint.route("/phone_details")
+@login_required
 def edit():
     log(log.INFO, '/phone_details')
     if 'id' in request.args:
@@ -44,6 +46,7 @@ def edit():
 
 
 @phone_blueprint.route("/phone_save", methods=["POST"])
+@login_required
 def save():
     log(log.INFO, '/phone_save')
     form = PhoneForm(request.form)
@@ -68,7 +71,7 @@ def save():
                 return redirect(url_for('phone.edit', id=phone.id))
         phone.save()
         # Update Invoice Ninja
-        product_key = f"Phone-{phone.name}"
+        product_key = f"Phone-{phone.name}"  # noqa E999
         if form.id.data < 0:
             ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=phone.price)
             if ninja_product:
@@ -91,6 +94,7 @@ def save():
 
 
 @phone_blueprint.route("/phone_delete", methods=["GET"])
+@login_required
 def delete():
     if 'id' in request.args:
         phone_id = int(request.args['id'])
