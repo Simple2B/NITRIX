@@ -50,7 +50,7 @@
                     {% for record in form.products %}
                     {% if form.is_edit and record.id == form.product_id.data %}
                     <option value="{{record.id}}" selected>{{ record.name }}</option>
-                    {% else %}
+                    {% elif record.status.value == "Active" %}
                     <option value="{{record.id}}">{{ record.name }}</option>
                     {% endif %}
                     {%endfor%}
