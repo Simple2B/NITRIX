@@ -18,7 +18,8 @@ def all_reseller_forms(reseller: Reseller): # noqa E999
             product_id=product.product_id,
             reseller_id=product.reseller_id,
             months=product.months,
-            price=product.price
+            init_price=product.init_price,
+            ext_price=product.ext_price,
             )
         result += [form]
     return result
@@ -135,13 +136,14 @@ def save_product():
         else:
             product.product_id = form.product_id.data
             product.months = form.months.data
-            product.price = form.price.data
+            product.init_price = form.init_price.data
+            product.ext_price = form.ext_price.data
             product.save()
             # Update Invoice Ninja
             product_key = ninja_product_name(product.product.name, product.months)
             if form.id.data < 0:
                 ninja_product = ninja.add_product(product_key=product_key,
-                                                  notes=product.reseller.name, cost=product.price)
+                                                  notes=product.reseller.name, cost=product.init_price)
                 if ninja_product:
                     product.ninja_product_id = ninja_product.id
                     product.save()
@@ -152,7 +154,7 @@ def save_product():
                         ninja_product.id,
                         product_key=product_key,
                         notes=product.reseller.name,
-                        cost=product.price)
+                        cost=product.init_price)
     else:
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error on /save_reseller_product")

@@ -9,9 +9,10 @@
     </form>
     {% if form.is_edit %}
     <div class="form-group row">
-      <label class="col-sm-6 col-form-label">Product</label>
+      <label class="col-sm-5 col-form-label">Product</label>
       <label class="col-sm-2 col-form-label">Months</label>
-      <label class="col-sm-2 col-form-label">Price</label>
+      <label class="col-sm-2 col-form-label">init Price</label>
+      <label class="col-sm-2 col-form-label">Ext Price</label>
     </div>
 
 
@@ -19,7 +20,7 @@
       <div class="form-group row">
         <input id="id" name="id" type="hidden" value="-1">
         <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
-        <div class="col-sm-6">
+        <div class="col-sm-5">
           <select class="form-control" name="product_id">
             {% for record in form.products %}
             <option value="{{record.id}}">{{ record.name }}</option>
@@ -30,8 +31,11 @@
           <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
         </div>
         <div class="col-sm-2">
-          <input class="form-control" id="price" name="price" required="" type="text" placeholder="0.00">
+          <input class="form-control" id="init_price" name="init_price" required="" type="text" placeholder="0.00">
         </div>
+        <div class="col-sm-2">
+            <input class="form-control" id="ext_price" name="ext_price" required="" type="text" placeholder="0.00">
+          </div>
         <div class="col-sm-2">
           <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
         </div>

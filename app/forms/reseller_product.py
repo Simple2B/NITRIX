@@ -8,5 +8,6 @@ class ResellerProductForm(FlaskForm):
     product_id = IntegerField("Product:", validators=[DataRequired()])
     reseller_id = IntegerField("Reseller:", validators=[DataRequired()])
     months = IntegerField("Months:", validators=[DataRequired()])
-    price = FloatField("Price:", validators=[DataRequired()])
+    init_price = FloatField("Init_Price:", validators=[DataRequired()])
+    ext_price = FloatField("Ext_Price:", validators=[DataRequired()])
     submit = SubmitField("Save")
