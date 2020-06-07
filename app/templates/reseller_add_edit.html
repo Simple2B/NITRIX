@@ -30,6 +30,8 @@
       </div>
     </div>
   </form>
+
+
   {% if form.is_edit %}
   <div class="form-group row">
     <label class="col-sm-6 col-form-label">Product</label>
@@ -43,50 +45,28 @@
       {{prod_form.reseller_id(type='hidden')}}
       <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
       <div class="col-sm-6">
-        <select class="form-control" name="product_id">
+        <select class="form-control" name="product_id" readonly>
           {% for record in form.products %}
           {% if record.id == prod_form.product_id.data %}
-          <option value="{{record.id}}" selected>{{ record.name }}</option>
+          <option value="{{record.id}}" readonly selected>{{ record.name }}</option>
           {% else %}
-          <option value="{{record.id}}">{{ record.name }}</option>
+          <option value="{{record.id}}" readonly>{{ record.name }}</option>
           {% endif %}
           {% endfor %}
         </select>
       </div>
-      <div class="col-sm-2"> {{prod_form.months(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.price(class="form-control")}} </div>
-      <div class="col-sm-2">
+      <div class="col-sm-2" readonly> {{prod_form.months(class="form-control" )}} </div>
+      <div class="col-sm-2"readonly> {{prod_form.price(class="form-control")}} </div>
+      <div class="col-sm-2"readonly>
         {{prod_form.submit(class="btn btn-success", value="v")}}
         {{prod_form.submit(class="btn btn-danger", value="-")}}
       </div>
     </div>
   </form>
   {% endfor %}
-
-  <form action="{{url_for('reseller.save_product')}}" method="POST">
-    <div class="form-group row">
-      <input id="id" name="id" type="hidden" value="-1">
-      <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
-      <div class="col-sm-6">
-        <select class="form-control" name="product_id">
-          {% for record in form.products %}
-          <option value="{{record.id}}">{{ record.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-sm-2">
-        <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
-      </div>
-      <div class="col-sm-2">
-        <input class="form-control" id="price" name="price" required="" type="text" placeholder="0.00">
-      </div>
-      <div class="col-sm-2">
-        <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
-      </div>
-    </div>
-
-  </form>
+  <a href="{{url_for('reseller.add_reseller_product')}}?id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">Add new product</a>
   {% endif %}
+
 </div>
 
 

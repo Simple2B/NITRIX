@@ -157,3 +157,30 @@ def save_product():
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error on /save_reseller_product")
     return redirect(url_for('reseller.edit', id=form.reseller_id.data))
+
+
+@reseller_blueprint.route("/add_reseller_product", methods=["POST", "GET"])
+@login_required
+def add_reseller_product():
+    # form = ResellerForm(request.form)
+    # form.is_edit = True
+    id = int(request.args['id'])
+    reseller = Reseller.query.filter(Reseller.id == id).first()
+    if reseller is None:
+        flash("Wrong account id.", "danger")
+        return redirect(url_for('main.resellers'))
+    form = ResellerForm(
+        id=reseller.id,
+        name=reseller.name,
+        status=reseller.status.name,
+        comments=reseller.comments
+        )
+    form.is_edit = True
+    form.save_route = url_for('reseller.save')
+    form.delete_route = url_for('reseller.delete')
+    form.product_forms = all_reseller_forms(reseller)
+    form.products = Product.query.filter(Product.deleted == False)  # noqa E712
+    return render_template(
+            "reseller_add_product.html",
+            form=form
+        )

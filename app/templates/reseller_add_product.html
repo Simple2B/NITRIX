@@ -1,0 +1,45 @@
+{% extends "base_add_edit.html" %}
+
+{% block res_product %}
+<div class="container ">
+      <div class="row pl-3 pb-3">
+        <h1>Add new product</h1>
+      </div>
+
+    </form>
+    {% if form.is_edit %}
+    <div class="form-group row">
+      <label class="col-sm-6 col-form-label">Product</label>
+      <label class="col-sm-2 col-form-label">Months</label>
+      <label class="col-sm-2 col-form-label">Price</label>
+    </div>
+
+
+    <form action="{{url_for('reseller.save_product')}}" method="POST">
+      <div class="form-group row">
+        <input id="id" name="id" type="hidden" value="-1">
+        <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
+        <div class="col-sm-6">
+          <select class="form-control" name="product_id">
+            {% for record in form.products %}
+            <option value="{{record.id}}">{{ record.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-2">
+          <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
+        </div>
+        <div class="col-sm-2">
+          <input class="form-control" id="price" name="price" required="" type="text" placeholder="0.00">
+        </div>
+        <div class="col-sm-2">
+          <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
+        </div>
+      </div>
+
+    </form>
+    {% endif %}
+
+  </div>
+
+{% endblock %}
