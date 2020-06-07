@@ -16,7 +16,7 @@ login_manager.needs_refresh_message_category = "info"
 def create_app(environment="development"):
 
     from config import config
-    from .views import main_blueprint, auth_blueprint, account_blueprint
+    from .views import main_blueprint, auth_blueprint, account_blueprint, reseller_product_blueprint
     from .views import product_blueprint, reseller_blueprint, user_blueprint, phone_blueprint
     from .models import User
     from .logger import log
@@ -42,6 +42,7 @@ def create_app(environment="development"):
     app.register_blueprint(phone_blueprint)
     app.register_blueprint(reseller_blueprint)
     app.register_blueprint(user_blueprint)
+    app.register_blueprint(reseller_product_blueprint)
 
     # Set up flask login.
     @login_manager.user_loader

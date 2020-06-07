@@ -20,34 +20,6 @@
         <label class="col-sm-2 col-form-label">Init Price</label>
         <label class="col-sm-2 col-form-label">Ext Price</label>
       </div>
-      {% for prod_form in form.product_forms %}
-  <form action="{{url_for('reseller.save_product')}}" method="POST">
-    <div class="form-group row">
-      {{prod_form.id(type='hidden')}}
-      {{prod_form.reseller_id(type='hidden')}}
-      <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
-      <div class="col-sm-4">
-        <select class="form-control" name="product_id">
-          {% for record in form.products %}
-          {% if record.id == prod_form.product_id.data %}
-          <option value="{{record.id}}" selected>{{ record.name }}</option>
-          {% else %}
-          <option value="{{record.id}}">{{ record.name }}</option>
-          {% endif %}
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-sm-2"> {{prod_form.months(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.init_price(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.ext_price(class="form-control")}} </div>
-      <div class="col-sm-2">
-        {{prod_form.submit(class="btn btn-success", value="v")}}
-        {{prod_form.submit(class="btn btn-danger", value="-")}}
-      </div>
-    </div>
-  </form>
-  {% endfor %}
-
 
       <form action="{{url_for('reseller.save_product')}}" method="POST">
         <div class="form-group row">

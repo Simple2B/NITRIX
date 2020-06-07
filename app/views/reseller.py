@@ -10,19 +10,16 @@ from app.utils import ninja_product_name
 reseller_blueprint = Blueprint('reseller', __name__)
 
 
-def all_reseller_forms(reseller: Reseller): # noqa E999
-    result = []
-    for product in reseller.products:
-        form = ResellerProductForm(
+def all_reseller_forms(reseller: Reseller):
+    return [ResellerProductForm(
             id=product.id,
             product_id=product.product_id,
+            product_name=product.product.name,
             reseller_id=product.reseller_id,
             months=product.months,
             init_price=product.init_price,
             ext_price=product.ext_price,
-            )
-        result += [form]
-    return result
+            ) for product in reseller.products]
 
 
 @reseller_blueprint.route("/reseller_edit")
@@ -45,7 +42,7 @@ def edit():
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
         form.product_forms = all_reseller_forms(reseller)
-        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
+        log(log.DEBUG, 'products: %d', len(form.product_forms))
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -159,28 +156,3 @@ def save_product():
         flash('Form validation error', 'danger')
         log(log.ERROR, "Form validation error on /save_reseller_product")
     return redirect(url_for('reseller.edit', id=form.reseller_id.data))
-
-
-@reseller_blueprint.route("/add_reseller_product", methods=["POST", "GET"])
-@login_required
-def add_reseller_product():
-    id = int(request.args['id'])
-    reseller = Reseller.query.filter(Reseller.id == id).first()
-    if reseller is None:
-        flash("Wrong account id.", "danger")
-        return redirect(url_for('main.resellers'))
-    form = ResellerForm(
-        id=reseller.id,
-        name=reseller.name,
-        status=reseller.status.name,
-        comments=reseller.comments
-        )
-    form.is_edit = True
-    form.save_route = url_for('reseller.save')
-    form.delete_route = url_for('reseller.delete')
-    form.product_forms = all_reseller_forms(reseller)
-    form.products = Product.query.filter(Product.deleted == False)  # noqa E712
-    return render_template(
-            "reseller_add_product.html",
-            form=form
-        )

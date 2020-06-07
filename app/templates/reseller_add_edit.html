@@ -39,32 +39,25 @@
   </div>
   {% for prod_form in form.product_forms %}
 
-  <form action="{{url_for('reseller.save_product')}}" method="POST">
+  <form action="{{url_for('reseller_product.edit')}}" method="POST">
     <div class="form-group row">
       {{prod_form.id(type='hidden')}}
       {{prod_form.reseller_id(type='hidden')}}
-      <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
-      <div class="col-sm-5">
-          {% for record in form.products %}
-          {% if record.id == prod_form.product_id.data %}
-          <input type="text" class="form-control" value="{{ record.name}}" readonly>
-          {% endif %}
-          {% endfor %}
-      </div>
-      <div class="col-sm-2"><input type="text" class="form-control" value="{{prod_form.months.data}}" readonly></div>
-      <div class="col-sm-2"> <input type="text" class="form-control" value="{{prod_form.init_price.data}}" readonly> </div>
-      <div class="col-sm-2"> <input type="text" class="form-control" value="{{prod_form.ext_price.data}}" readonly> </div>
-      <!-- <div class="col-sm-2">
+      <div class="col-sm-4">{{prod_form.product_name(readonly=True, class='form-control')}}</div>
+      <div class="col-sm-2">{{prod_form.months(readonly=True, class='form-control')}}</div>
+      <div class="col-sm-2">{{prod_form.init_price(readonly=True, class='form-control')}}</div>
+      <div class="col-sm-2">{{prod_form.ext_price(readonly=True, class='form-control')}}</div>
+      <div class="col-sm-2">
         {{prod_form.submit(class="btn btn-success", value="v")}}
         {{prod_form.submit(class="btn btn-danger", value="-")}}
-      </div> -->
+      </div>
     </div>
   </form>
   {% endfor %}
   {% endif %}
   {% if form.is_edit %}
   <div class="row">
-  <a href="{{url_for('reseller.add_reseller_product')}}?id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">Add/Edit product</a>
+  <a href="{{url_for('reseller_product.add')}}?id_reseller={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">Add product</a>
   </div>
   {%endif%}
 </div>
