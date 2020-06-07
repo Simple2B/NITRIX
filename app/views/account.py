@@ -106,7 +106,7 @@ def add_ninja_invoice(account: Account): # noqa E999
     current_invoice.add_item(
         ninja_product_name(account.product.name, account.months),
         account.name,
-        cost=reseller_product.price if reseller_product else 0)
+        cost=reseller_product.init_price if reseller_product else 0)
     if account.phone.name != "None":
         phone_name = f"Phone-{account.phone.name}"
         current_invoice.add_item(

@@ -1,49 +1,84 @@
-{% extends "base_add_edit.html" %}
-
-{% block res_product %}
-<div class="container ">
-      <div class="row pl-3 pb-3">
-        <h1>Add new product</h1>
-      </div>
-
-    </form>
-    {% if form.is_edit %}
-    <div class="form-group row">
-      <label class="col-sm-5 col-form-label">Product</label>
-      <label class="col-sm-2 col-form-label">Months</label>
-      <label class="col-sm-2 col-form-label">init Price</label>
-      <label class="col-sm-2 col-form-label">Ext Price</label>
-    </div>
-
-
-    <form action="{{url_for('reseller.save_product')}}" method="POST">
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>indext page</title>
+</head>
+<body>
+    <div class="container">
+    <div class="card bg-secondary">
+        <h5 class="card-header">Add new Product</h5>
+        <div class="card-body bg-light">
+        {% if form.is_edit %}
       <div class="form-group row">
-        <input id="id" name="id" type="hidden" value="-1">
-        <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
-        <div class="col-sm-5">
-          <select class="form-control" name="product_id">
-            {% for record in form.products %}
-            <option value="{{record.id}}">{{ record.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-sm-2">
-          <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
-        </div>
-        <div class="col-sm-2">
-          <input class="form-control" id="init_price" name="init_price" required="" type="text" placeholder="0.00">
-        </div>
-        <div class="col-sm-2">
-            <input class="form-control" id="ext_price" name="ext_price" required="" type="text" placeholder="0.00">
-          </div>
-        <div class="col-sm-2">
-          <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
-        </div>
+        <label class="col-sm-5 col-form-label">Product</label>
+        <label class="col-sm-2 col-form-label">Months</label>
+        <label class="col-sm-2 col-form-label">Init Price</label>
+        <label class="col-sm-2 col-form-label">Ext Price</label>
       </div>
+      {% for prod_form in form.product_forms %}
+  <form action="{{url_for('reseller.save_product')}}" method="POST">
+    <div class="form-group row">
+      {{prod_form.id(type='hidden')}}
+      {{prod_form.reseller_id(type='hidden')}}
+      <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
+      <div class="col-sm-4">
+        <select class="form-control" name="product_id">
+          {% for record in form.products %}
+          {% if record.id == prod_form.product_id.data %}
+          <option value="{{record.id}}" selected>{{ record.name }}</option>
+          {% else %}
+          <option value="{{record.id}}">{{ record.name }}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-2"> {{prod_form.months(class="form-control")}} </div>
+      <div class="col-sm-2"> {{prod_form.init_price(class="form-control")}} </div>
+      <div class="col-sm-2"> {{prod_form.ext_price(class="form-control")}} </div>
+      <div class="col-sm-2">
+        {{prod_form.submit(class="btn btn-success", value="v")}}
+        {{prod_form.submit(class="btn btn-danger", value="-")}}
+      </div>
+    </div>
+  </form>
+  {% endfor %}
 
-    </form>
-    {% endif %}
 
-  </div>
+      <form action="{{url_for('reseller.save_product')}}" method="POST">
+        <div class="form-group row">
+          <input id="id" name="id" type="hidden" value="-1">
+          <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
+          <div class="col-sm-4">
+            <select class="form-control" name="product_id">
+              {% for record in form.products %}
+              <option value="{{record.id}}">{{ record.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-sm-2">
+            <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
+          </div>
+          <div class="col-sm-2">
+            <input class="form-control" id="init_price" name="init_price" required="" type="text" placeholder="0.00">
+          </div>
+          <div class="col-sm-2">
+              <input class="form-control" id="ext_price" name="ext_price" required="" type="text" placeholder="0.00">
+            </div>
+          <div class="col-sm-2">
+            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
+          </div>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+    </div>
+</div>
 
-{% endblock %}
+
+</body>
+</html>

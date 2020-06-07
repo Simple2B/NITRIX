@@ -164,8 +164,6 @@ def save_product():
 @reseller_blueprint.route("/add_reseller_product", methods=["POST", "GET"])
 @login_required
 def add_reseller_product():
-    # form = ResellerForm(request.form)
-    # form.is_edit = True
     id = int(request.args['id'])
     reseller = Reseller.query.filter(Reseller.id == id).first()
     if reseller is None:

@@ -30,9 +30,7 @@
       </div>
     </div>
   </form>
-
-
-  {% if form.is_edit %}
+  {% if form.is_edit and form.product_forms %}
   <div class="form-group row">
     <label class="col-sm-5 col-form-label">Product</label>
     <label class="col-sm-2 col-form-label">Months</label>
@@ -47,19 +45,15 @@
       {{prod_form.reseller_id(type='hidden')}}
       <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
       <div class="col-sm-5">
-        <select class="form-control" name="product_id" readonly>
           {% for record in form.products %}
           {% if record.id == prod_form.product_id.data %}
-          <option value="{{record.id}}" readonly selected>{{ record.name }}</option>
-          {% else %}
-          <option value="{{record.id}}" readonly>{{ record.name }}</option>
+          <input type="text" class="form-control" value="{{ record.name}}" readonly>
           {% endif %}
           {% endfor %}
-        </select>
       </div>
-      <div class="col-sm-2" > {{prod_form.months(class="form-control" )}} </div>
-      <div class="col-sm-2"> {{prod_form.init_price(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.ext_price(class="form-control")}} </div>
+      <div class="col-sm-2"><input type="text" class="form-control" value="{{prod_form.months.data}}" readonly></div>
+      <div class="col-sm-2"> <input type="text" class="form-control" value="{{prod_form.init_price.data}}" readonly> </div>
+      <div class="col-sm-2"> <input type="text" class="form-control" value="{{prod_form.ext_price.data}}" readonly> </div>
       <!-- <div class="col-sm-2">
         {{prod_form.submit(class="btn btn-success", value="v")}}
         {{prod_form.submit(class="btn btn-danger", value="-")}}
@@ -67,11 +61,11 @@
     </div>
   </form>
   {% endfor %}
-  <a href="{{url_for('reseller.add_reseller_product')}}?id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">Add new product</a>
   {% endif %}
-
+  {% if form.is_edit %}
+  <div class="row">
+  <a href="{{url_for('reseller.add_reseller_product')}}?id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">Add/Edit product</a>
+  </div>
+  {%endif%}
 </div>
-
-
-
 {% endblock %}
