@@ -17,7 +17,7 @@
     <div class="col-sm-8">
       <select class="form-control" name="product_id">
         {% for record in form.products %}
-        {% if form.is_edit and record.id == form.product_id.data %}
+        {% if record.id == form.product_id.data %}
         <option value="{{record.id}}" selected>{{ record.name }}</option>
         {% elif record.status.value == "Active" and record.deleted == False %}
         <option value="{{record.id}}">{{ record.name }}</option>
