@@ -27,7 +27,8 @@ def client():
 def test_edit_user(client):
     response = client.get('/users')
     assert response.status_code == 200
-    user = User(name='TEST USER NAME', password_val="12345")
+    user = User(name='TEST USER NAME')
+    user.password = "12345"
     user.save()
     response = client.get(f'/user_edit?id={user.id}')
     assert response.status_code == 200
