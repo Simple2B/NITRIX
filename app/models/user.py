@@ -25,7 +25,6 @@ class User(db.Model, UserMixin, ModelMixin):
     name = db.Column(db.String(60), unique=True, nullable=False)
     user_type = db.Column(Enum(Type), default=Type.user)
     password_hash = db.Column(db.String(255))
-    password_val = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
     deleted = db.Column(db.Boolean, default=False)
 
@@ -36,7 +35,6 @@ class User(db.Model, UserMixin, ModelMixin):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
-        self.password_val = password
 
     @classmethod
     def authenticate(cls, user_name, password):
