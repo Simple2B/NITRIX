@@ -119,7 +119,7 @@
         </div>
         {%for acc_ext in form.extensions %}
         <div class="save_ext">
-            <form action="{{ url_for('account.ext_save') }}" method="POST">
+            <form action="{{ url_for('account_extension.ext_save') }}" method="POST">
                 <input type="hidden" name="id" value="{{acc_ext.id}}">
                 <input type="hidden" name="account_id" value="{{form.id.data}}">
                 <div class="row mb-1">
@@ -158,7 +158,7 @@
             </form>
         </div>
         {% endfor %}
-        <form action="{{ url_for('account.ext_save') }}" method="POST">
+        <form action="{{ url_for('account_extension.ext_save') }}" method="POST">
             <input type="hidden" name="id" value="-1">
             <input type="hidden" name="account_id" value="{{form.id.data}}">
             <div class="row">

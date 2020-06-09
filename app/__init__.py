@@ -18,6 +18,7 @@ def create_app(environment="development"):
     from config import config
     from .views import main_blueprint, auth_blueprint, account_blueprint, reseller_product_blueprint
     from .views import product_blueprint, reseller_blueprint, user_blueprint, phone_blueprint
+    from .views import account_extension_blueprint
     from .models import User
     from .logger import log
 
@@ -38,6 +39,7 @@ def create_app(environment="development"):
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(main_blueprint)
     app.register_blueprint(account_blueprint)
+    app.register_blueprint(account_extension_blueprint)
     app.register_blueprint(product_blueprint)
     app.register_blueprint(phone_blueprint)
     app.register_blueprint(reseller_blueprint)
