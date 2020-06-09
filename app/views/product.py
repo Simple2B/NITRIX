@@ -1,4 +1,5 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask_login import login_required
 from app.models import Product
 from app.forms import ProductForm
 from app.logger import log
@@ -7,6 +8,7 @@ product_blueprint = Blueprint('product', __name__)
 
 
 @product_blueprint.route("/product_details")
+@login_required
 def edit():
     log(log.INFO, '/product_details')
     if 'id' in request.args:
@@ -41,6 +43,7 @@ def edit():
 
 
 @product_blueprint.route("/product_save", methods=["POST"])
+@login_required
 def save():
     log(log.INFO, '/product_save')
     form = ProductForm(request.form)
@@ -64,6 +67,7 @@ def save():
 
 
 @product_blueprint.route("/product_delete", methods=["GET"])
+@login_required
 def delete():
     if 'id' in request.args:
         product_id = int(request.args['id'])

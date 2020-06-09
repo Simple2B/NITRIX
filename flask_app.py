@@ -24,8 +24,16 @@ def create_database():
             reseller_product.ninja_product_id = ninja_product.id
             reseller_product.save(False)
 
+    def add_phone(name, price):
+        phone = Phone(name=name, price=price).save(False)
+        product_key = f'Phone-{phone.name}'
+        ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=price)
+        if ninja_product:
+            phone.ninja_product_id = ninja_product.id
+            phone.save(False)
+
     db.create_all()
-    Phone(name='None').save(False)
+    Phone(name='None', price=0.00).save(False)
     User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
     User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
     reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
@@ -47,7 +55,9 @@ def create_database():
     add_reseller_product(months=3, price=6.99, product=product_bronsa, reseller=reseller_nitrix)
     add_reseller_product(months=6, price=12.45, product=product_bronsa, reseller=reseller_nitrix)
     add_reseller_product(months=12, price=20.99, product=product_bronsa, reseller=reseller_nitrix)
-
+    add_phone(name="Samsung", price=54.00)
+    add_phone(name="Nokia", price=38.00)
+    add_phone(name="Lg", price=30.00)
     db.session.commit()
 
 

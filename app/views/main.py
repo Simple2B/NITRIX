@@ -1,7 +1,7 @@
 import io
 import csv
 import datetime
-from flask import render_template, Blueprint, redirect, url_for, send_from_directory
+from flask import render_template, Blueprint, redirect, url_for, send_from_directory, flash
 from flask import current_app as app, send_file, request
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
@@ -104,9 +104,10 @@ def report():
 
     entities = Class.query.filter(Class.deleted == False)  # noqa
 
-    if not entities:
+    if not entities.first():
         log(log.INFO, 'no entities')
-        return
+        flash("Nothing to report", "danger")
+        return redirect(url_for(f'main.{content}'.lower()))
 
     proxy = io.StringIO()
     writer = csv.writer(proxy)

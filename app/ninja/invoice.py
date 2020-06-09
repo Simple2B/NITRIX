@@ -1,6 +1,5 @@
 from app.logger import log
 from app.ninja import api
-from datetime import datetime
 
 
 class NinjaInvoice(object):
@@ -58,7 +57,7 @@ class NinjaInvoice(object):
             **self.to_dict())
 
     @staticmethod
-    def get(invoice_id: int):
+    def get(invoice_id: int): # noqa E999
         log(log.DEBUG, 'NinjaInvoice.get %d', invoice_id)
         res = api.do_get('{}invoices?id={}'.format(api.BASE_URL, invoice_id))
         if not res or not res['data']:
@@ -71,7 +70,7 @@ class NinjaInvoice(object):
         res = api.do_post(
             api.BASE_URL + 'invoices',
             client_id=client_id,
-            invoice_date=datetime.now().strftime('%Y-%m-%d'),
+            invoice_date=invoice_date,
             due_date=due_date)
         if not res or not res['data']:
             return res

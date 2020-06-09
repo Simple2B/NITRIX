@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask_login import login_required
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
 from app.models import ResellerProduct
@@ -20,6 +21,7 @@ def all_phones():
 
 
 @account_blueprint.route("/account_details")
+@login_required
 def edit():
     log(log.INFO, '/account_details')
     if 'id' in request.args:
@@ -72,7 +74,7 @@ def edit():
             )
 
 
-def add_ninja_invoice(account: Account):
+def add_ninja_invoice(account: Account): # noqa E999
     reseller_product = ResellerProduct.query.filter(
         ResellerProduct.reseller_id == account.reseller_id
         ).filter(
@@ -90,7 +92,7 @@ def add_ninja_invoice(account: Account):
             ResellerProduct.months == account.months
         ).first()
     # First day of month
-    invoice_date = datetime(account.activation_date.year, account.activation_date.month, 1)
+    invoice_date = datetime(datetime.now().year, datetime.now().month, 1)
     invoice_date = invoice_date.strftime('%Y-%m-%d')
     current_invoice = None
     for invoice in NinjaInvoice.all():
@@ -105,9 +107,16 @@ def add_ninja_invoice(account: Account):
         ninja_product_name(account.product.name, account.months),
         account.name,
         cost=reseller_product.price if reseller_product else 0)
+    if account.phone.name != "None":
+        phone_name = f"Phone-{account.phone.name}"
+        current_invoice.add_item(
+            phone_name,
+            account.name,
+            cost=account.phone.price)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
+@login_required
 def save():
     log(log.INFO, "/account_save")
     form = AccountForm(request.form)
@@ -136,6 +145,7 @@ def save():
             # Add a new account
             account = Account(name=form.name.data, product_id=form.product_id.data,
                               reseller_id=form.reseller_id.data,
+                              phone_id=form.phone_id.data,
                               sim=form.sim.data,
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
@@ -164,6 +174,7 @@ def save():
 
 
 @account_blueprint.route("/account_ext_add", methods=["POST"])
+@login_required
 def ext_save():
     form = AccountExtensionForm(request.form)
     if form.validate_on_submit():
@@ -206,6 +217,7 @@ def ext_save():
 
 
 @account_blueprint.route("/account_delete", methods=["GET"])
+@login_required
 def delete():
     if 'id' in request.args:
         account_id = int(request.args['id'])
