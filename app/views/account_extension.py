@@ -1,15 +1,22 @@
-from flask import Blueprint, request, flash, redirect, url_for
+from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
 
 from app.models import Account, AccountExtension
 from app.forms import AccountExtensionForm
 # from views.account import add_ninja_invoice
 
-
 account_extension_blueprint = Blueprint('account_extension', __name__)
 
 
-# For account extesion views
+@account_extension_blueprint.route("/account_extension_add")
+def add():
+    account_id = int(request.args['account_id'])
+    form = AccountExtensionForm(id=account_id)  # "id" is a temporal field here look into AccountExtensionForm
+    form.is_edit = False
+    # form.save_route = url_for('reseller_product.save')
+    return render_template("account_extension.html", form=form)
+
+
 @account_extension_blueprint.route("/account_ext_add", methods=["POST"])
 @login_required
 def ext_save():
@@ -53,3 +60,4 @@ def ext_save():
     else:
         flash('Form validation error', 'danger')
     return redirect(url_for('account.edit', id=request.form['account_id']))
+

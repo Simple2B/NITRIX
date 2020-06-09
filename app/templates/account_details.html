@@ -109,6 +109,13 @@
             </div>
         </div>
     </form>
+    {% if form.is_edit %}
+    <div class="row">
+        <a href="{{url_for('account_extension.add')}}?account_id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">
+            Add extension</a>
+    </div>
+    {%endif%}
+
     <div class="container">
         {% if form.is_edit %}
         <div class="row">

@@ -1,0 +1,30 @@
+{% extends "base_add_edit.html" %}
+
+{%block content %}
+<div class="container">
+  <div class="form-group mt-2">
+    {% if form.is_edit %}
+    <h2>Extension edit</h2>
+    {% else %}
+    <h2>Extension add</h2>
+    {% endif %}
+  </div>
+  {{form.id(type='hidden')}}
+  {{form.reseller_id(type='hidden')}}
+  
+  <div class="form-group row">
+    {{form.extension_date.label(class="col-sm-4 col-form-label")}}
+    <div class="col-sm-8">
+      {{form.extension_date(class="form-control")}}
+    </div>
+  </div>
+  <div class="form-group row">
+    {{form.months.label(class="col-sm-4 col-form-label")}}
+    <div class="col-sm-8">
+      {{form.months(class="form-control")}}
+    </div>
+  </div>
+
+</div>
+
+{% endblock%}
