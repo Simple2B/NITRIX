@@ -33,8 +33,13 @@ def delete():
         return redirect(url_for('main.resellers'))
     product = ResellerProduct.query.filter(ResellerProduct.id == int(request.args['id'])).first()
     reseller_id = product.reseller_id
-    ninja_product = ninja.get_product(product.ninja_product_id)
-    ninja.delete_product(ninja_product.id, ninja_product.product_key)
+
+    def delete_ninja_product(ninja_prod_id):
+        ninja_product = ninja.get_product(ninja_prod_id)
+        ninja.delete_product(ninja_product.id, ninja_product.product_key)
+
+    delete_ninja_product(product.ninja_init_product_id)
+    delete_ninja_product(product.ninja_ext_product_id)
     product.delete()
     return redirect(url_for('reseller.edit', id=reseller_id))
 
@@ -76,10 +81,6 @@ def save():
         flash('Form validation error', 'danger')
         log(log.WARNING, "Form validation error %s", form.errors)
         return redirect(url_for('reseller.edit', id=form.reseller_id.data))
-    # product = ResellerProduct.query\
-    #     .filter(ResellerProduct.reseller_id == form.reseller_id.data)\
-    #     .filter(ResellerProduct.product_id == form.product_id.data)\
-    #     .filter(ResellerProduct.months == form.months.data).first()
     product = ResellerProduct.query.filter(ResellerProduct.id == form.id.data).first()
     if product:
         product.reseller_id = form.reseller_id.data
@@ -97,19 +98,36 @@ def save():
             ext_price=form.ext_price.data)
     product.save()
     product_key = ninja_product_name(product.product.name, product.months)
+    product_key_ext = ninja_product_name(product.product.name, product.months) + " Extension"
     if form.id.data < 0:
         ninja_product = ninja.add_product(product_key=product_key,
                                             notes=product.reseller.name, cost=product.init_price)
         if ninja_product:
-            product.ninja_product_id = ninja_product.id
+            product.ninja_init_product_id = ninja_product.id
             product.save()
+
+        ninja_product_ext = ninja.add_product(product_key=product_key_ext,
+                                            notes=product.reseller.name, cost=product.ext_price)
+
+        if ninja_product_ext:
+            product.ninja_ext_product_id = ninja_product_ext.id
+            product.save()
+
     else:
-        ninja_product = ninja.get_product(product.ninja_product_id)
+        ninja_product = ninja.get_product(product.ninja_init_product_id)
         if ninja_product:
             ninja.update_product(
                 ninja_product.id,
                 product_key=product_key,
                 notes=product.reseller.name,
                 cost=product.init_price)
+
+        ninja_product_ext = ninja.get_product(product.ninja_ext_product_id)
+        if ninja_product_ext:
+            ninja.update_product(
+                ninja_product_ext.id,
+                product_key=product_key_ext,
+                notes=product.reseller.name,
+                cost=product.ext_price)
 
     return redirect(url_for('reseller.edit', id=form.reseller_id.data))

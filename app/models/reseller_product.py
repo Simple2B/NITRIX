@@ -14,6 +14,7 @@ class ResellerProduct(db.Model, ModelMixin):
     months = db.Column(db.Integer)
     init_price = db.Column(db.Float)
     ext_price = db.Column(db.Float)
-    ninja_product_id = db.Column(db.Integer)
+    ninja_init_product_id = db.Column(db.Integer)
+    ninja_ext_product_id = db.Column(db.Integer)
     product = relationship('Product')
     reseller = relationship('Reseller')

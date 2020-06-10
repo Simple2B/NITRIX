@@ -17,7 +17,8 @@ def get_context():
 def create_database():
     """ build database """
     def add_reseller_product(product, months, initprice, extprice, reseller):
-        reseller_product = ResellerProduct(months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
+        reseller_product = ResellerProduct(
+            months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
         product_key = f'{product.name} {months} Months'
         ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=initprice)
         if ninja_product:

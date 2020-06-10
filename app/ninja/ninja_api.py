@@ -66,6 +66,7 @@ class NinjaApi(object):
             'Content-Type': 'application/json'
             }
         data = json.dumps(data)
+        log(log.DEBUG, 'do_put data: %s', data)
         try:
             response = requests.put(url, headers=headers, data=data)
         except requests.exceptions.ConnectionError:
@@ -136,10 +137,13 @@ class NinjaApi(object):
             client_id {int} -- Invoice Ninja Client ID
         """
         log(log.DEBUG, 'NinjaApi.get_product %d', prod_id)
-        res = self.do_get('{}products?id={}'.format(self.BASE_URL, prod_id))
+        res = self.do_get('{}products'.format(self.BASE_URL))
         if not res or not res['data']:
             return res
-        return NinjaProduct(res['data'][0])
+        for product in res['data']:
+            if product['id'] == prod_id:
+                return NinjaProduct(product)
+        return None
 
     def add_product(self, notes: str, product_key: str, cost: float, qty: float = 1.0):
         """adds new product

@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Reseller, Product, ResellerProduct
+from app.models import Reseller
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
