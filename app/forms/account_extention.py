@@ -10,4 +10,3 @@ class AccountExtensionForm(FlaskForm):
     extension_date = DateField("Extension date", validators=[DataRequired()], default=datetime.now)
     months = IntegerField("Month", [DataRequired()])
     product_id = IntegerField("Product", validators=[DataRequired()])
-    

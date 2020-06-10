@@ -9,7 +9,7 @@ from app.views.account import add_ninja_invoice
 
 account_extension_blueprint = Blueprint('account_extension', __name__)
 
-UNKNOWN_ID = 'Unknown extension id'
+UNKNOWN_ID = 'Unknown id'
 VALIDATION_ERROR = 'Form validation error'
 
 
@@ -18,7 +18,10 @@ VALIDATION_ERROR = 'Form validation error'
 def add():
     log(log.INFO, '%s /account_extension_add', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    account_id = int(request.args['account_id'])
+    if 'id' not in request.args:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
+    account_id = int(request.args['id'])
     form = AccountExtensionForm(id=account_id)
     form.products = Product.query.filter(Product.deleted == False) # noqa E712
     form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
@@ -64,7 +67,7 @@ def save_new():
     if not form.validate_on_submit():
         flash(VALIDATION_ERROR, 'danger')
         log(log.WARNING, VALIDATION_ERROR, form.errors)
-        return redirect(url_for('account.edit', id=form.id.data))  
+        return redirect(url_for('account.edit', id=form.id.data))
     account = Account.query.filter(Account.id == form.id.data).first()
     account_ext = AccountExtension()
     account_ext.account_id = account.id
@@ -90,6 +93,7 @@ def save_new():
 @account_extension_blueprint.route("/account_ext_save_update", methods=["POST"])
 @login_required
 def save_update():
+    log(log.INFO, '%s /account_ext_save_update', request.method)
     form = AccountExtensionForm(request.form)
     if not form.validate_on_submit():
         flash(VALIDATION_ERROR, 'danger')
