@@ -15,3 +15,6 @@ class AccountExtension(db.Model, ModelMixin):
     months = db.Column(db.Integer)
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
     reseller = relationship('Reseller')
+    product_id = db.Column(db.Integer, db.ForeignKey("products.id"))
+    product = relationship('Product')
+

@@ -1,63 +1,117 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
 
-from app.models import Account, AccountExtension
+from app.models import Account, AccountExtension, Product, Reseller
 from app.forms import AccountExtensionForm
-# from views.account import add_ninja_invoice
+from app.logger import log
+
+from app.views.account import add_ninja_invoice
 
 account_extension_blueprint = Blueprint('account_extension', __name__)
 
+UNKNOWN_ID = 'Unknown extension id'
+VALIDATION_ERROR = 'Form validation error'
+
 
 @account_extension_blueprint.route("/account_extension_add")
+@login_required
 def add():
+    log(log.INFO, '%s /account_extension_add', request.method)
+    log(log.DEBUG, 'args: %s', request.args)
     account_id = int(request.args['account_id'])
-    form = AccountExtensionForm(id=account_id)  # "id" is a temporal field here look into AccountExtensionForm
+    form = AccountExtensionForm(id=account_id)
+    form.products = Product.query.filter(Product.deleted == False) # noqa E712
+    form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
     form.is_edit = False
-    # form.save_route = url_for('reseller_product.save')
+    form.save_route = url_for('account_extension.save_new')
     return render_template("account_extension.html", form=form)
 
 
-@account_extension_blueprint.route("/account_ext_add", methods=["POST"])
+@account_extension_blueprint.route("/account_extension_edit")
 @login_required
-def ext_save():
+def edit():
+    log(log.INFO, '%s /account_extension_edit', request.method)
+    log(log.DEBUG, 'args: %s', request.args)
+    if 'id' not in request.args:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
+    extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
+    if not extension:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
+    form = AccountExtensionForm(
+        id=extension.id,
+        product_id=extension.product_id,
+        reseller_id=extension.reseller_id,
+        months=extension.months,
+        extension_date=extension.extension_date
+        )
+    form.is_edit = True
+    form.products = Product.query.filter(Product.deleted == False) # noqa E712
+    form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+    form.save_route = url_for('account_extension.save_update')
+    return render_template(
+        "account_extension.html",
+        form=form
+    )
+
+
+@account_extension_blueprint.route("/account_ext_save_new", methods=["POST"])
+@login_required
+def save_new():
+    log(log.INFO, '%s /account_ext_save_new', request.method)
     form = AccountExtensionForm(request.form)
-    if form.validate_on_submit():
-        account = Account.query.filter(Account.id == request.form['account_id']).first()
-        # add new Account Extension
-        if form.id.data < 0:
-            account_ext = AccountExtension()
-            account_ext.account_id = account.id
-            account_ext.reseller_id = account.reseller_id
-            account_ext.months = account.months
-            account_ext.extension_date = account.activation_date
-            account_ext.save()
-            account.reseller_id = form.reseller_id.data
-            account.months = form.months.data
-            # Check that months must be in 1-12
-            if not 0 < account.months <= 12:
-                flash('Mohths must be in 1-12', 'danger')
-                return redirect(url_for('account.edit', id=account.id))
-            account.activation_date = form.extension_date.data
-            account.save()
-            # Register product in Invoice Ninja
-            # add_ninja_invoice(account)
-        else:
-            account_ext = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
-            if request.form['action'] == 'delete':  # delete AccountExtension
-                account_ext.delete()
-            else:
-                #  Update AccountExtension
-                account_ext.reseller_id = form.reseller_id.data
-                account_ext.months = form.months.data
-                account_ext.extension_date = form.extension_date.data
-                # Check that months must be in 1-12
-                if not 0 < account_ext.months <= 12:
-                    flash('Mohths must be in 1-12', 'danger')
-                    return redirect(url_for('account.edit', id=account.id))
-                account_ext.save()
+    if not form.validate_on_submit():
+        flash(VALIDATION_ERROR, 'danger')
+        log(log.WARNING, VALIDATION_ERROR, form.errors)
+        return redirect(url_for('account.edit', id=form.id.data))  
+    account = Account.query.filter(Account.id == form.id.data).first()
+    account_ext = AccountExtension()
+    account_ext.account_id = account.id
+    account_ext.reseller_id = account.reseller_id
+    account_ext.product_id = account.product_id
+    account_ext.months = account.months
+    account_ext.extension_date = account.activation_date
+    account_ext.save()
+    account.product_id = form.product_id.data
+    account.reseller_id = form.reseller_id.data
+    account.months = form.months.data
+    # Check that months must be in 1-12
+    if not 0 < account.months <= 12:
+        flash('Mohths must be in 1-12', 'danger')
+        return redirect(url_for('account.edit', id=account.id))
+    account.activation_date = form.extension_date.data
+    account.save()
+    # Register product in Invoice Ninja
+    add_ninja_invoice(account)
+    return redirect(url_for('account.edit', id=form.id.data))
 
-        return redirect(url_for('account.edit', id=request.form['account_id']))
-    else:
-        flash('Form validation error', 'danger')
-    return redirect(url_for('account.edit', id=request.form['account_id']))
 
+@account_extension_blueprint.route("/account_ext_save_update", methods=["POST"])
+@login_required
+def save_update():
+    form = AccountExtensionForm(request.form)
+    if not form.validate_on_submit():
+        flash(VALIDATION_ERROR, 'danger')
+        log(log.WARNING, VALIDATION_ERROR, form.errors)
+        return redirect(url_for('account.edit', id=form.id.data))
+    extension = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
+    extension.reseller_id = form.reseller_id.data
+    extension.product_id = form.product_id.data
+    extension.extension_date = form.extension_date.data
+    extension.months = form.months.data
+    extension.save()
+    return redirect(url_for('account.edit', id=form.id.data))
+
+
+@account_extension_blueprint.route("/account_ext_delete")
+@login_required
+def delete():
+    log(log.INFO, '%s /account_ext_delete', request.method)
+    if 'id' not in request.args:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
+    extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
+    account_id = extension.account_id
+    extension.delete()
+    return redirect(url_for('account.edit', id=account_id))
