@@ -45,12 +45,12 @@ def edit():
         form.products = Product.query.filter(Product.deleted == False)  # noqa E712
         form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
         form.phones = all_phones()
-        form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
+        form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data).all()
         form.name_changes = AccountChanges.query.filter(AccountChanges.account_id == form.id.data).filter(
-                AccountChanges.change_type == AccountChanges.ChangeType.name)
+                AccountChanges.change_type == AccountChanges.ChangeType.name).all()
         form.sim_changes = AccountChanges.query.filter(
             AccountChanges.account_id == form.id.data).filter(
-                AccountChanges.change_type == AccountChanges.ChangeType.sim)
+                AccountChanges.change_type == AccountChanges.ChangeType.sim).all()
         form.is_edit = True
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')
@@ -63,7 +63,7 @@ def edit():
         form = AccountForm()
         form.products = Product.query.all()
         form.resellers = Reseller.query.all()
-        form.phones = Phone.query.filter(Phone.deleted == False).filter(Phone.status == Phone.Status.active)  # noqa E712
+        form.phones = Phone.query.filter(Phone.deleted == False).filter(Phone.status == Phone.Status.active).all()  # noqa E712
         form.is_edit = False
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')
