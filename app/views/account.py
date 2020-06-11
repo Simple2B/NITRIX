@@ -38,6 +38,7 @@ def edit():
             phone_id=account.phone_id,
             reseller_id=account.reseller_id,
             sim=account.sim,
+            imei=account.imei,
             comment=account.comment,
             activation_date=account.activation_date,
             months=account.months
@@ -147,6 +148,7 @@ def save():
                               reseller_id=form.reseller_id.data,
                               phone_id=form.phone_id.data,
                               sim=form.sim.data,
+                              imei=form.imei.data,
                               comment=form.comment.data,
                               activation_date=form.activation_date.data,
                               months=form.months.data)
