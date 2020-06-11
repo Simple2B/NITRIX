@@ -55,6 +55,7 @@ def edit():
     form.products = Product.query.filter(Product.deleted == False) # noqa E712
     form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
     form.save_route = url_for('account_extension.save_update')
+    form.delete_route = url_for('account_extension.delete')
     return render_template(
         "account_extension.html",
         form=form
