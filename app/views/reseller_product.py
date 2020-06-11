@@ -8,6 +8,7 @@ from app.utils import ninja_product_name
 
 
 reseller_product_blueprint = Blueprint('reseller_product', __name__)
+NINJA_ERROR = 'Ninja connection failed'
 
 
 @reseller_product_blueprint.route("/reseller_product_add")
@@ -34,7 +35,11 @@ def delete():
     product = ResellerProduct.query.filter(ResellerProduct.id == int(request.args['id'])).first()
     reseller_id = product.reseller_id
     ninja_product = ninja.get_product(product.ninja_product_id)
-    ninja.delete_product(ninja_product.id, ninja_product.product_key)
+    if ninja_product:
+        ninja.delete_product(ninja_product.id, ninja_product.product_key)
+    else:
+        log(log.ERROR, NINJA_ERROR)
+        flash(NINJA_ERROR, 'danger')
     product.delete()
     return redirect(url_for('reseller.edit', id=reseller_id))
 
@@ -76,10 +81,6 @@ def save():
         flash('Form validation error', 'danger')
         log(log.WARNING, "Form validation error %s", form.errors)
         return redirect(url_for('reseller.edit', id=form.reseller_id.data))
-    # product = ResellerProduct.query\
-    #     .filter(ResellerProduct.reseller_id == form.reseller_id.data)\
-    #     .filter(ResellerProduct.product_id == form.product_id.data)\
-    #     .filter(ResellerProduct.months == form.months.data).first()
     product = ResellerProduct.query.filter(ResellerProduct.id == form.id.data).first()
     if product:
         product.reseller_id = form.reseller_id.data

@@ -1,3 +1,4 @@
+from flask import url_for
 import pytest
 from app import db, create_app
 from app.models import ResellerProduct
@@ -28,6 +29,7 @@ def test_edit_reseller(client):
     TEST_PROD_ID = 3
     reseller_product = ResellerProduct(product_id=TEST_PROD_ID)
     reseller_product.save()
-    response = client.get(f'/reseller_product_edit?id={reseller_product.id}')
+    url = url_for('reseller_product.edit', id=reseller_product.id)
+    response = client.get(url)
     assert response.status_code == 200
-    assert b'3' in response.data
+    assert f'{TEST_PROD_ID}'.encode('utf-8') in response.data

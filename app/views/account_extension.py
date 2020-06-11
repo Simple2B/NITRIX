@@ -24,8 +24,8 @@ def add():
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
     form = AccountExtensionForm(id=account_id)
-    form.products = Product.query.filter(Product.deleted == False) # noqa E712
-    form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+    form.products = Product.query.filter(Product.deleted == False).all() # noqa E712
+    form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
     form.is_edit = False
     form.save_route = url_for('account_extension.save_new')
     return render_template("account_extension.html", form=form)
@@ -51,8 +51,8 @@ def edit():
         extension_date=extension.extension_date
         )
     form.is_edit = True
-    form.products = Product.query.filter(Product.deleted == False) # noqa E712
-    form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+    form.products = Product.query.filter(Product.deleted == False).all() # noqa E712
+    form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
     form.save_route = url_for('account_extension.save_update')
     form.delete_route = url_for('account_extension.delete')
     return render_template(
