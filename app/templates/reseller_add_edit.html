@@ -30,65 +30,40 @@
       </div>
     </div>
   </form>
-  {% if form.is_edit %}
-  <div class="form-group row">
-    <label class="col-sm-6 col-form-label">Product</label>
-    <label class="col-sm-2 col-form-label">Months</label>
-    <label class="col-sm-2 col-form-label">Price</label>
-  </div>
-  {% for prod_form in form.product_forms %}
-  <form action="{{url_for('reseller.save_product')}}" method="POST">
-    <div class="form-group row">
-      {{prod_form.id(type='hidden')}}
-      {{prod_form.reseller_id(type='hidden')}}
-      <!-- {{prod_form.product_id.label(class="col-sm-2 col-form-label")}} -->
-      <div class="col-sm-6">
-        <select class="form-control" name="product_id">
-          {% for record in form.products %}
-          {% if record.id == prod_form.product_id.data %}
-          <option value="{{record.id}}" selected>{{ record.name }}</option>
-          {% else %}
-          <option value="{{record.id}}">{{ record.name }}</option>
-          {% endif %}
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-sm-2"> {{prod_form.months(class="form-control")}} </div>
-      <div class="col-sm-2"> {{prod_form.price(class="form-control")}} </div>
-      <div class="col-sm-2">
-        {{prod_form.submit(class="btn btn-success", value="v")}}
-        {{prod_form.submit(class="btn btn-danger", value="-")}}
-      </div>
-    </div>
-  </form>
-  {% endfor %}
-
-  <form action="{{url_for('reseller.save_product')}}" method="POST">
-    <div class="form-group row">
-      <input id="id" name="id" type="hidden" value="-1">
-      <input id="reseller_id" name="reseller_id" type="hidden" value="{{form.id.data}}">
-      <div class="col-sm-6">
-        <select class="form-control" name="product_id">
-          {% for record in form.products %}
-          <option value="{{record.id}}">{{ record.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="col-sm-2">
-        <input class="form-control" id="months" name="months" required="" type="text" placeholder="?">
-      </div>
-      <div class="col-sm-2">
-        <input class="form-control" id="price" name="price" required="" type="text" placeholder="0.00">
-      </div>
-      <div class="col-sm-2">
-        <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Add">
-      </div>
-    </div>
-
-  </form>
+  {% if form.is_edit and form.product_forms %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Product</th>
+        <th scope="col">Months</th>
+        <th scope="col">Price</th>
+        <th scope="col">Extension Price</th>
+      </tr>
+    <tbody>
+      {% for prod_form in form.product_forms %}
+      <tr>
+        <th scope="row">
+          <a
+            {{'href=' + url_for('reseller_product.edit', _external=True, id=prod_form.id.data)}}>{{prod_form.product_name.data}}</a>
+          <a type="button" class="close" aria-label="Delete"
+            {{'href=' + url_for('reseller_product.delete', _external=True, id=prod_form.id.data)}}>
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Remove</span>
+          </a>
+        </th>
+        <td>{{prod_form.months.data}}</td>
+        <td>{{prod_form.init_price.data}}</td>
+        <td>{{prod_form.ext_price.data}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   {% endif %}
+{% if form.is_edit %}
+<div class="row">
+  <a href="{{url_for('reseller_product.add')}}?reseller_id={{ form.id.data }}" type="button"
+    class="btn btn-primary btn-lg btn-block">Add product</a>
 </div>
-
-
-
+{%endif%}
+</div>
 {% endblock %}

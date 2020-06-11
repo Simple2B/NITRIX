@@ -4,5 +4,7 @@
         "NITRIX",
         "noqa",
         "wtforms"
-    ]
+    ],
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": true
 }

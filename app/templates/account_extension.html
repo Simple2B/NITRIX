@@ -1,0 +1,56 @@
+{% extends "base_add_edit.html" %}
+
+{%block content %}
+<div class="container">
+  <div class="form-group mt-2">
+    {% if form.is_edit %}
+    <h2>Extension edit</h2>
+    {% else %}
+    <h2>Extension add</h2>
+    {% endif %}
+  </div>
+  {{form.id(type='hidden')}}
+
+  <div class="form-group row">
+    <label class="col-sm-4 col-form-label">Reseller:</label>
+    <div class="col-sm-8">
+        <select class="form-control" name="reseller_id">
+            {% for record in form.resellers %}
+            {% if form.is_edit and record.id == 2 %}
+            <option value="{{record.id}}" selected>{{ record.name }}</option>
+            {% elif record.status.value == "Active" %}
+            <option value="{{record.id}}">{{ record.name }}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+    </div>
+</div>
+  <div class="form-group row">
+    {{form.extension_date.label(class="col-sm-4 col-form-label")}}
+    <div class="col-sm-8">
+      {{form.extension_date(class="form-control", type="date")}}
+    </div>
+  </div>
+    <div class="form-group row">
+    <label class="col-sm-4 col-form-label">Product:</label>
+        <div class="col-sm-8">
+            <select class="form-control" name="product_id">
+              {% for record in form.products %}
+              {% if form.is_edit and record.id == form.product_id.data %}
+              <option value="{{record.id}}" selected>{{ record.name }}</option>
+              {% elif record.status.value == "Active" %}
+              <option value="{{record.id}}">{{ record.name }}</option>
+              {% endif %}
+              {%endfor%}
+            </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        {{form.months.label(class="col-sm-4 col-form-label")}}
+        <div class="col-sm-8">
+            {{form.months(class="form-control")}}
+        </div>
+    </div>
+</div>
+
+{% endblock%}
