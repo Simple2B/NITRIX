@@ -1,6 +1,6 @@
 import pytest
 from app import db, create_app
-from app.models import ResellerProduct, Product
+from app.models import ResellerProduct
 from .test_auth import register, login
 
 

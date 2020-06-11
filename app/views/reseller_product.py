@@ -98,8 +98,7 @@ def save():
     product.save()
     product_key = ninja_product_name(product.product.name, product.months)
     if form.id.data < 0:
-        ninja_product = ninja.add_product(product_key=product_key,
-                                            notes=product.reseller.name, cost=product.init_price)
+        ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name, cost=product.init_price)
         if ninja_product:
             product.ninja_product_id = ninja_product.id
             product.save()

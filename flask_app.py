@@ -17,7 +17,8 @@ def get_context():
 def create_database():
     """ build database """
     def add_reseller_product(product, months, initprice, extprice, reseller):
-        reseller_product = ResellerProduct(months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
+        reseller_product = ResellerProduct(
+            months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
         product_key = f'{product.name} {months} Months'
         ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=initprice)
         if ninja_product:
@@ -41,8 +42,8 @@ def create_database():
     if ninja_client:
         reseller_nitrix.ninja_client_id = ninja_client.id
     product_gold = Product(name='Gold').save(False)
-    product_silver = Product(name='Silver').save(False)
-    product_bronsa = Product(name='Bronsa').save(False)
+    # product_silver = Product(name='Silver').save(False)
+    # product_bronsa = Product(name='Bronsa').save(False)
     add_reseller_product(months=1, initprice=6.78, extprice=4.55, product=product_gold, reseller=reseller_nitrix)
     add_reseller_product(months=3, initprice=16.50, extprice=10.55, product=product_gold, reseller=reseller_nitrix)
     add_reseller_product(months=6, initprice=30.45, extprice=19.55, product=product_gold, reseller=reseller_nitrix)
