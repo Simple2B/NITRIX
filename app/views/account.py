@@ -1,7 +1,6 @@
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from dateutil.relativedelta import relativedelta
 
 from app.models import Account, Product, Reseller, AccountExtension, AccountChanges, Phone
 from app.models import ResellerProduct
@@ -47,8 +46,6 @@ def edit():
         form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
         form.phones = all_phones()
         form.extensions = AccountExtension.query.filter(AccountExtension.account_id == form.id.data)
-        for ext in form.extensions:
-            ext.end_date = str(ext.extension_date + relativedelta(months=ext.months))
         form.name_changes = AccountChanges.query.filter(AccountChanges.account_id == form.id.data).filter(
                 AccountChanges.change_type == AccountChanges.ChangeType.name)
         form.sim_changes = AccountChanges.query.filter(

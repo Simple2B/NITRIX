@@ -1,9 +1,11 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
+from dateutil.relativedelta import relativedelta
 
 from app.models import Account, AccountExtension, Product, Reseller
 from app.forms import AccountExtensionForm
 from app.logger import log
+
 
 from app.views.account import add_ninja_invoice
 
@@ -75,6 +77,7 @@ def save_new():
     account_ext.product_id = account.product_id
     account_ext.months = account.months
     account_ext.extension_date = account.activation_date
+    account_ext.end_date = account_ext.extension_date + relativedelta(months=account_ext.months)
     account_ext.save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
@@ -102,10 +105,12 @@ def save_update():
     extension = AccountExtension.query.filter(AccountExtension.id == form.id.data).first()
     extension.reseller_id = form.reseller_id.data
     extension.product_id = form.product_id.data
-    extension.extension_date = form.extension_date.data
     extension.months = form.months.data
+    extension.extension_date = form.extension_date.data
+    extension.end_date = extension.extension_date + relativedelta(months=extension.months)
+    account_id = extension.account_id
     extension.save()
-    return redirect(url_for('account.edit', id=form.id.data))
+    return redirect(url_for('account.edit', id=account_id))
 
 
 @account_extension_blueprint.route("/account_ext_delete")
