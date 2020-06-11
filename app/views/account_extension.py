@@ -6,7 +6,6 @@ from app.models import Account, AccountExtension, Product, Reseller
 from app.forms import AccountExtensionForm
 from app.logger import log
 
-
 from app.views.account import add_ninja_invoice
 
 account_extension_blueprint = Blueprint('account_extension', __name__)

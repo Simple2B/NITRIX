@@ -83,7 +83,11 @@
         </div>
     </div>
     <div class="row pl-3 pt-3">
+        {% if form.extensions %}
+        <label class="col-sm-3 col-form-label mt-2">Extension date:</label>
+        {% else %}
         <label class="col-sm-3 col-form-label mt-2">Activation date:</label>
+        {% endif %}
         <div class="col-sm-4 mt-2">
             {{form.activation_date(class='form-control', type='date' )}}
         </div>
