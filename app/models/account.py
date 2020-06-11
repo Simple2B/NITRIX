@@ -53,4 +53,5 @@ class Account(db.Model, ModelMixin):
 
     @staticmethod
     def columns():
-        return ['ID', 'Name', 'Product', 'Phone', 'IMEI', 'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months']
+        return ['ID', 'Name', 'Product', 'Phone', 'IMEI',
+                'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months']
