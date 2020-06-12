@@ -14,8 +14,8 @@
     <div class="row pt-4 pl-3">
         {{form.id(type='hidden')}}
         <!-- <label class="col-sm-2 col-form-label">Account name:</label> -->
-        {{form.name.label(class="col-sm-3 col-form-label")}}
-        <div class="col-sm-7">
+        {{form.name.label(class="col-sm-1 col-form-label")}}
+        <div class="col-sm-11">
             {% if form.is_edit %}
             {{form.name(class='form-control')}}
             {% else %}
@@ -24,14 +24,14 @@
         </div>
     </div>
     <div class="row pt-3 pl-3">
-        <label class="col-sm-3 col-form-label">SIM:</label>
-        <div class="col-sm-7">
+        <label class="col-sm-1 col-form-label">SIM:</label>
+        <div class="col-sm-11">
             {{form.sim(class='form-control ', placeholder="SIM value")}}
         </div>
     </div>
     <div class="row pt-3 pl-3">
-        <label class="col-sm-3 col-form-label">Phone:</label>
-        <div class="col-sm-7">
+        <label class="col-sm-1 col-form-label">Phone:</label>
+        <div class="col-sm-11">
             <select class="form-control" name="phone_id">
                 {% for record in form.phones %}
                 {% if form.is_edit and record.id == form.phone_id.data %}
@@ -44,14 +44,14 @@
         </div>
     </div>
     <div class="row pt-3 pl-3">
-        <label class="col-sm-3 col-form-label">IMEI:</label>
-        <div class="col-sm-7">
+        <label class="col-sm-1 col-form-label">IMEI:</label>
+        <div class="col-sm-11">
             {{form.imei(class='form-control ', placeholder="IMEI")}}
         </div>
     </div>
     <div class="row pt-3 pl-3">
-        <label class="col-sm-3 col-form-label">Product:</label>
-        <div class="col-sm-7">
+        <label class="col-sm-1 col-form-label">Product:</label>
+        <div class="col-sm-11">
             <select class="form-control" name="product_id">
                 {% for record in form.products %}
                 {% if form.is_edit and record.id == form.product_id.data %}
@@ -64,8 +64,8 @@
         </div>
     </div>
     <div class="row pt-3 pl-3">
-        <label class="col-sm-3 col-form-label">Reseller:</label>
-        <div class="col-sm-7">
+        <label class="col-sm-1 col-form-label">Reseller:</label>
+        <div class="col-sm-11">
             {% if form.is_edit %}
             <div class="form-control"> {{ form.reseller_name }} </div>
             {{form.reseller_id(type="hidden")}}
@@ -85,7 +85,7 @@
     <div class="row pt-3 pl-3">
         <label class="col-sm-3 col-form-label">Comment:</label>
         <div class="container-fluid">
-            {{form.comment(class='col-sm-10 form-control', rows="5")}}
+            {{form.comment(class='col-sm-12 form-control', rows="5")}}
         </div>
     </div>
     <div class="row pl-3 pt-3">
@@ -150,12 +150,50 @@
 </table>
 {% endif %}
 {% if form.is_edit %}
-<div class="row">
+<div class="container">
     <a href="{{url_for('account_extension.add')}}?id={{ form.id.data }}" type="button" class="btn btn-primary btn-lg btn-block">
         Add extension</a>
 </div>
-{%endif%}
+{% endif %}
+{% if form.is_edit and form.name_changes %}
+<div class="row">
+    <label class="col-sm-4 col-form-label ">Account history:</label>
 </div>
+{%for change in form.name_changes %}
+<div class="row mt-2">
+    <label class="col-sm-1 col-form-label">Name:</label>
+    <div class="col-sm-4 mx-3 form-control" readonly> {{change.value_str}} </div>
+    <label class="d-inline-flex  col-form-label">Change date:</label>
+    <div class="col-sm-4">
+        <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+    </div>
+    <a
+    {{'href=' + url_for('account.delete_change', _external=True, id=change.id)}} class="btn btn-danger">X</a>
+</div>
+{% endfor %}
+{% endif %}
+{% if form.is_edit and form.sim_changes %}
+<br>
+<div class="row">
+    <label class="col-sm-4 col-form-label ">SIM history:</label>
+</div>
+{%for change in form.sim_changes %}
+<div class="row  mb-2">
+    <label class="col-sm-1 col-form-label">SIM:</label>
+    <div class="col-sm-4 mx-3 form-control" readonly> {{change.value_str}} </div>
+    <label class="d-inline-flex  col-form-label">Change date:</label>
+    <div class="col-sm-4">
+        <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
+    </div>
+    <a
+    {{'href=' + url_for('account.delete_change', _external=True, id=change.id)}} class="btn btn-danger">X</a>
+</div>
+{% endfor %}
+{% endif %}
+</div>
+</div>
+</div>
+
 {% endblock %}
 
 {% block javascript%}
