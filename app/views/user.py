@@ -31,6 +31,7 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('user.save')
         form.delete_route = url_for('user.delete')
+        form.close_button = url_for('main.users')
         return render_template(
                 "user_edit.html",
                 form=form
@@ -40,6 +41,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('user.save')
         form.delete_route = url_for('user.delete')
+        form.close_button = url_for('main.users')
         return render_template(
                 "user_edit.html",
                 form=form

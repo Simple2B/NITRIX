@@ -55,6 +55,7 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')
+        form.close_button = url_for('main.accounts')
         form.reseller_name = account.reseller.name
         return render_template(
                 "account_details.html",
@@ -68,6 +69,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('account.save')
         form.delete_route = url_for('account.delete')
+        form.close_button = url_for('main.accounts')
         return render_template(
                 "account_details.html",
                 form=form
