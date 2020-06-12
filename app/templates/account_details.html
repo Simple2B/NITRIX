@@ -167,6 +167,8 @@
     <div class="col-sm-4">
         <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
     </div>
+    <a
+    {{'href=' + url_for('account.delete_change', _external=True, id=change.id)}} class="btn btn-danger">X</a>
 </div>
 {% endfor %}
 {% endif %}
@@ -183,6 +185,8 @@
     <div class="col-sm-4">
         <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
     </div>
+    <a
+    {{'href=' + url_for('account.delete_change', _external=True, id=change.id)}} class="btn btn-danger">X</a>
 </div>
 {% endfor %}
 {% endif %}

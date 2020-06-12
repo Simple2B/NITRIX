@@ -186,3 +186,15 @@ def delete():
         return redirect(url_for('main.accounts'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.accounts'))
+
+@account_blueprint.route("/account_change_delete", methods=["GET"])
+@login_required
+def delete_change():
+    log(log.INFO, '%s /account_change_delete', request.method)
+    if 'id' not in request.args:
+        flash('Unknown Change id', 'danger')
+        return redirect(url_for('main.accounts'))
+    account_change = AccountChanges.query.filter(AccountChanges.id == int(request.args['id'])).first()
+    account_id = account_change.account_id
+    account_change.delete()
+    return redirect(url_for('account.edit', id=account_id))
