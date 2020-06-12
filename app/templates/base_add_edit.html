@@ -89,11 +89,11 @@
         <div class="card-footer mt-6">
           <div class="row">
             <div class="col-sm-6 my-1 d-flex justify-content-around">
-              <button class="btn btn-success " type="submit" form="main-form">Save</button>
+              <button class="btn btn-success btn-lg btn-block" type="submit" form="main-form">Save</button>
             </div>
             {% if form.is_edit %}
             <div class="col-sm-6 my-1 d-flex justify-content-around">
-              <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger">Delete</a>
+              <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger btn-lg btn-block">Delete</a>
             </div>
             {% endif %}
           </div>
@@ -105,11 +105,11 @@
           <div class="card-footer mt-6">
             <div class="row">
               <div class="col-sm-6 my-1 d-flex justify-content-around">
-                <button class="btn btn-success " type="submit" form="main-form">Save</button>
+                <button class="btn btn-success btn-lg btn-block" type="submit" form="main-form">Save</button>
               </div>
               {% if form.is_edit %}
               <div class="col-sm-6 my-1 d-flex justify-content-around">
-                <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger">Delete</a>
+                <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger btn-lg btn-block">Delete</a>
               </div>
               {% endif %}
             </div>

@@ -12,8 +12,8 @@
   {{form.id(type='hidden')}}
 
   <div class="form-group row">
-    <label class="col-sm-4 col-form-label">Reseller:</label>
-    <div class="col-sm-8">
+    <label class="col-sm-2 col-form-label">Reseller:</label>
+    <div class="col-sm-10">
         <select class="form-control" name="reseller_id">
             {% for record in form.resellers %}
             {% if form.is_edit and record.id == 2 %}
@@ -26,14 +26,14 @@
     </div>
 </div>
   <div class="form-group row">
-    {{form.extension_date.label(class="col-sm-4 col-form-label")}}
-    <div class="col-sm-8">
+    {{form.extension_date.label(class="col-sm-2 col-form-label")}}
+    <div class="col-sm-10">
       {{form.extension_date(class="form-control", type="date")}}
     </div>
   </div>
     <div class="form-group row">
-    <label class="col-sm-4 col-form-label">Product:</label>
-        <div class="col-sm-8">
+    <label class="col-sm-2 col-form-label">Product:</label>
+        <div class="col-sm-10">
             <select class="form-control" name="product_id">
               {% for record in form.products %}
               {% if form.is_edit and record.id == form.product_id.data %}
@@ -46,8 +46,8 @@
         </div>
     </div>
     <div class="form-group row">
-        {{form.months.label(class="col-sm-4 col-form-label")}}
-        <div class="col-sm-8">
+        {{form.months.label(class="col-sm-2 col-form-label")}}
+        <div class="col-sm-10">
             {{form.months(class="form-control")}}
         </div>
     </div>
