@@ -40,6 +40,7 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
+        form.close_button = url_for('main.resellers')
         form.product_forms = all_reseller_forms(reseller)
         log(log.DEBUG, 'products: %d', len(form.product_forms))
         return render_template(
@@ -51,6 +52,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
+        form.close_button = url_for('main.resellers')
         return render_template(
                 "reseller_add_edit.html",
                 form=form

@@ -21,6 +21,7 @@ def add():
         )
     form.is_edit = False
     form.save_route = url_for('reseller_product.save')
+    form.close_button = url_for('reseller.edit', id=reseller_id)
     form.products = Product.query.filter(Product.deleted == False)  # noqa E712
     return render_template("reseller_product.html", form=form)
 
@@ -66,6 +67,7 @@ def edit():
         )
     form.products = Product.query.filter(Product.deleted == False)  # noqa E712
     form.save_route = url_for('reseller_product.save')
+    form.close_button = url_for('reseller.edit', id=product.reseller_id)
     return render_template(
         "reseller_product.html",
         form=form

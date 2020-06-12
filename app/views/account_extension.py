@@ -28,6 +28,7 @@ def add():
     form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
     form.is_edit = False
     form.save_route = url_for('account_extension.save_new')
+    form.close_button = url_for('account.edit', id=account_id)
     return render_template("account_extension.html", form=form)
 
 
@@ -53,6 +54,7 @@ def edit():
     form.is_edit = True
     form.products = Product.query.filter(Product.deleted == False).all() # noqa E712
     form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
+    form.close_button = url_for('account.edit', id=extension.id)
     form.save_route = url_for('account_extension.save_update')
     form.delete_route = url_for('account_extension.delete')
     return render_template(
