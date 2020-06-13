@@ -16,10 +16,11 @@ def get_context():
 
 def create_database():
     """ build database """
-    def add_reseller_product(product, months, price, reseller):
-        reseller_product = ResellerProduct(months=months, price=price, product=product, reseller=reseller).save(False)
+    def add_reseller_product(product, months, initprice, extprice, reseller):
+        reseller_product = ResellerProduct(
+            months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
         product_key = f'{product.name} {months} Months'
-        ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=price)
+        ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=initprice)
         if ninja_product:
             reseller_product.ninja_product_id = ninja_product.id
             reseller_product.save(False)
@@ -41,20 +42,9 @@ def create_database():
     if ninja_client:
         reseller_nitrix.ninja_client_id = ninja_client.id
     product_gold = Product(name='Gold').save(False)
-    product_silver = Product(name='Silver').save(False)
-    product_bronsa = Product(name='Bronsa').save(False)
-    add_reseller_product(months=1, price=6.78, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=3, price=16.50, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=6, price=30.45, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=12, price=50.0, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=1, price=4.25, product=product_silver, reseller=reseller_nitrix)
-    add_reseller_product(months=3, price=11.50, product=product_silver, reseller=reseller_nitrix)
-    add_reseller_product(months=6, price=19.45, product=product_silver, reseller=reseller_nitrix)
-    add_reseller_product(months=12, price=35.99, product=product_silver, reseller=reseller_nitrix)
-    add_reseller_product(months=1, price=2.50, product=product_bronsa, reseller=reseller_nitrix)
-    add_reseller_product(months=3, price=6.99, product=product_bronsa, reseller=reseller_nitrix)
-    add_reseller_product(months=6, price=12.45, product=product_bronsa, reseller=reseller_nitrix)
-    add_reseller_product(months=12, price=20.99, product=product_bronsa, reseller=reseller_nitrix)
+    add_reseller_product(months=1, initprice=6.78, extprice=4.55, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=3, initprice=16.50, extprice=10.55, product=product_gold, reseller=reseller_nitrix)
+    add_reseller_product(months=6, initprice=30.45, extprice=19.55, product=product_gold, reseller=reseller_nitrix)
     add_phone(name="Samsung", price=54.00)
     add_phone(name="Nokia", price=38.00)
     add_phone(name="Lg", price=30.00)

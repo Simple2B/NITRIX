@@ -27,6 +27,8 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('product.save')
         form.delete_route = url_for('product.delete')
+        form.close_button = url_for('main.products')
+
         return render_template(
                 "product_add_edit.html",
                 form=form
@@ -36,6 +38,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('product.save')
         form.delete_route = url_for('product.delete')
+        form.close_button = url_for('main.products')
         return render_template(
                 "product_add_edit.html",
                 form=form

@@ -30,6 +30,8 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('phone.save')
         form.delete_route = url_for('phone.delete')
+        form.close_button = url_for('main.phones')
+
         return render_template(
                 "phone_add_edit.html",
                 form=form
@@ -39,6 +41,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('phone.save')
         form.delete_route = url_for('phone.delete')
+        form.close_button = url_for('main.phones')
         return render_template(
                 "phone_add_edit.html",
                 form=form
