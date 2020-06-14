@@ -92,3 +92,9 @@ def test_delete_user(client):
     login(client, 'admin')
     res = client.get(url_for('main.users'))
     assert f'{TEST_USER_NAME}'.encode() in res.data
+
+
+def test_close_button(client):
+    res = client.get(url_for('main.users'))
+    assert res.status_code == 200
+    assert f"{url_for('main.users')}".encode() in res.data
