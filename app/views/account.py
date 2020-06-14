@@ -189,6 +189,7 @@ def delete():
     flash('Wrong request', 'danger')
     return redirect(url_for('main.accounts'))
 
+
 @account_blueprint.route("/account_change_delete", methods=["GET"])
 @login_required
 def delete_change():

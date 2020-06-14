@@ -8,6 +8,7 @@ from .test_auth import register, login, logout
 TEST_USER_NAME = 'Test-User'
 TEST_USER_TYPE = User.Type.super_admin
 
+
 @pytest.fixture
 def client():
     app = create_app(environment='testing')
