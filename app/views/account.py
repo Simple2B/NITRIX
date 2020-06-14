@@ -157,7 +157,7 @@ def save():
                               months=form.months.data)
         # Check that months must be in 1-12
         if not 0 < account.months <= 12:
-            flash('Mohths must be in 1-12', 'danger')
+            flash('Months must be in 1-12', 'danger')
             return redirect(url_for('account.edit', id=account.id))
         account.save()
         add_ninja_invoice(account)

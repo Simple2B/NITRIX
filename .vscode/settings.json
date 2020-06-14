@@ -2,6 +2,7 @@
     "python.linting.flake8Enabled": true,
     "cSpell.words": [
         "NITRIX",
+        "imei",
         "noqa",
         "wtforms"
     ],
