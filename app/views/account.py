@@ -161,7 +161,7 @@ def save():
             return redirect(url_for('account.edit', id=account.id))
         account.save()
         add_ninja_invoice(account)
-        # Сhange Resellers last activity
+        # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
         reseller.save()
