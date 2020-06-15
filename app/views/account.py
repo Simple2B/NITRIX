@@ -9,6 +9,7 @@ from ..database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
 from app.utils import ninja_product_name
+from app.ninja import api as ninja
 
 
 account_blueprint = Blueprint('account', __name__)
@@ -160,7 +161,8 @@ def save():
             flash('Months must be in 1-12', 'danger')
             return redirect(url_for('account.edit', id=account.id))
         account.save()
-        add_ninja_invoice(account)
+        if ninja.configured:
+            add_ninja_invoice(account)
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
