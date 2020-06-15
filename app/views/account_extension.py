@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from app.models import Account, AccountExtension, Product, Reseller
 from app.forms import AccountExtensionForm
 from app.logger import log
+from app.ninja import api as ninja
 
 from app.views.account import add_ninja_invoice
 
@@ -91,7 +92,8 @@ def save_new():
     account.activation_date = form.extension_date.data
     account.save()
     # Register product in Invoice Ninja
-    add_ninja_invoice(account)
+    if ninja.configured:
+        add_ninja_invoice(account)
     return redirect(url_for('account.edit', id=form.id.data))
 
 
