@@ -93,6 +93,16 @@ def save():
         product.ext_price = form.ext_price.data
 
     else:
+        product = ResellerProduct.query.filter(
+            ResellerProduct.reseller_id == form.reseller_id.data
+        ).filter(
+            ResellerProduct.product_id == form.product_id.data
+        ).filter(
+            ResellerProduct.months == form.months.data
+        ).first()
+        if product:
+            flash('Reseller already have this product', 'danger')
+            return redirect(url_for('reseller.edit', id=form.reseller_id.data))
         product = ResellerProduct(
             reseller_id=form.reseller_id.data,
             product_id=form.product_id.data,

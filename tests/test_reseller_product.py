@@ -4,6 +4,12 @@ from app import db, create_app
 from app.models import ResellerProduct, Product, Reseller
 from .test_auth import register, login
 
+INIT_PRICE = 55555.00
+EXT_PRICE = 333.33
+NEW_INIT_PRICE = 88888.00
+NEW_EXT_PRICE = 4444.44
+PRODUCT_NAME = "GOLD"
+SECOND_PRODUCT_NAME = "SILVER"
 
 @pytest.fixture
 def client():
@@ -74,4 +80,30 @@ def test_save_delete_reseller(client):
     response = client.get(url_for('reseller_product.delete', id=reseller_product.id))
     assert response.status_code == 302
     assert b"4444" not in response.data
+
+
+def test_save_exist_product(client):
+    # add new product
+    reseller = Reseller(name='Dima')
+    reseller.save()
+    product = Product(name="Gold")
+    product.save()
+    response = client.post(
+        url_for('reseller_product.save'),
+        data=dict(
+            id=-1, product_id=product.id, reseller_id=reseller.id, months=3, init_price=INIT_PRICE, ext_price=EXT_PRICE),
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b'55555' in response.data
+    # add the same product
+    response = client.post(
+        url_for('reseller_product.save'),
+        data=dict(
+            id=-1, product_id=product.id, reseller_id=reseller.id, months=3, init_price=INIT_PRICE,
+            ext_price=EXT_PRICE),
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert b'Reseller already have this product' in response.data
 
