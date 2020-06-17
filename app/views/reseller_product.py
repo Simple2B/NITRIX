@@ -6,7 +6,6 @@ from app.logger import log
 from app.ninja import api as ninja
 from app.utils import ninja_product_name
 
-
 reseller_product_blueprint = Blueprint('reseller_product', __name__)
 NINJA_ERROR = 'Ninja connection failed'
 
@@ -18,7 +17,7 @@ def add():
 
     form = ResellerProductForm(
         reseller_id=reseller_id
-        )
+    )
     form.is_edit = False
     form.save_route = url_for('reseller_product.save')
     form.close_button = url_for('reseller.edit', id=reseller_id)
@@ -65,7 +64,7 @@ def edit():
         months=product.months,
         init_price=product.init_price,
         ext_price=product.ext_price
-        )
+    )
     form.products = Product.query.filter(Product.deleted == False)  # noqa E712
     form.save_route = url_for('reseller_product.save')
     form.close_button = url_for('reseller.edit', id=product.reseller_id)
@@ -113,7 +112,8 @@ def save():
     if ninja.configured:
         product_key = ninja_product_name(product.product.name, product.months)
         if form.id.data < 0:
-            ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name, cost=product.init_price)
+            ninja_product = ninja.add_product(product_key=product_key, notes=product.reseller.name,
+                                              cost=product.init_price)
             if ninja_product:
                 product.ninja_product_id = ninja_product.id
                 product.save()
