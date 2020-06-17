@@ -15,6 +15,7 @@ PASSW = '1234'
 EXTENSION_ADD = 'account_extension.add'
 EXTENSION_EDIT = 'account_extension.edit'
 EXTENSION_SAVE_NEW = 'account_extension.save_new'
+EXTENSION_SAVE_UPDATE = 'account_extension.save_update'
 EXTENSION_DELETE = 'account_extension.delete'
 UNKNOWN_ID = 'Unknown id'
 VALIDATION_ERROR = 'Form validation error'
@@ -40,7 +41,6 @@ def test_add(client):
     # what if not authorised
     response = client.get(url_for(EXTENSION_ADD))
     assert response.status_code == REDIRECTED  # to the login page
-    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
 
     login(client, LOGIN, PASSW)
     # what if id is empty
@@ -52,7 +52,7 @@ def test_add(client):
     assert response.status_code == REDIRECTED  # to the main.accounts
     assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if id is not a number
-    response = client.get(url_for(EXTENSION_ADD))
+    response = client.get(url_for(EXTENSION_ADD), id=NOT_NUMBER_ID)
     assert response.status_code == REDIRECTED  # to the main.accounts
     assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if correct id
@@ -75,7 +75,7 @@ def test_edit():
     assert response.status_code == REDIRECTED  # to the main.accounts
     assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if id is not a number
-    response = client.get(url_for(EXTENSION_EDIT))
+    response = client.get(url_for(EXTENSION_EDIT), id=NOT_NUMBER_ID)
     assert response.status_code == REDIRECTED  # to the main.accounts
     assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if id is correct, but an account_extension is not found
@@ -180,10 +180,21 @@ def test_save_new():
 
 
 def test_save_update():
-    # what if id is not a number
-
     # what if not authorised
+    response = client.get(url_for(EXTENSION_SAVE_UPDATE))
+    assert response.status_code == REDIRECTED  # to the login page
 
+    login(client, LOGIN, PASSW)
+    # what if id is empty
+    response = client.post(
+        url_for(EXTENSION_SAVE_UPDATE),
+        data=dict(id=''))
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
+    # what if id is not into request
+    response = client.post(url_for(EXTENSION_SAVE_UPDATE))
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if pass not all data
 
     # what if wrong data
@@ -194,11 +205,29 @@ def test_save_update():
 
 def test_delete():
     # what if not authorised
-    response = client.get(url_for(EXTENSION_SAVE_NEW))
+    response = client.get(url_for(EXTENSION_DELETE))
     assert response.status_code == REDIRECTED  # to the login page
-    # try delete without id
 
+    login(client, LOGIN, PASSW)
+    # what if id is empty
+    response = client.get(url_for(EXTENSION_DELETE, id=''))
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
+    # what if id is not into request
+    response = client.get(url_for(EXTENSION_DELETE))
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
     # what if id is not a number
-
-    # try delete an extension which is not existed
-    pass
+    response = client.get(url_for(EXTENSION_DELETE), id=NOT_NUMBER_ID)
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
+    # what if delete an extension which is not existed
+    response = client.get(url_for(EXTENSION_DELETE), id=CORRECT_ID)
+    assert response.status_code == REDIRECTED  # to the main.accounts
+    assert bytes(UNKNOWN_ID, encoding=ENCODING) in response.data
+    # what if delete existed extension
+    extension = AccountExtension(id=CORRECT_ID, account_id=10)
+    extension.save()
+    response = client.get(url_for(EXTENSION_DELETE), id=CORRECT_ID)
+    assert response.status_code == REDIRECTED
+    assert response.data.get('id') == '10'
