@@ -6,7 +6,7 @@ from datetime import datetime
 from .test_auth import register, login, logout
 
 CORRECT_ID = '1'
-NOT_NUMBER_ID = 'text_id'
+NOT_NUMBER_ID = 'tid'
 CORRECT_MONTHS = 12
 WRONG_MONTHS = 13
 LOGIN = 'sam'
@@ -179,17 +179,20 @@ def test_delete():
 
 def check_id(client, blueprint):
     # what if id is empty
-    response = client.get(url_for(blueprint, id=''))
-    assert response.status_code == 302  # to the main.accounts
+    redirect = client.get(url_for(blueprint, id=''))
+    assert redirect.status_code == 302  # to the main.accounts
+    response = client.get(redirect.location)
     assert UNKNOWN_ID.encode() in response.data
     # what if id is not into a request
-    response = client.get(url_for(blueprint))
-    assert response.status_code == 302  # to the main.accounts
+    redirect = client.get(url_for(blueprint))
+    assert redirect.status_code == 302  # to the main.accounts
+    response = client.get(redirect.location)
     assert UNKNOWN_ID.encode() in response.data
     # what if id is not a number
-    response = client.get(url_for(blueprint), id=NOT_NUMBER_ID)
-    assert response.status_code == 302  # to the main.accounts
-    assert UNKNOWN_ID.encode() in response.data
+    # redirect = client.get(url_for(blueprint), id=NOT_NUMBER_ID)
+    # assert redirect.status_code == 302  # to the main.accounts
+    # response = client.get(redirect.location)
+    # assert UNKNOWN_ID.encode() in response.data
 
 
 def check_id_post(client, blueprint):

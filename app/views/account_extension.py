@@ -20,7 +20,7 @@ VALIDATION_ERROR = 'Form validation error'
 def add():
     log(log.INFO, '%s /account_extension_add', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args:
+    if 'id' not in request.args or not request.args.get('id'):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
