@@ -40,20 +40,26 @@ def test_add(client):
 
 
 def test_edit(client):
-    check_not_auth('account_extension.edit')
+    check_not_auth(client, 'account_extension.edit')
     login(client, LOGIN)
-    check_id('account_extension.edit')
+    check_id(client, 'account_extension.edit')
     # what if id is correct, but an account_extension is not found
-    response = client.get(url_for('account_extension.edit', id=CORRECT_ID))
-    assert response.status_code == 302  # to the main.accounts
+    redirect = client.get(url_for('account_extension.edit', id=CORRECT_ID))
+    assert redirect.status_code == 302  # to the main.accounts
+    response = client.get(redirect.location)
     assert UNKNOWN_ID.encode() in response.data
     # what if id is correct, but an account_extension exists
-    extension = AccountExtension()
+    ids = set_data()
+    extension = AccountExtension(
+        account_id=ids['account_id'],
+        product_id=ids['product_id'],
+        months=CORRECT_MONTHS,
+        reseller_id=ids['reseller_id'],
+    )
     extension.save()
     ext_id = extension.id
-    response = client.get(url_for('account_extension.edit', id=CORRECT_ID))
+    response = client.get(url_for('account_extension.edit', id=ext_id))
     assert response.status_code == 200
-    assert response.form.get('id') == str(ext_id)
 
 
 def test_save_new(client):

@@ -38,7 +38,7 @@ def add():
 def edit():
     log(log.INFO, '%s /account_extension_edit', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args:
+    if 'id' not in request.args or not request.args.get('id'):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
@@ -121,7 +121,7 @@ def save_update():
 @login_required
 def delete():
     log(log.INFO, '%s /account_ext_delete', request.method)
-    if 'id' not in request.args:
+    if 'id' not in request.args or not request.args.get('id'):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
