@@ -16,9 +16,13 @@ class NinjaApi(object):
         super().__init__()
         self.BASE_URL = os.environ.get(
             # NINJA_API_BASE_URL=http://ec2-52-14-0-156.us-east-2.compute.amazonaws.com:8080/api/v1/
-            'NINJA_API_BASE_URL', 'http://den-pc:8001/')
+            'NINJA_API_BASE_URL', None)
         self.NINJA_TOKEN = os.environ.get(
-            'NINJA_API_TOKEN', 'UNKNOWN_TOKEN')
+            'NINJA_API_TOKEN', '')
+
+    @property
+    def configured(self):
+        return self.BASE_URL is not None
 
     def do_get(self, url: str):  # noqa E999
         headers = {'X-Ninja-Token': self.NINJA_TOKEN}
