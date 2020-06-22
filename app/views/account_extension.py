@@ -121,7 +121,7 @@ def save_update():
 @login_required
 def delete():
     log(log.INFO, '%s /account_ext_delete', request.method)
-    if 'id' not in request.args or not request.args.get('id'):
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
