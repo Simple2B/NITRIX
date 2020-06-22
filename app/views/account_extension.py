@@ -20,7 +20,7 @@ VALIDATION_ERROR = 'Form validation error'
 def add():
     log(log.INFO, '%s /account_extension_add', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args or not request.args.get('id'):
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
@@ -38,7 +38,7 @@ def add():
 def edit():
     log(log.INFO, '%s /account_extension_edit', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args or not request.args.get('id'):
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
@@ -125,6 +125,13 @@ def delete():
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
+    if not extension:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
     account_id = extension.account_id
     extension.delete()
     return redirect(url_for('account.edit', id=account_id))
+
+
+def hasValidIdentificator(obj):
+    return 'id' in obj.args and obj.args.get('id').isnumeric()
