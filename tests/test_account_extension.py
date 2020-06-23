@@ -140,11 +140,8 @@ def save_update(client):
     login(client, LOGIN)
     check_id_post(client, 'account_extension.save_update')
     # what if pass not all data
-
     # what if wrong data
-
-    # what if no account by an account_id
-    pass
+    # # what if no account by an account_id
 
 
 def check_partial_data(client, blueprint):
