@@ -74,8 +74,11 @@ def save_new():
         log(log.WARNING, VALIDATION_ERROR, form.errors)
         return redirect(url_for('account.edit', id=form.id.data))
     account = Account.query.filter(Account.id == form.id.data).first()
+    if not account:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
     # Check that months must be in 1-12
-    if not 0 < account.months <= 12:
+    if not 0 < form.months.data <= 12:
         flash('Months must be in 1-12', 'danger')
         return redirect(url_for('account.edit', id=account.id))
     account_ext = AccountExtension()
@@ -84,7 +87,8 @@ def save_new():
     account_ext.product_id = account.product_id
     account_ext.months = account.months
     account_ext.extension_date = account.activation_date
-    account_ext.end_date = account_ext.extension_date + relativedelta(months=account_ext.months)
+    m = account_ext.months if account_ext.months else 0
+    account_ext.end_date = account_ext.extension_date + relativedelta(months=m)
     account_ext.save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
@@ -92,8 +96,8 @@ def save_new():
     account.activation_date = form.extension_date.data
     account.save()
     # Register product in Invoice Ninja
-    if ninja.configured:
-        add_ninja_invoice(account)
+    # if ninja.configured:
+    #     add_ninja_invoice(account)
     return redirect(url_for('account.edit', id=form.id.data))
 
 
