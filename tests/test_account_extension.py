@@ -135,7 +135,7 @@ def test_save_new(client):
     remove_data(ids)
 
 
-def save_update(client):
+def test_save_update(client):
     check_not_auth_post(client, 'account_extension.save_update')
     login(client, LOGIN)
     check_id_post(client, 'account_extension.save_update')
@@ -197,6 +197,7 @@ def check_partial_data(client, blueprint):
 
 
 def check_id(client, blueprint):
+    ''' verify different ID values behavior '''
     # what if id is empty
     redirect = client.get(url_for(blueprint, id=EMPTY_ID))
     assert redirect.status_code == 302  # to the main.accounts
