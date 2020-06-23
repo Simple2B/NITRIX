@@ -20,7 +20,7 @@ VALIDATION_ERROR = 'Form validation error'
 def add():
     log(log.INFO, '%s /account_extension_add', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args:
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
@@ -38,7 +38,7 @@ def add():
 def edit():
     log(log.INFO, '%s /account_extension_edit', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if 'id' not in request.args:
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
@@ -74,21 +74,25 @@ def save_new():
         log(log.WARNING, VALIDATION_ERROR, form.errors)
         return redirect(url_for('account.edit', id=form.id.data))
     account = Account.query.filter(Account.id == form.id.data).first()
+    if not account:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
+    # Check that months must be in 1-12
+    if not 0 < form.months.data <= 12:
+        flash('Months must be in 1-12', 'danger')
+        return redirect(url_for('account.edit', id=account.id))
     account_ext = AccountExtension()
     account_ext.account_id = account.id
     account_ext.reseller_id = account.reseller_id
     account_ext.product_id = account.product_id
     account_ext.months = account.months
     account_ext.extension_date = account.activation_date
-    account_ext.end_date = account_ext.extension_date + relativedelta(months=account_ext.months)
+    m = account_ext.months if account_ext.months else 0
+    account_ext.end_date = account_ext.extension_date + relativedelta(months=m)
     account_ext.save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
     account.months = form.months.data
-    # Check that months must be in 1-12
-    if not 0 < account.months <= 12:
-        flash('Mohths must be in 1-12', 'danger')
-        return redirect(url_for('account.edit', id=account.id))
     account.activation_date = form.extension_date.data
     account.save()
     # Register product in Invoice Ninja
@@ -121,10 +125,17 @@ def save_update():
 @login_required
 def delete():
     log(log.INFO, '%s /account_ext_delete', request.method)
-    if 'id' not in request.args:
+    if not hasValidIdentificator(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
+    if not extension:
+        flash(UNKNOWN_ID, 'danger')
+        return redirect(url_for('main.accounts'))
     account_id = extension.account_id
     extension.delete()
     return redirect(url_for('account.edit', id=account_id))
+
+
+def hasValidIdentificator(obj):
+    return 'id' in obj.args and obj.args.get('id').isnumeric()
