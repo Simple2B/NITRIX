@@ -105,6 +105,7 @@ def test_save_new(client):
 
     check_partial_data(client, 'account_extension.save_new')
     # what if wrong months
+    ids = set_data()
     redirect = client.post(
         url_for('account_extension.save_new'),
         data=dict(
@@ -115,7 +116,8 @@ def test_save_new(client):
     )
     assert redirect.status_code == 302  # to the account.edit
     response = client.get(redirect.location)
-    assert MONTHS_ERROR.encode in response.data
+    assert MONTHS_ERROR.encode() in response.data
+    remove_data(ids)
     # what if OK
     ids = set_data()
     response = client.post(
@@ -128,8 +130,9 @@ def test_save_new(client):
         )
     )
     extensions = AccountExtension.query.filter(AccountExtension.account_id == ids['account_id']).all()
-    assert response.status_code == 200
+    assert response.status_code == 302
     assert extensions
+    remove_data(ids)
 
 
 def save_update(client):
@@ -190,9 +193,10 @@ def check_partial_data(client, blueprint):
             reseller_id=ids['reseller_id'],
             product_id=ids['product_id'])
     )
-    assert response.status_code == 302  # to the account.edit
+    assert redirect.status_code == 302  # to the account.edit
     response = client.get(redirect.location)
     assert VALIDATION_ERROR.encode() in response.data
+    remove_data(ids)
 
 
 def check_id(client, blueprint):
@@ -273,3 +277,10 @@ def set_data():
         'reseller_id': res_id,
         'account_id': acc_id
     }
+
+
+def remove_data(ids):
+    Product.query.filter(Product.id == ids['product_id']).first().delete()
+    Phone.query.filter(Phone.id == ids['phone_id']).first().delete()
+    Reseller.query.filter(Reseller.id == ids['reseller_id']).first().delete()
+    Account.query.filter(Account.id == ids['account_id']).first().delete()
