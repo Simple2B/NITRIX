@@ -96,8 +96,8 @@ def save_new():
     account.activation_date = form.extension_date.data
     account.save()
     # Register product in Invoice Ninja
-    # if ninja.configured:
-    #     add_ninja_invoice(account)
+    if ninja.configured:
+        add_ninja_invoice(account)
     return redirect(url_for('account.edit', id=form.id.data))
 
 
