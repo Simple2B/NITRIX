@@ -1,27 +1,24 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Reseller, Product, ResellerProduct
+from app.models import Reseller
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
-from app.utils import ninja_product_name
 
 
 reseller_blueprint = Blueprint('reseller', __name__)
 
 
-def all_reseller_forms(reseller: Reseller): # noqa E999
-    result = []
-    for product in reseller.products:
-        form = ResellerProductForm(
+def all_reseller_forms(reseller: Reseller):
+    return [ResellerProductForm(
             id=product.id,
             product_id=product.product_id,
+            product_name=product.product.name,
             reseller_id=product.reseller_id,
             months=product.months,
-            price=product.price
-            )
-        result += [form]
-    return result
+            init_price=product.init_price,
+            ext_price=product.ext_price,
+            ) for product in reseller.products]
 
 
 @reseller_blueprint.route("/reseller_edit")
@@ -43,8 +40,9 @@ def edit():
         form.is_edit = True
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
+        form.close_button = url_for('main.resellers')
         form.product_forms = all_reseller_forms(reseller)
-        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
+        log(log.DEBUG, 'products: %d', len(form.product_forms))
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -54,6 +52,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('reseller.save')
         form.delete_route = url_for('reseller.delete')
+        form.close_button = url_for('main.resellers')
         return render_template(
                 "reseller_add_edit.html",
                 form=form
@@ -109,51 +108,3 @@ def delete():
         return redirect(url_for('main.resellers'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.resellers'))
-
-
-@reseller_blueprint.route("/save_reseller_product", methods=["POST"])
-@login_required
-def save_product():
-    log(log.INFO, '/save_reseller_product')
-    form = ResellerProductForm(request.form)
-    if form.validate_on_submit():
-        if form.id.data < 0:
-            # new reseller product
-            log(log.INFO, 'new reseller product')
-            product = ResellerProduct()
-            product.reseller_id = form.reseller_id.data
-        else:
-            product = ResellerProduct.query.filter(ResellerProduct.id == form.id.data).first()
-            if product is None:
-                flash("Wrong reseller product id.", "danger")
-                log(log.ERROR, "Wrong reseller product id=%d", form.id.data)
-                return redirect(url_for('reseller.edit', id=form.reseller_id.data))
-        if request.form['submit'] == '-':
-            ninja_product = ninja.get_product(product.ninja_product_id)
-            ninja.delete_product(ninja_product.id, ninja_product.product_key)
-            product.delete()
-        else:
-            product.product_id = form.product_id.data
-            product.months = form.months.data
-            product.price = form.price.data
-            product.save()
-            # Update Invoice Ninja
-            product_key = ninja_product_name(product.product.name, product.months)
-            if form.id.data < 0:
-                ninja_product = ninja.add_product(product_key=product_key,
-                                                  notes=product.reseller.name, cost=product.price)
-                if ninja_product:
-                    product.ninja_product_id = ninja_product.id
-                    product.save()
-            else:
-                ninja_product = ninja.get_product(product.ninja_product_id)
-                if ninja_product:
-                    ninja.update_product(
-                        ninja_product.id,
-                        product_key=product_key,
-                        notes=product.reseller.name,
-                        cost=product.price)
-    else:
-        flash('Form validation error', 'danger')
-        log(log.ERROR, "Form validation error on /save_reseller_product")
-    return redirect(url_for('reseller.edit', id=form.reseller_id.data))

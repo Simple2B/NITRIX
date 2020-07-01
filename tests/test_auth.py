@@ -18,10 +18,11 @@ def client():
         app_ctx.pop()
 
 
-def register(user_name, password='password'):
+def register(user_name, password='password', user_type=User.Type.super_admin):
     # noinspection PyArgumentList
-    user = User(name=user_name, password=password, user_type=User.Type.super_admin)
+    user = User(name=user_name, password=password, user_type=user_type)
     user.save()
+    return user.id
 
 
 def login(client, user_name, password='password'):

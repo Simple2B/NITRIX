@@ -57,7 +57,7 @@ pip install uwsgi
 ```
 Verify **uwsgi.ini** file (WSGI configuration) in project folder:
 ```ini
-[[uwsgi]
+[uwsgi]
 # path to project foled
 base = /home/inv/NITRIX
 # module name
@@ -91,7 +91,7 @@ Line `uid = inv` must contain correct user name.
 
 Create file `/etc/systemd/system/nitrix-uwsgi.service` with follow content:
 ```ini
-[[Unit]
+[Unit]
 Description=uWSGI instance to serve flask-uwsgi project
 After=network.target
 

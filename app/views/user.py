@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.models import User
 from app.forms import UserForm
 from app.logger import log
@@ -10,6 +10,7 @@ user_blueprint = Blueprint('user', __name__)
 
 
 @user_blueprint.route("/user_edit")
+@login_required
 def edit():
     if current_user.user_type.name not in ['super_admin']:
         return redirect(url_for("main.index"))
@@ -25,13 +26,13 @@ def edit():
             id=user.id,
             name=user.name,
             user_type=user.user_type.name,
-            password=user.password_val,
             activated=user.activated.name
             )
 
         form.is_edit = True
         form.save_route = url_for('user.save')
         form.delete_route = url_for('user.delete')
+        form.close_button = url_for('main.users')
         return render_template(
                 "user_edit.html",
                 form=form
@@ -41,6 +42,7 @@ def edit():
         form.is_edit = False
         form.save_route = url_for('user.save')
         form.delete_route = url_for('user.delete')
+        form.close_button = url_for('main.users')
         return render_template(
                 "user_edit.html",
                 form=form
@@ -48,6 +50,7 @@ def edit():
 
 
 @user_blueprint.route("/user_save", methods=["POST"])
+@login_required
 def save():
     if current_user.user_type.name not in ['super_admin']:
         return redirect(url_for("main.index"))
@@ -74,6 +77,7 @@ def save():
 
 
 @user_blueprint.route("/user_delete", methods=["GET"])
+@login_required
 def delete():
     if current_user.user_type.name not in ['super_admin']:
         return redirect(url_for("main.index"))

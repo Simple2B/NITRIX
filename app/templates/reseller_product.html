@@ -1,0 +1,49 @@
+{% extends "base_add_edit.html" %}
+
+{%block content %}
+<div class="container">
+  <div class="form-group mt-2">
+    {% if form.is_edit %}
+    <h2>Product edit</h2>
+    {% else %}
+    <h2>Product add</h2>
+    {% endif %}
+  </div>
+  {{form.id(type='hidden')}}
+  {{form.reseller_id(type='hidden')}}
+  {{form.product_name(type='hidden')}}
+  <div class="form-group row">
+    {{form.product_name.label(class="col-sm-2 col-form-label")}}
+    <div class="col-sm-10">
+      <select class="form-control" name="product_id">
+        {% for record in form.products %}
+        {% if record.id == form.product_id.data %}
+        <option value="{{record.id}}" selected>{{ record.name }}</option>
+        {% elif record.status.value == "Active" and record.deleted == False %}
+        <option value="{{record.id}}">{{ record.name }}</option>
+        {% endif %}
+        {%endfor%}
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    {{form.months.label(class="col-sm-2 col-form-label")}}
+    <div class="col-sm-10">
+      {{form.months(class="form-control")}}
+    </div>
+  </div>
+  <div class="form-group row">
+    {{form.init_price.label(class="col-sm-2 col-form-label")}}
+    <div class="col-sm-10">
+      {{form.init_price(class="form-control")}}
+    </div>
+  </div>
+  <div class="form-group row">
+    {{form.ext_price.label(class="col-sm-2 col-form-label")}}
+    <div class="col-sm-10">
+      {{form.ext_price(class="form-control")}}
+    </div>
+  </div>
+</div>
+
+{% endblock%}
