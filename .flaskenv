@@ -5,5 +5,5 @@
 # For those cases, use the .env file.
 
 FLASK_APP=flask_app
-FLASK_ENV=development
-FLASK_DEBUG=1
+# FLASK_ENV=development
+FLASK_DEBUG=0
