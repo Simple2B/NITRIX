@@ -107,7 +107,6 @@ def delete():
         # Delete in Invoice Ninja
         ninja_product = ninja.get_product(phone.ninja_product_id)
         ninja.delete_product(ninja_product.id, ninja_product.product_key)
-        phone.delete()
         return redirect(url_for('main.phones'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.phones'))
