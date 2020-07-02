@@ -9,15 +9,25 @@ from .database import db
 
 # instantiate extensions
 login_manager = LoginManager()
-login_manager.needs_refresh_message = (u"Session timedout, please re-login")
+login_manager.needs_refresh_message = u"Session timedout, please re-login"
 login_manager.needs_refresh_message_category = "info"
 
 
 def create_app(environment="development"):
 
     from config import config
-    from .views import main_blueprint, auth_blueprint, account_blueprint, reseller_product_blueprint
-    from .views import product_blueprint, reseller_blueprint, user_blueprint, phone_blueprint
+    from .views import (
+        main_blueprint,
+        auth_blueprint,
+        account_blueprint,
+        reseller_product_blueprint,
+    )
+    from .views import (
+        product_blueprint,
+        reseller_blueprint,
+        user_blueprint,
+        phone_blueprint,
+    )
     from .views import account_extension_blueprint
     from .models import User
     from .logger import log
@@ -25,7 +35,7 @@ def create_app(environment="development"):
     # Instantiate app.
     app = Flask(__name__)
     log.set_level(log.DEBUG)
-    log(log.INFO, 'start server')
+    log(log.INFO, "start server")
     # Set app config.
     env = os.environ.get("FLASK_ENV", environment)
     app.config.from_object(config[env])
@@ -48,8 +58,9 @@ def create_app(environment="development"):
 
     # Set up flask login.
     @login_manager.user_loader
-    def get_user(id):
-        return User.query.get(int(id))
+    def get_user(user_id: int):
+        # return User.query.get(int(user_id))
+        return User.query.filter(User.id == user_id).first()
 
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
