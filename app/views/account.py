@@ -23,9 +23,18 @@ account_blueprint = Blueprint("account", __name__)
 
 
 def all_phones():
-    phones = Phone.query.filter(Phone.deleted == False)  # noqa E712
-    phones = phones.filter(Phone.status == Phone.Status.active)  # noqa E712
-    return phones
+    phones = Phone.query.filter(Phone.deleted == False, Phone.status == Phone.Status.active).order_by(Phone.name)  # noqa E712
+    all_phones = phones.all()
+    if 'None' in [p.name for p in all_phones]:
+        all_phones = organise_list_starting_with_value(all_phones, 'None')
+    return all_phones
+
+
+def organise_list_starting_with_value(input_list, value):
+    default_phone_value_index = input_list.index([item for item in input_list if item.name == value][0])
+    default_value = input_list.pop(default_phone_value_index)
+    input_list.insert(0, default_value)
+    return input_list
 
 
 @account_blueprint.route("/account_details")
@@ -76,12 +85,8 @@ def edit():
     else:
         form = AccountForm()
         form.products = Product.query.all()
-        form.resellers = Reseller.query.all()
-        form.phones = (
-            Phone.query.filter(Phone.deleted == False)  # noqa E712
-            .filter(Phone.status == Phone.Status.active)
-            .all()
-        )  # noqa E712
+        form.resellers = organise_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')
+        form.phones = all_phones()
         form.is_edit = False
         form.save_route = url_for("account.save")
         form.delete_route = url_for("account.delete")
