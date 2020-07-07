@@ -25,6 +25,7 @@ account_blueprint = Blueprint("account", __name__)
 
 SIM_COST_ACCOUNT_COMMENT = os.environ.get('SIM_COST_ACCOUNT_COMMENT', 'IMPORTANT! Sim cost discounted.')
 
+
 def all_phones():
     phones = Phone.query.filter(Phone.deleted == False, Phone.status == Phone.Status.active).order_by(Phone.name)  # noqa E712
     all_phones = phones.all()
