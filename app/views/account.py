@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
@@ -21,6 +23,7 @@ from app.ninja import api as ninja
 
 account_blueprint = Blueprint("account", __name__)
 
+SIM_COST_ACCOUNT_COMMENT = os.environ.get('SIM_COST_ACCOUNT_COMMENT', 'IMPORTANT! Sim cost discounted.')
 
 def all_phones():
     phones = Phone.query.filter(Phone.deleted == False, Phone.status == Phone.Status.active).order_by(Phone.name)  # noqa E712
@@ -170,6 +173,9 @@ def save():
         else:
             # Add a new account
             new_account = True
+            if form.sim_cost.data == 'yes':
+                form.comment.data += SIM_COST_ACCOUNT_COMMENT
+
             account = Account(
                 name=form.name.data,
                 product_id=form.product_id.data,
