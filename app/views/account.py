@@ -230,3 +230,7 @@ def delete_change():
     account_id = account_change.account_id
     account_change.delete()
     return redirect(url_for("account.edit", id=account_id))
+
+
+test_dummy = 'test'
+test_dummy
