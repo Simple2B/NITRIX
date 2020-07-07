@@ -23,6 +23,7 @@ from app.ninja import api as ninja
 
 account_blueprint = Blueprint("account", __name__)
 
+SIM_COST_DISCOUNT = float(os.environ.get('SIM_COST_DISCOUNT', 10)) * (-1.0)
 SIM_COST_ACCOUNT_COMMENT = os.environ.get('SIM_COST_ACCOUNT_COMMENT', 'IMPORTANT! Sim cost discounted.')
 
 
@@ -61,6 +62,7 @@ def edit():
             phone_id=account.phone_id,
             reseller_id=account.reseller_id,
             sim=account.sim,
+            sim_cost=None,
             imei=account.imei,
             comment=account.comment,
             activation_date=account.activation_date,
@@ -142,6 +144,8 @@ def add_ninja_invoice(account: Account):
         phone_name = f"Phone-{account.phone.name}"
         if current_invoice:
             current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+    if SIM_COST_ACCOUNT_COMMENT in account.comment:
+        current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
@@ -175,7 +179,7 @@ def save():
             # Add a new account
             new_account = True
             if form.sim_cost.data == 'yes':
-                form.comment.data += SIM_COST_ACCOUNT_COMMENT
+                form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
 
             account = Account(
                 name=form.name.data,

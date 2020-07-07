@@ -54,7 +54,7 @@ class NinjaInvoice(object):
         log(log.DEBUG, 'NinjaApi.update_product %d', self.id)
         return api.do_put(
             '{}invoices/{}'.format(api.BASE_URL, self.id),
-            **self.to_dict())
+            **(self.to_dict()))
 
     @staticmethod
     def get(invoice_id: int): # noqa E999
