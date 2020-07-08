@@ -1,4 +1,5 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask import current_app as app
 from flask_login import login_required
 from dateutil.relativedelta import relativedelta
 
@@ -95,8 +96,9 @@ def save_new():
     account.months = form.months.data
     account.activation_date = form.extension_date.data
     account.save()
+    account.is_new = False
     # Register product in Invoice Ninja
-    if ninja.configured:
+    if ninja.configured and not app.config['TESTING']:
         add_ninja_invoice(account)
     return redirect(url_for('account.edit', id=form.id.data))
 

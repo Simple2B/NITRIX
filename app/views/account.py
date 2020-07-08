@@ -139,12 +139,12 @@ def add_ninja_invoice(account: Account):
             account.name,
             cost=reseller_product.init_price if reseller_product else 0,
         )
-    if account.phone.name != "None":
-        phone_name = f"Phone-{account.phone.name}"
-        if current_invoice:
-            current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
-    if SIM_COST_ACCOUNT_COMMENT in account.comment:
-        current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
+        if account.is_new:
+            if account.phone.name != "None":
+                phone_name = f"Phone-{account.phone.name}"
+                current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+            if SIM_COST_ACCOUNT_COMMENT in account.comment:
+                current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
