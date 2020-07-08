@@ -12,7 +12,7 @@ class AccountForm(FlaskForm):
     phone_id = IntegerField("Phone", validators=[DataRequired()])
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])
     sim = StringField("SIM", [DataRequired()])
-    sim_cost = BooleanField("Sim Cost", default=False)
+    sim_cost = BooleanField("Sim Cost:", default=False)
     imei = StringField("IMEI")
     comment = StringField("Comment", widget=TextArea())
     activation_date = DateField("Activation date", validators=[DataRequired()], default=datetime.now)
