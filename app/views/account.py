@@ -62,7 +62,6 @@ def edit():
             phone_id=account.phone_id,
             reseller_id=account.reseller_id,
             sim=account.sim,
-            sim_cost=None,
             imei=account.imei,
             comment=account.comment,
             activation_date=account.activation_date,
@@ -178,7 +177,7 @@ def save():
         else:
             # Add a new account
             new_account = True
-            if form.sim_cost.data == 'yes':
+            if form.sim_cost.data:
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
 
             account = Account(
