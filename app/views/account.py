@@ -101,7 +101,7 @@ def edit():
         return render_template("account_details.html", form=form)
 
 
-def add_ninja_invoice(account: Account):
+def add_ninja_invoice(account: Account, is_new: bool):
     reseller_product = (
         ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
         .filter(ResellerProduct.product_id == account.product_id)
@@ -139,7 +139,7 @@ def add_ninja_invoice(account: Account):
             account.name,
             cost=reseller_product.init_price if reseller_product else 0,
         )
-        if account.is_new:
+        if is_new:
             if account.phone.name != "None":
                 phone_name = f"Phone-{account.phone.name}"
                 current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
@@ -177,7 +177,7 @@ def save():
         else:
             # Add a new account
             new_account = True
-            if form.sim_cost.data:
+            if form.sim_cost.data == 'yes':
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
 
             account = Account(
@@ -197,7 +197,7 @@ def save():
             return redirect(url_for("account.edit", id=account.id))
         account.save()
         if new_account and ninja.configured:
-            add_ninja_invoice(account)
+            add_ninja_invoice(account, new_account)
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()

@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, DateField, SubmitField, BooleanField
+from wtforms import StringField, IntegerField, DateField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 
@@ -12,7 +12,10 @@ class AccountForm(FlaskForm):
     phone_id = IntegerField("Phone", validators=[DataRequired()])
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])
     sim = StringField("SIM", [DataRequired()])
-    sim_cost = BooleanField("Sim Cost:", default=False)
+    sim_cost = SelectField(
+        "Sim Cost:", default='yes',
+        choices=[('yes', 'Yes'), ('no', 'No')]
+    )
     imei = StringField("IMEI")
     comment = StringField("Comment", widget=TextArea())
     activation_date = DateField("Activation date", validators=[DataRequired()], default=datetime.now)

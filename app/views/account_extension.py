@@ -99,7 +99,7 @@ def save_new():
     account.is_new = False
     # Register product in Invoice Ninja
     if ninja.configured and not app.config['TESTING']:
-        add_ninja_invoice(account)
+        add_ninja_invoice(account, False)
     return redirect(url_for('account.edit', id=form.id.data))
 
 
