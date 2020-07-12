@@ -16,35 +16,79 @@ def get_context():
 
 def create_database():
     """ build database """
+
     def add_reseller_product(product, months, initprice, extprice, reseller):
         reseller_product = ResellerProduct(
-            months=months, init_price=initprice, ext_price=extprice, product=product, reseller=reseller).save(False)
-        product_key = f'{product.name} {months} Months'
-        ninja_product = ninja.add_product(product_key=product_key, notes=reseller.name, cost=initprice)
+            months=months,
+            init_price=initprice,
+            ext_price=extprice,
+            product=product,
+            reseller=reseller,
+        ).save(False)
+        product_key = f"{product.name} {months} Months"
+        ninja_product = None
+        if ninja.configured:
+            ninja_product = ninja.add_product(
+                product_key=product_key, notes=reseller.name, cost=initprice
+            )
         if ninja_product:
             reseller_product.ninja_product_id = ninja_product.id
             reseller_product.save(False)
 
     def add_phone(name, price):
         phone = Phone(name=name, price=price).save(False)
-        product_key = f'Phone-{phone.name}'
-        ninja_product = ninja.add_product(product_key=product_key, notes="Phone", cost=price)
+        product_key = f"Phone-{phone.name}"
+        ninja_product = (
+            ninja.add_product(product_key=product_key, notes="Phone", cost=price)
+            if ninja.configured
+            else None
+        )
         if ninja_product:
             phone.ninja_product_id = ninja_product.id
             phone.save(False)
 
     db.create_all()
-    Phone(name='None', price=0.00).save(False)
-    User(name='admin', password='admin', user_type=User.Type.super_admin, activated=User.Status.active).save(False)
-    User(name='user', password='user', user_type=User.Type.user, activated=User.Status.active).save(False)
-    reseller_nitrix = Reseller(name='NITRIX', comments='Main reseller').save(False)
-    ninja_client = ninja.add_client(name=reseller_nitrix.name)
+    Phone(name="None", price=0.00).save(False)
+    User(
+        name="admin",
+        password="admin",
+        user_type=User.Type.super_admin,
+        activated=User.Status.active,
+    ).save(False)
+    User(
+        name="user",
+        password="user",
+        user_type=User.Type.user,
+        activated=User.Status.active,
+    ).save(False)
+    reseller_nitrix = Reseller(name="NITRIX", comments="Main reseller").save(False)
+    ninja_client = (
+        ninja.add_client(name=reseller_nitrix.name) if ninja.configured else None
+    )
     if ninja_client:
         reseller_nitrix.ninja_client_id = ninja_client.id
-    product_gold = Product(name='Gold').save(False)
-    add_reseller_product(months=1, initprice=6.78, extprice=4.55, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=3, initprice=16.50, extprice=10.55, product=product_gold, reseller=reseller_nitrix)
-    add_reseller_product(months=6, initprice=30.45, extprice=19.55, product=product_gold, reseller=reseller_nitrix)
+    product_gold = Product(name="Gold").save(False)
+    add_reseller_product(
+        months=1,
+        initprice=6.78,
+        extprice=4.55,
+        product=product_gold,
+        reseller=reseller_nitrix,
+    )
+    add_reseller_product(
+        months=3,
+        initprice=16.50,
+        extprice=10.55,
+        product=product_gold,
+        reseller=reseller_nitrix,
+    )
+    add_reseller_product(
+        months=6,
+        initprice=30.45,
+        extprice=19.55,
+        product=product_gold,
+        reseller=reseller_nitrix,
+    )
     add_phone(name="Samsung", price=54.00)
     add_phone(name="Nokia", price=38.00)
     add_phone(name="Lg", price=30.00)
@@ -58,19 +102,19 @@ def create_db():
 
 
 @app.cli.command()
-@click.confirmation_option(prompt='Are you sure?')
+@click.confirmation_option(prompt="Are you sure?")
 def drop_db():
     """Drop the current database."""
     db.drop_all()
 
 
 @app.cli.command()
-@click.confirmation_option(prompt='Are you sure?')
+@click.confirmation_option(prompt="Are you sure?")
 def reset_db():
     """Reset the current database."""
     db.drop_all()
     create_database()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

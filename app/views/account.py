@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
@@ -21,11 +23,25 @@ from app.ninja import api as ninja
 
 account_blueprint = Blueprint("account", __name__)
 
+SIM_COST_DISCOUNT = float(os.environ.get('SIM_COST_DISCOUNT', 10)) * (-1.0)
+SIM_COST_ACCOUNT_COMMENT = os.environ.get('SIM_COST_ACCOUNT_COMMENT', 'IMPORTANT! Sim cost discounted.')
+
 
 def all_phones():
-    phones = Phone.query.filter(Phone.deleted == False)  # noqa E712
-    phones = phones.filter(Phone.status == Phone.Status.active)  # noqa E712
-    return phones
+    phones = Phone.query.filter(Phone.deleted == False, Phone.status == Phone.Status.active).order_by(Phone.name)  # noqa E712
+    all_phones = phones.all()
+    all_phones = organize_list_starting_with_value(all_phones, 'None')
+    return all_phones
+
+
+def organize_list_starting_with_value(input_list, value):
+    try:
+        default_phone_value_index = input_list.index([item for item in input_list if item.name == value][0])
+    except ValueError:
+        return input_list
+    default_value = input_list.pop(default_phone_value_index)
+    input_list.insert(0, default_value)
+    return input_list
 
 
 @account_blueprint.route("/account_details")
@@ -76,12 +92,8 @@ def edit():
     else:
         form = AccountForm()
         form.products = Product.query.all()
-        form.resellers = Reseller.query.all()
-        form.phones = (
-            Phone.query.filter(Phone.deleted == False)  # noqa E712
-            .filter(Phone.status == Phone.Status.active)
-            .all()
-        )  # noqa E712
+        form.resellers = organize_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')
+        form.phones = all_phones()
         form.is_edit = False
         form.save_route = url_for("account.save")
         form.delete_route = url_for("account.delete")
@@ -89,7 +101,7 @@ def edit():
         return render_template("account_details.html", form=form)
 
 
-def add_ninja_invoice(account: Account):
+def add_ninja_invoice(account: Account, is_new: bool):
     reseller_product = (
         ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
         .filter(ResellerProduct.product_id == account.product_id)
@@ -127,10 +139,12 @@ def add_ninja_invoice(account: Account):
             account.name,
             cost=reseller_product.init_price if reseller_product else 0,
         )
-    if account.phone.name != "None":
-        phone_name = f"Phone-{account.phone.name}"
-        if current_invoice:
-            current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+        if is_new:
+            if account.phone.name != "None":
+                phone_name = f"Phone-{account.phone.name}"
+                current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+            if SIM_COST_ACCOUNT_COMMENT in account.comment:
+                current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
@@ -163,6 +177,9 @@ def save():
         else:
             # Add a new account
             new_account = True
+            if form.sim_cost.data == 'yes':
+                form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
+
             account = Account(
                 name=form.name.data,
                 product_id=form.product_id.data,
@@ -180,7 +197,7 @@ def save():
             return redirect(url_for("account.edit", id=account.id))
         account.save()
         if new_account and ninja.configured:
-            add_ninja_invoice(account)
+            add_ninja_invoice(account, new_account)
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()

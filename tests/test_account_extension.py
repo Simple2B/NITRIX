@@ -4,6 +4,7 @@ from app import create_app, db
 from app.models import AccountExtension, Account, Product, Phone, Reseller
 from datetime import datetime
 from .test_auth import register, login, logout
+from .mock_db import create_mock_db
 
 CORRECT_ID = '1'
 EMPTY_ID = ''
@@ -16,15 +17,16 @@ UNKNOWN_ID = 'Unknown id'
 MONTHS_ERROR = 'Months must be in 1-12'
 VALIDATION_ERROR = 'Form validation error'
 
+app = create_app(environment='testing')
+app.config['TESTING'] = True  # why do we need the here?
+
 
 @pytest.fixture
 def client():
-    app = create_app(environment='testing')
-    app.config['TESTING'] = True  # why do we need the here?
     with app.test_client() as client:
         app_ctx = app.app_context()
         app_ctx.push()
-        db.create_all()
+        create_mock_db()
         register(LOGIN)  # register a test user.
         yield client
         db.session.remove()
