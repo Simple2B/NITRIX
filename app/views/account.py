@@ -165,12 +165,14 @@ def save():
                 change.change_type = AccountChanges.ChangeType.name
                 change.value_str = account.name
                 change.save()
+                flash(f'In account {account.name} name changed to {form.name.data}', 'info')
             if account.sim != form.sim.data:
                 # Changed account SIM
                 change = AccountChanges(account=account)
                 change.change_type = AccountChanges.ChangeType.sim
                 change.value_str = account.sim
                 change.save()
+                flash(f'In account {account.name} sim changed to {form.sim.data}', 'info')
 
             for k in request.form.keys():
                 account.__setattr__(k, form.__getattribute__(k).data)
@@ -191,6 +193,7 @@ def save():
                 activation_date=form.activation_date.data,
                 months=form.months.data,
             )
+            flash(f'Account {account.name} added', "info")
         # Check that months must be in 1-12
         if not 0 < account.months <= 12:
             flash("Months must be in 1-12", "danger")
