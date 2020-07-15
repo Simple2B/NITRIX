@@ -1,4 +1,6 @@
 // custom javascript
 $(document).ready(function() {
-    $('#theTable').DataTable();
+    $('#theTable').DataTable({
+        "pageLength": 50
+    });
 } );
