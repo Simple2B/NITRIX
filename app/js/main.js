@@ -1,6 +1,7 @@
 // custom javascript
 $(document).ready(function() {
     $('#theTable').DataTable({
-        "pageLength": 50
+        "pageLength": 50,
+        "order": []
     });
 } );
