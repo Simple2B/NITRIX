@@ -22,7 +22,7 @@ def index():
 @login_required
 def accounts():
     log(log.INFO, '/accounts')
-    ordered_accounts = Account.query.order_by(Account.activation_date.desc()).all()
+    ordered_accounts = Account.query.order_by(Account.id.desc()).all()
     return render_template(
         'index.html',
         main_content='Accounts',
