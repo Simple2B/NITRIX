@@ -116,9 +116,9 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    # First day of month
-    invoice_date = datetime(datetime.now().year, datetime.now().month, 1)
-    invoice_date = invoice_date.strftime("%Y-%m-%d")
+    # First day of month TODO: not today! account.activation_date!
+    # invoice_date = datetime(datetime.now().year, datetime.now().month, 1)  # TODO: old impl "monthly"
+    invoice_date = account.activation_date.strftime("%Y-%m-%d")
     current_invoice = None
     for invoice in NinjaInvoice.all():
         if (
@@ -134,23 +134,37 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             account.reseller.ninja_client_id, invoice_date
         )
     if current_invoice:
-        current_invoice.add_item(
+        added_item = current_invoice.add_item(
             ninja_product_name(account.product.name, account.months),
             f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
             cost=reseller_product.init_price if reseller_product else 0,
         )
+        if not added_item:
+            log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+            return None
         if is_new:
             if account.phone.name != "None":
                 phone_name = f"Phone-{account.phone.name}"
-                current_invoice.add_item(
+                added_item = current_invoice.add_item(
                     phone_name,
                     f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
                     cost=account.phone.price)
+                if not added_item:
+                    log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+                    return None
             if SIM_COST_ACCOUNT_COMMENT in account.comment:
-                current_invoice.add_item(
+                added_item = current_invoice.add_item(
                     'SIM Cost',
                     f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
                     SIM_COST_DISCOUNT)
+                if not added_item:
+                    log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+                    return None
+        log(log.INFO, 'Invoice into Invoice Ninja added successfully')
+        return True
+    else:
+        log(log.ERROR, 'Could not add invoice to Invoice Ninja!')
+        return None
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
@@ -184,6 +198,10 @@ def save():
                 account.__setattr__(k, form.__getattribute__(k).data)
         else:
             # Add a new account
+            if Account.query.filter(Account.name == form.name.data, Account.product_id == form.product_id.data).first():
+                log(log.WARNING, "Attempt to register account with existing credentials")
+                flash('Such account already exists', 'error')
+                return redirect(url_for("account.edit", id=form.id.data))
             new_account = True
             if form.sim_cost.data == 'yes':
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
@@ -206,7 +224,10 @@ def save():
             return redirect(url_for("account.edit", id=account.id))
         account.save()
         if new_account and ninja.configured:
-            add_ninja_invoice(account, new_account, 'Activated')
+            nina_api_result = add_ninja_invoice(account, new_account, 'Activated')
+            if not nina_api_result:
+                log(log.ERROR, "Could not register account as invoice in Invoice Ninja!")
+                flash("WARNING! Account registration in Ninja failed!", "danger")
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
