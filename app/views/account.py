@@ -101,7 +101,7 @@ def edit():
         return render_template("account_details.html", form=form)
 
 
-def add_ninja_invoice(account: Account, is_new: bool):
+def add_ninja_invoice(account: Account, is_new: bool, mode: str):
     reseller_product = (
         ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
         .filter(ResellerProduct.product_id == account.product_id)
@@ -136,15 +136,21 @@ def add_ninja_invoice(account: Account, is_new: bool):
     if current_invoice:
         current_invoice.add_item(
             ninja_product_name(account.product.name, account.months),
-            account.name,
+            f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
             cost=reseller_product.init_price if reseller_product else 0,
         )
         if is_new:
             if account.phone.name != "None":
                 phone_name = f"Phone-{account.phone.name}"
-                current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+                current_invoice.add_item(
+                    phone_name,
+                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
+                    cost=account.phone.price)
             if SIM_COST_ACCOUNT_COMMENT in account.comment:
-                current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
+                current_invoice.add_item(
+                    'SIM Cost',
+                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
+                    SIM_COST_DISCOUNT)
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
@@ -200,7 +206,7 @@ def save():
             return redirect(url_for("account.edit", id=account.id))
         account.save()
         if new_account and ninja.configured:
-            add_ninja_invoice(account, new_account)
+            add_ninja_invoice(account, new_account, 'Activated')
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
