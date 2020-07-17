@@ -17,7 +17,7 @@ from app.forms import AccountForm
 from ..database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
-from app.utils import ninja_product_name
+from app.utils import ninja_product_name, organize_list_starting_with_value
 from app.ninja import api as ninja
 
 
@@ -32,16 +32,6 @@ def all_phones():
     all_phones = phones.all()
     all_phones = organize_list_starting_with_value(all_phones, 'None')
     return all_phones
-
-
-def organize_list_starting_with_value(input_list, value):
-    try:
-        default_phone_value_index = input_list.index([item for item in input_list if item.name == value][0])
-    except ValueError:
-        return input_list
-    default_value = input_list.pop(default_phone_value_index)
-    input_list.insert(0, default_value)
-    return input_list
 
 
 @account_blueprint.route("/account_details")
@@ -124,8 +114,6 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    # First day of month TODO: not today! account.activation_date!
-    # invoice_date = datetime(datetime.now().year, datetime.now().month, 1)  # TODO: old impl "monthly"
     invoice_date = account.activation_date.strftime("%Y-%m-%d")
     current_invoice = None
     for invoice in NinjaInvoice.all():
