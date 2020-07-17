@@ -200,8 +200,8 @@ def save():
             # Add a new account
             if Account.query.filter(Account.name == form.name.data, Account.product_id == form.product_id.data).first():
                 log(log.WARNING, "Attempt to register account with existing credentials")
-                flash('Such account already exists', 'error')
-                return redirect(url_for("account.edit", id=form.id.data))
+                flash('Such account already exists', 'danger')
+                return redirect(url_for("account.edit"))
             new_account = True
             if form.sim_cost.data == 'yes':
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
