@@ -46,7 +46,7 @@ def test_save_reseller(client):
     # edit exists reseller
     response = client.post(
         '/reseller_save',
-        data=dict(id=1, name='ANOTHER RESELLER NAME', status='not_active'),
+        data=dict(id=1, name='ANOTHER RESELLER NAME', status='not_active', submit='save'),
         follow_redirects=True
     )
     assert response.status_code == 200

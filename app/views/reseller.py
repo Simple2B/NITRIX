@@ -92,6 +92,8 @@ def save():
         reseller.save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
+            if request.form["submit"] == "save_and_edit":
+                return redirect(url_for("reseller.edit", id=reseller.id))
             return redirect(url_for("main.resellers"))
         return redirect(url_for("reseller.edit", id=reseller.id))
     else:

@@ -87,11 +87,15 @@
         {% endblock %}
         <div class="card-footer mt-6">
           <div class="row">
-            <div class="col-sm-6 my-1 d-flex justify-content-around">
-              <button class="btn btn-success btn-lg btn-block" type="submit" form="main-form">Save</button>
+            <div class="col-sm-4 my-1 d-flex justify-content-around">
+              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form" value="save">Save</button>
             </div>
             {% if form.is_edit %}
-            <div class="col-sm-6 my-1 d-flex justify-content-around">
+            <div class="col-sm-4 my-1 d-flex justify-content-around">
+              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form" value="save_and_edit">Save
+                and edit</button>
+            </div>
+            <div class="col-sm-4 my-1 d-flex justify-content-around">
               <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger btn-lg btn-block">Delete</a>
             </div>
             {% endif %}
