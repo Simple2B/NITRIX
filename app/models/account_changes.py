@@ -20,4 +20,4 @@ class AccountChanges(db.Model, ModelMixin):
     date = db.Column(db.DateTime, default=datetime.now)
     change_type = db.Column(Enum(ChangeType), default=ChangeType.name)
     value_str = db.Column(db.String(60), nullable=False)
-    account = relationship('Account')
+    account = relationship('Account', backref=db.backref("changes", lazy="dynamic"))
