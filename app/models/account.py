@@ -49,10 +49,12 @@ class Account(db.Model, ModelMixin):
             'sim': self.sim,
             'expiration_date': self.expiration_date.strftime("%Y-%m-%d"),
             'activation_date': self.activation_date.strftime("%Y-%m-%d"),
-            'months': self.months
+            'months': self.months,
+            'prev_names': ", ".join([change.value_str for change in self.changes.filter_by(change_type='name').all()]),
+            'prev_sims': ", ".join([change.value_str for change in self.changes.filter_by(change_type='sim').all()])
         }
 
     @staticmethod
     def columns():
         return ['ID', 'Name', 'Product', 'Phone', 'IMEI',
-                'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months']
+                'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months', 'Prev. names', 'Prev. SIMs']

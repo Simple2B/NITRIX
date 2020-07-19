@@ -17,7 +17,7 @@ from app.forms import AccountForm
 from ..database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
-from app.utils import ninja_product_name
+from app.utils import ninja_product_name, organize_list_starting_with_value
 from app.ninja import api as ninja
 
 
@@ -32,16 +32,6 @@ def all_phones():
     all_phones = phones.all()
     all_phones = organize_list_starting_with_value(all_phones, 'None')
     return all_phones
-
-
-def organize_list_starting_with_value(input_list, value):
-    try:
-        default_phone_value_index = input_list.index([item for item in input_list if item.name == value][0])
-    except ValueError:
-        return input_list
-    default_value = input_list.pop(default_phone_value_index)
-    input_list.insert(0, default_value)
-    return input_list
 
 
 @account_blueprint.route("/account_details")
@@ -90,9 +80,22 @@ def edit():
         form.reseller_name = account.reseller.name
         return render_template("account_details.html", form=form)
     else:
+        prev_product = None
+        prev_reseller = None
+        if 'prev_reseller' in request.args and 'prev_product' in request.args:
+            prev_product = request.args['prev_product']
+            prev_reseller = request.args['prev_reseller']
         form = AccountForm()
-        form.products = Product.query.all()
-        form.resellers = organize_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')
+        form.products = organize_list_starting_with_value(
+            Product
+            .query
+            .filter(Product.deleted == False)  # noqa E712
+            .order_by(Product.name)
+            .all(),
+            prev_product) if prev_product else Product.query.all()
+        form.resellers = organize_list_starting_with_value(
+            Reseller.query.order_by(Reseller.name).all(),
+            prev_reseller if prev_reseller else 'NITRIX')
         form.phones = all_phones()
         form.is_edit = False
         form.save_route = url_for("account.save")
@@ -116,8 +119,6 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    # First day of month TODO: not today! account.activation_date!
-    # invoice_date = datetime(datetime.now().year, datetime.now().month, 1)  # TODO: old impl "monthly"
     invoice_date = account.activation_date.strftime("%Y-%m-%d")
     current_invoice = None
     for invoice in NinjaInvoice.all():
@@ -200,8 +201,8 @@ def save():
             # Add a new account
             if Account.query.filter(Account.name == form.name.data, Account.product_id == form.product_id.data).first():
                 log(log.WARNING, "Attempt to register account with existing credentials")
-                flash('Such account already exists', 'error')
-                return redirect(url_for("account.edit", id=form.id.data))
+                flash('Such account already exists', 'danger')
+                return redirect(url_for("account.edit"))
             new_account = True
             if form.sim_cost.data == 'yes':
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
@@ -235,7 +236,13 @@ def save():
 
         log(log.INFO, "Account data was saved")
         if request.form["submit"] == "save_and_add":
-            return redirect(url_for("account.edit"))
+            return redirect(
+                url_for(
+                    "account.edit",
+                    prev_reseller=account.reseller.name,
+                    prev_product=account.product.name
+                )
+            )
         if request.form["submit"] == "save_and_edit":
             return redirect(url_for("account.edit", id=account.id))
         return redirect(url_for("main.accounts"))

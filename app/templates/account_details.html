@@ -171,11 +171,12 @@
 </div>
 {% endif %}
 {% if form.is_edit and form.name_changes %}
+<br>
 <div class="row">
     <label class="col-sm-4 col-form-label ">Account history:</label>
 </div>
 {%for change in form.name_changes %}
-<div class="row mt-2">
+<div class="row mb-2">
     <label class="col-sm-1 col-form-label">Name:</label>
     <div class="col-sm-4 mx-3 form-control" readonly> {{change.value_str}} </div>
     <label class="d-inline-flex  col-form-label">Change date:</label>
@@ -188,7 +189,7 @@
 {% endfor %}
 {% endif %}
 {% if form.is_edit and form.sim_changes %}
-<br>
+
 <div class="row">
     <label class="col-sm-4 col-form-label ">SIM history:</label>
 </div>
