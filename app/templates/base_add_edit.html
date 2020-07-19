@@ -17,24 +17,12 @@
 
 <body>
   <div class="container">
-    <!-- <div class="row "> -->
-    <!-- <div class="col-lg-8 d-inline-flex "> -->
     <div class="card">
       <div class="card-header px-0 py-0">
-        <div class="container">
-          <nav class="navbar navbar-expand-lg navbar-light"></nav>
-          <div class="row justify-content-between">
-            <div class="col-4">
-              <a class="navbar-brand" href="{{ form.close_button }}">NITRIX</a>
-            </div>
-            <div class="col-1">
-              <a type="button" class="close" aria-label="Close" href="{{ form.close_button }}">
-               x
-              </a>
-            </div>
-          </div>
-          </nav>
-        </div>
+        <nav class="navbar navbar-expand-lg navbar-light d-flex justify-content-between">
+                <a class="navbar-brand" href="{{ form.close_button }}">NITRIX</a>
+                <a class="btn btn-outline-secondary btn-sm my-sm-0" href="{{ form.close_button }}">X</a>
+        </nav>
       </div>
       <div class="card-body px-0 py-0">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -88,11 +76,13 @@
         <div class="card-footer mt-6">
           <div class="row">
             <div class="col-sm-4 my-1 d-flex justify-content-around">
-              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form" value="save">Save</button>
+              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form"
+                value="save">Save</button>
             </div>
             {% if form.is_edit %}
             <div class="col-sm-4 my-1 d-flex justify-content-around">
-              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form" value="save_and_edit">Save
+              <button class="btn btn-success btn-lg btn-block" type="submit" name="submit" form="main-form"
+                value="save_and_edit">Save
                 and edit</button>
             </div>
             <div class="col-sm-4 my-1 d-flex justify-content-around">
@@ -112,7 +102,8 @@
               </div>
               {% if form.is_edit %}
               <div class="col-sm-6 my-1 d-flex justify-content-around">
-                <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger btn-lg btn-block">Delete</a>
+                <a href="{{ form.delete_route}}?id={{ form.id.data }}"
+                  class="btn btn-danger btn-lg btn-block">Delete</a>
               </div>
               {% endif %}
             </div>
@@ -126,17 +117,15 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
       integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
-    </script>
+      </script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
       integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
-    </script>
+      </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
       integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
-    </script>
+      </script>
     {% block javascript %}
     {% endblock %}
-    <!-- </div> -->
-    <!-- </div> -->
   </div>
 
 </body>

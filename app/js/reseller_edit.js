@@ -2,7 +2,7 @@
 $(document).ready(() => {
   let incommingResellerInfo = Array.from(document.querySelectorAll(".changeable")).map(el => (el.value));
   document.querySelectorAll(".redirector").forEach(button => button.addEventListener('click', e => {
-    targetLocation = e.currentTarget.href;
+    let targetLocation = e.currentTarget.href;
     let outgoingResellerInfo = Array.from(document.querySelectorAll(".changeable")).map(el => (el.value));
     if (JSON.stringify(incommingResellerInfo) != JSON.stringify(outgoingResellerInfo)) {
       e.preventDefault();

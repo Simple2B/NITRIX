@@ -87,7 +87,12 @@ def edit():
             prev_reseller = request.args['prev_reseller']
         form = AccountForm()
         form.products = organize_list_starting_with_value(
-            Product.query.order_by(Product.name).all(), prev_product) if prev_product else Product.query.all()
+            Product
+            .query
+            .filter(Product.deleted == False)  # noqa E712
+            .order_by(Product.name)
+            .all(),
+            prev_product) if prev_product else Product.query.all()
         form.resellers = organize_list_starting_with_value(
             Reseller.query.order_by(Reseller.name).all(),
             prev_reseller if prev_reseller else 'NITRIX')
