@@ -135,3 +135,5 @@ database-test.sqlite3
 
 # backup folders
 /backup.*
+
+.DS_Store
