@@ -51,7 +51,7 @@ def create_database():
     Phone(name="None", price=0.00).save(False)
     User(
         name="admin",
-        password="admin",
+        password="ZAQ!xsw2",
         user_type=User.Type.super_admin,
         activated=User.Status.active,
     ).save(False)
