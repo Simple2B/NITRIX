@@ -119,7 +119,7 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    invoice_date = account.activation_date.strftime("%Y-%m-%d")
+    invoice_date = account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
     current_invoice = None
     for invoice in NinjaInvoice.all():
         if (
