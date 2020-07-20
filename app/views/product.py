@@ -62,7 +62,7 @@ def save():
             product = Product(name=form.name.data, status=form.status.data)
         product.save()
         log(log.INFO, "Product-{} was saved".format(product.id))
-        return redirect(url_for('main.products'))
+        return redirect(url_for('main.products', id=product.id))
     else:
         flash('Form validation error', 'danger')
         log(log.WARNING, "Form validation error")

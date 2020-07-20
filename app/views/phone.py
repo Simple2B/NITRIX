@@ -86,7 +86,7 @@ def save():
                         cost=phone.price,
                     )
         log(log.INFO, "Phone-{} was saved".format(phone.id))
-        return redirect(url_for("main.phones"))
+        return redirect(url_for("main.phones", id=phone.id))
     else:
         flash("Form validation error", "danger")
         log(log.WARNING, "Form validation error")
