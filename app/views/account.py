@@ -245,7 +245,7 @@ def save():
             )
         if request.form["submit"] == "save_and_edit":
             return redirect(url_for("account.edit", id=account.id))
-        return redirect(url_for("main.accounts"))
+        return redirect(url_for("main.accounts", id=account.id))
     else:
         flash("Form validation error", "danger")
         log(log.ERROR, "Form validation error")
