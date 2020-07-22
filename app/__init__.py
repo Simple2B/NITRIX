@@ -5,7 +5,7 @@ from datetime import timedelta
 from flask import Flask, render_template, session
 from flask_login import LoginManager
 from werkzeug.exceptions import HTTPException
-from .database import db
+from .database import db, migrate
 
 # instantiate extensions
 login_manager = LoginManager()
@@ -43,6 +43,7 @@ def create_app(environment="development"):
 
     # Set up extensions.
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     # Register blueprints.
