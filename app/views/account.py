@@ -1,7 +1,7 @@
 import os
 
 from datetime import datetime
-from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask import render_template, Blueprint, request, flash, redirect, url_for, session
 from flask_login import login_required
 
 from app.models import (
@@ -11,10 +11,10 @@ from app.models import (
     AccountExtension,
     AccountChanges,
     Phone,
+    ResellerProduct
 )
-from app.models import ResellerProduct
 from app.forms import AccountForm
-from ..database import db
+# from ..database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
 from app.utils import ninja_product_name, organize_list_starting_with_value
@@ -78,6 +78,7 @@ def edit():
         form.delete_route = url_for("account.delete")
         form.close_button = url_for("main.accounts")
         form.reseller_name = account.reseller.name
+        form.history = AccountChanges.get_history(account)
         return render_template("account_details.html", form=form)
     else:
         prev_product = None
@@ -168,6 +169,77 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
         return None
 
 
+def document_changes_if_exist(account, form):
+    if account.name != form.name.data:
+        # Changed account name
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.name
+        change.value_str = account.name
+        change.new_value_str = form.name.data
+        change.save()
+        flash(f'In account {account.name} name changed to {form.name.data}', 'info')
+    if account.sim != form.sim.data:
+        # Changed account SIM
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.sim
+        change.new_value_str = form.sim.data
+        change.value_str = account.sim if account.sim else 'Empty'
+        change.save()
+        flash(f'In account {account.name} sim changed to {form.sim.data}', 'info')
+    if account.product_id != form.product_id.data:
+        # Changed account product
+        new_product = Product.query.get(form.product_id.data).name
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.product
+        change.new_value_str = new_product
+        change.value_str = account.product.name
+        change.save()
+        flash(f'In account {account.name} product changed to {new_product}', 'info')
+    if account.phone_id != form.phone_id.data:
+        # Changed account phone
+        new_phone = Phone.query.get(form.phone_id.data).name
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.phone
+        change.new_value_str = new_phone
+        change.value_str = account.phone.name if account.phone.name else 'Empty'
+        change.save()
+        flash(f'In account {account.name} phone changed to {new_phone}', 'info')
+    if account.reseller_id != form.reseller_id.data:
+        # Changed account reseller
+        new_reseller = Reseller.query.get(form.reseller_id.data).name
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.reseller
+        change.new_value_str = new_reseller
+        change.value_str = account.reseller.name
+        change.save()
+        flash(f'In account {account.name} reseller changed to {new_reseller}', 'info')
+    if account.activation_date.strftime("%Y-%m-%d") != form.activation_date.data.strftime("%Y-%m-%d"):
+        # Changed account activation date
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.activation_date
+        change.new_value_str = form.activation_date.data.strftime("%Y-%m-%d")
+        change.value_str = account.activation_date.strftime("%Y-%m-%d")
+        change.save()
+        flash(
+            f'In account {account.name} activation date changed to {form.activation_date.strftime("%Y-%m-%d")}',
+            'info')
+    if account.months != form.months.data:
+        # Changed account months
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.months
+        change.new_value_str = form.months
+        change.value_str = account.months
+        change.save()
+        flash(f'In account {account.name} months changed to {form.months}', 'info')
+
+
 @account_blueprint.route("/account_save", methods=["POST"])
 @login_required
 def save():
@@ -180,21 +252,7 @@ def save():
         if form.id.data > 0:
             # Edit exists account
             account = Account.query.filter(Account.id == form.id.data).first()
-            if account.name != form.name.data:
-                # Changed account name
-                change = AccountChanges(account=account)
-                change.change_type = AccountChanges.ChangeType.name
-                change.value_str = account.name
-                change.save()
-                flash(f'In account {account.name} name changed to {form.name.data}', 'info')
-            if account.sim != form.sim.data:
-                # Changed account SIM
-                change = AccountChanges(account=account)
-                change.change_type = AccountChanges.ChangeType.sim
-                change.value_str = account.sim
-                change.save()
-                flash(f'In account {account.name} sim changed to {form.sim.data}', 'info')
-
+            document_changes_if_exist(account, form)
             for k in request.form.keys():
                 account.__setattr__(k, form.__getattribute__(k).data)
         else:
@@ -224,11 +282,18 @@ def save():
             flash("Months must be in 1-12", "danger")
             return redirect(url_for("account.edit", id=account.id))
         account.save()
-        if new_account and ninja.configured:
-            nina_api_result = add_ninja_invoice(account, new_account, 'Activated')
-            if not nina_api_result:
-                log(log.ERROR, "Could not register account as invoice in Invoice Ninja!")
-                flash("WARNING! Account registration in Ninja failed!", "danger")
+        if new_account:
+            change = AccountChanges(account=account)
+            change.user_id = session.get('_user_id')
+            change.change_type = AccountChanges.ChangeType.created
+            change.new_value_str = 'Created'
+            change.value_str = 'None'
+            change.save()
+            if ninja.configured:
+                nina_api_result = add_ninja_invoice(account, new_account, 'Activated')
+                if not nina_api_result:
+                    log(log.ERROR, "Could not register account as invoice in Invoice Ninja!")
+                    flash("WARNING! Account registration in Ninja failed!", "danger")
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
@@ -257,23 +322,29 @@ def save():
 def delete():
     if "id" in request.args:
         account_id = int(request.args["id"])
-        Account.query.filter(Account.id == account_id).delete()
-        db.session.commit()
+        account = Account.query.filter(Account.id == account_id).first()
+        change = AccountChanges(account=account)
+        change.user_id = session.get('_user_id')
+        change.change_type = AccountChanges.ChangeType.deleted
+        change.new_value_str = 'None'
+        change.value_str = 'Deleted'
+        change.save()
+        account.delete()
         return redirect(url_for("main.accounts"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.accounts"))
 
 
-@account_blueprint.route("/account_change_delete", methods=["GET"])
-@login_required
-def delete_change():
-    log(log.INFO, "%s /account_change_delete", request.method)
-    if "id" not in request.args:
-        flash("Unknown Change id", "danger")
-        return redirect(url_for("main.accounts"))
-    account_change = AccountChanges.query.filter(
-        AccountChanges.id == int(request.args["id"])
-    ).first()
-    account_id = account_change.account_id
-    account_change.delete()
-    return redirect(url_for("account.edit", id=account_id))
+# @account_blueprint.route("/account_change_delete", methods=["GET"])
+# @login_required
+# def delete_change():
+#     log(log.INFO, "%s /account_change_delete", request.method)
+#     if "id" not in request.args:
+#         flash("Unknown Change id", "danger")
+#         return redirect(url_for("main.accounts"))
+#     account_change = AccountChanges.query.filter(
+#         AccountChanges.id == int(request.args["id"])
+#     ).first()
+#     account_id = account_change.account_id
+#     account_change.delete()
+#     return redirect(url_for("account.edit", id=account_id))
