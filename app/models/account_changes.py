@@ -39,7 +39,13 @@ class AccountChanges(db.Model, ModelMixin):
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Created by user [{self.user.name}]"
         elif self.change_type == self.ChangeType.deleted:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted by user [{self.user.name}]"
-        return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] User [{self.user.name}] changed [{self.change_type.name}] value from [{self.value_str}] to [{self.new_value_str}]"
+        return "[{}] User [{}] changed [{}] value from [{}] to [{}]".format(
+            self.date.strftime('%Y/%m/%d, %H:%M:%S'),
+            self.user.name,
+            self.change_type.name,
+            self.value_str,
+            self.new_value_str
+        )
 
     @property
     def message_by_user(self):
@@ -47,7 +53,13 @@ class AccountChanges(db.Model, ModelMixin):
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Created account [{self.account.name}]"
         elif self.change_type == self.ChangeType.deleted:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted account [{self.account.name}]"
-        return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Changed [{self.change_type.value}] value from [{self.value_str}] to [{self.new_value_str}] in account [{self.account.name}]"
+        return "[{}] Changed [{}] value from [{}] to [{}] in account [{}]".format(
+            self.date.strftime('%Y/%m/%d, %H:%M:%S'),
+            self.change_type.value,
+            self.value_str,
+            self.new_value_str,
+            self.account.name
+        )
 
     @classmethod
     def get_history(cls, account):
