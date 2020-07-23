@@ -10,5 +10,5 @@ class LoginForm(FlaskForm):
 
 
 class TwoFactorForm(FlaskForm):
-    token = StringField('OTP Token', [DataRequired(), Length(6,6)])
-    
+    token = StringField('OTP Token', [DataRequired(), Length(6, 6)])
+    submit = SubmitField("Verify OTP")
