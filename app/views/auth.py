@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request, session, abort
 from flask_login import login_user, logout_user, login_required
 from io import BytesIO
+from database import db
 
 from app.models import User
 from app.forms import LoginForm
@@ -61,6 +62,10 @@ def qrcode():
 
     # remove user_name from session for added security
     del session['user_name']
+
+    # update otp status in users DB
+    user.otp_active = True
+    db.session.commit()
 
     # render qrcode for Google Authenticator
     url = pyqrcode.create(user.get_totp_uri())
