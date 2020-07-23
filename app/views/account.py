@@ -17,7 +17,7 @@ from app.forms import AccountForm
 from ..database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
-from app.utils import ninja_product_name
+from app.utils import ninja_product_name, organize_list_starting_with_value
 from app.ninja import api as ninja
 
 
@@ -32,16 +32,6 @@ def all_phones():
     all_phones = phones.all()
     all_phones = organize_list_starting_with_value(all_phones, 'None')
     return all_phones
-
-
-def organize_list_starting_with_value(input_list, value):
-    try:
-        default_phone_value_index = input_list.index([item for item in input_list if item.name == value][0])
-    except ValueError:
-        return input_list
-    default_value = input_list.pop(default_phone_value_index)
-    input_list.insert(0, default_value)
-    return input_list
 
 
 @account_blueprint.route("/account_details")
@@ -90,9 +80,22 @@ def edit():
         form.reseller_name = account.reseller.name
         return render_template("account_details.html", form=form)
     else:
+        prev_product = None
+        prev_reseller = None
+        if 'prev_reseller' in request.args and 'prev_product' in request.args:
+            prev_product = request.args['prev_product']
+            prev_reseller = request.args['prev_reseller']
         form = AccountForm()
-        form.products = Product.query.all()
-        form.resellers = organize_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')
+        form.products = organize_list_starting_with_value(
+            Product
+            .query
+            .filter(Product.deleted == False)  # noqa E712
+            .order_by(Product.name)
+            .all(),
+            prev_product) if prev_product else Product.query.all()
+        form.resellers = organize_list_starting_with_value(
+            Reseller.query.order_by(Reseller.name).all(),
+            prev_reseller if prev_reseller else 'NITRIX')
         form.phones = all_phones()
         form.is_edit = False
         form.save_route = url_for("account.save")
@@ -101,7 +104,7 @@ def edit():
         return render_template("account_details.html", form=form)
 
 
-def add_ninja_invoice(account: Account, is_new: bool):
+def add_ninja_invoice(account: Account, is_new: bool, mode: str):
     reseller_product = (
         ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
         .filter(ResellerProduct.product_id == account.product_id)
@@ -116,9 +119,7 @@ def add_ninja_invoice(account: Account, is_new: bool):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    # First day of month
-    invoice_date = datetime(datetime.now().year, datetime.now().month, 1)
-    invoice_date = invoice_date.strftime("%Y-%m-%d")
+    invoice_date = account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
     current_invoice = None
     for invoice in NinjaInvoice.all():
         if (
@@ -134,17 +135,37 @@ def add_ninja_invoice(account: Account, is_new: bool):
             account.reseller.ninja_client_id, invoice_date
         )
     if current_invoice:
-        current_invoice.add_item(
+        added_item = current_invoice.add_item(
             ninja_product_name(account.product.name, account.months),
-            account.name,
+            f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
             cost=reseller_product.init_price if reseller_product else 0,
         )
+        if not added_item:
+            log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+            return None
         if is_new:
             if account.phone.name != "None":
                 phone_name = f"Phone-{account.phone.name}"
-                current_invoice.add_item(phone_name, account.name, cost=account.phone.price)
+                added_item = current_invoice.add_item(
+                    phone_name,
+                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
+                    cost=account.phone.price)
+                if not added_item:
+                    log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+                    return None
             if SIM_COST_ACCOUNT_COMMENT in account.comment:
-                current_invoice.add_item('SIM Cost', account.name, SIM_COST_DISCOUNT)
+                added_item = current_invoice.add_item(
+                    'SIM Cost',
+                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
+                    SIM_COST_DISCOUNT)
+                if not added_item:
+                    log(log.ERROR, 'Could not add item to invoice in invoice Ninja!')
+                    return None
+        log(log.INFO, 'Invoice into Invoice Ninja added successfully')
+        return True
+    else:
+        log(log.ERROR, 'Could not add invoice to Invoice Ninja!')
+        return None
 
 
 @account_blueprint.route("/account_save", methods=["POST"])
@@ -165,17 +186,23 @@ def save():
                 change.change_type = AccountChanges.ChangeType.name
                 change.value_str = account.name
                 change.save()
+                flash(f'In account {account.name} name changed to {form.name.data}', 'info')
             if account.sim != form.sim.data:
                 # Changed account SIM
                 change = AccountChanges(account=account)
                 change.change_type = AccountChanges.ChangeType.sim
                 change.value_str = account.sim
                 change.save()
+                flash(f'In account {account.name} sim changed to {form.sim.data}', 'info')
 
             for k in request.form.keys():
                 account.__setattr__(k, form.__getattribute__(k).data)
         else:
             # Add a new account
+            if Account.query.filter(Account.name == form.name.data, Account.product_id == form.product_id.data).first():
+                log(log.WARNING, "Attempt to register account with existing credentials")
+                flash('Such account already exists', 'danger')
+                return redirect(url_for("account.edit"))
             new_account = True
             if form.sim_cost.data == 'yes':
                 form.comment.data += f'\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}'
@@ -191,13 +218,17 @@ def save():
                 activation_date=form.activation_date.data,
                 months=form.months.data,
             )
+            flash(f'Account {account.name} added', "info")
         # Check that months must be in 1-12
         if not 0 < account.months <= 12:
             flash("Months must be in 1-12", "danger")
             return redirect(url_for("account.edit", id=account.id))
         account.save()
         if new_account and ninja.configured:
-            add_ninja_invoice(account, new_account)
+            nina_api_result = add_ninja_invoice(account, new_account, 'Activated')
+            if not nina_api_result:
+                log(log.ERROR, "Could not register account as invoice in Invoice Ninja!")
+                flash("WARNING! Account registration in Ninja failed!", "danger")
         # Change Resellers last activity
         reseller = Reseller.query.filter(Reseller.id == account.reseller_id).first()
         reseller.last_activity = datetime.now()
@@ -205,10 +236,16 @@ def save():
 
         log(log.INFO, "Account data was saved")
         if request.form["submit"] == "save_and_add":
-            return redirect(url_for("account.edit"))
+            return redirect(
+                url_for(
+                    "account.edit",
+                    prev_reseller=account.reseller.name,
+                    prev_product=account.product.name
+                )
+            )
         if request.form["submit"] == "save_and_edit":
             return redirect(url_for("account.edit", id=account.id))
-        return redirect(url_for("main.accounts"))
+        return redirect(url_for("main.accounts", id=account.id))
     else:
         flash("Form validation error", "danger")
         log(log.ERROR, "Form validation error")

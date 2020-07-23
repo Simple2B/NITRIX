@@ -7,7 +7,7 @@ from app.models import Account, AccountExtension, Product, Reseller
 from app.forms import AccountExtensionForm
 from app.logger import log
 from app.ninja import api as ninja
-
+from app.utils import organize_list_starting_with_value
 from app.views.account import add_ninja_invoice
 
 account_extension_blueprint = Blueprint('account_extension', __name__)
@@ -26,8 +26,8 @@ def add():
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
     form = AccountExtensionForm(id=account_id)
-    form.products = Product.query.filter(Product.deleted == False).all() # noqa E712
-    form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
+    form.products = Product.query.filter(Product.deleted == False).order_by(Product.name).all() # noqa E712
+    form.resellers = organize_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')  # noqa E712
     form.is_edit = False
     form.save_route = url_for('account_extension.save_new')
     form.close_button = url_for('account.edit', id=account_id)
@@ -99,7 +99,7 @@ def save_new():
     account.is_new = False
     # Register product in Invoice Ninja
     if ninja.configured and not app.config['TESTING']:
-        add_ninja_invoice(account, False)
+        add_ninja_invoice(account, False, 'Extended')
     return redirect(url_for('account.edit', id=form.id.data))
 
 

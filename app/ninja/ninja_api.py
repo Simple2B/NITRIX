@@ -78,7 +78,7 @@ class NinjaApi(object):
             response.raise_for_status()
         except requests.HTTPError as error:
             log(log.ERROR, "NinjaApi.HTTPError: %s", error)
-        return response.ok
+        return response.ok if response.ok else None
 
     @property
     def clients(self):

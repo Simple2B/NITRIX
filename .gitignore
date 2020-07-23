@@ -132,3 +132,8 @@ dmypy.json
 database-devel.sqlite3
 database-develop.sqlite3
 database-test.sqlite3
+
+# backup folders
+/backup.*
+
+.DS_Store

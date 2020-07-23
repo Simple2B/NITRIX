@@ -45,16 +45,18 @@ class NinjaInvoice(object):
             'cost': cost,
             'qty': qty
             }]
-        return self.save()
+        result = self.save()
+        return result if result else None
 
     def delete_item(self, invoice_items):
         self.invoice_items = [data for data in self.invoice_items if data['invoice_items'] != invoice_items]
 
     def save(self):
         log(log.DEBUG, 'NinjaApi.update_product %d', self.id)
-        return api.do_put(
+        api_result = api.do_put(
             '{}invoices/{}'.format(api.BASE_URL, self.id),
             **(self.to_dict()))
+        return api_result if api_result else None
 
     @staticmethod
     def get(invoice_id: int): # noqa E999

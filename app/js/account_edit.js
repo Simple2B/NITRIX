@@ -11,17 +11,6 @@ $(document).ready(function() {
     $('#months').change(update_end_date);
     update_end_date();
 
-    function update_end_date_ext() {
-        let endDate = new Date($('#extension_date').val());
-        let month = +$('#monthsExt').val();
-        endDate.setMonth(endDate.getMonth() + month);
-        $("#endDateExt")[0].valueAsDate = endDate;
-    };
-
-    $('#extension_date').change(update_end_date_ext);
-    $('#monthsExt').change(update_end_date_ext);
-    update_end_date_ext();
-
     document.querySelectorAll('.save_ext').forEach(row => {
         function update_end_date_ext() {
             let endDate = new Date(row.querySelector('.extension_datesave').value);

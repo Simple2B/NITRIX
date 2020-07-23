@@ -28,3 +28,8 @@ class Product(db.Model, ModelMixin):
     @staticmethod
     def columns():
         return ['ID', 'Name', 'Status']
+
+
+@classmethod
+def get_ordered_by_name_desc(cls):
+    return cls.query.filter(cls.deleted == False).order_by(cls.name).all()  # noqa E712
