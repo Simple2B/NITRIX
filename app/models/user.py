@@ -5,6 +5,9 @@ from flask_login import UserMixin
 from .. import db
 from ..utils import ModelMixin
 from sqlalchemy import Enum
+import base64
+import os
+import onetimepass
 
 
 class User(db.Model, UserMixin, ModelMixin):
@@ -27,6 +30,14 @@ class User(db.Model, UserMixin, ModelMixin):
     password_hash = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
     deleted = db.Column(db.Boolean, default=False)
+    otp_secret = db.Column(db.String(16))
+    otp_active = db.Column(db.Boolean, default=False)
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.otp_secret is None:
+            # generate a random otp secret (16 chars)
+            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     @hybrid_property
     def password(self):
@@ -35,6 +46,13 @@ class User(db.Model, UserMixin, ModelMixin):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    def get_totp_uri(self):
+        ''' generate authentication URI for Google Authenticator '''
+        return f'otpauth://totp/NITRIX:{self.name}?secret={self.otp_secret}&issuer=NITRIX'
+
+    def verify_totp(self, token):
+        return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
     def authenticate(cls, user_name, password):
