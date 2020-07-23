@@ -14,15 +14,27 @@ def login():
     form = LoginForm(request.form)
     log(log.INFO, '/login')
     if form.validate_on_submit():
+        # check if user has active two-factor auth
+        user = User.query.filter(form.user_name.data).first()
+        if not user.otp_active:
+            return 'Set up Two Factor Authentication first.'
         user = User.authenticate(form.user_name.data, form.password.data)
         if user is not None:
-            login_user(user)
-            flash("Login successful.", "success")
-            return redirect(url_for("main.index"))
+            if user.verify_totp(form.token.data):
+                login_user(user)
+                flash("Login successful.", "success")
+                return redirect(url_for("main.index"))
+            else:
+                flash("Your OTP password is invalid. Please try again.", "danger")
+                log(log.WARNING, "Invalid OTP token")
         flash("Wrong user name or password.", "danger")
         log(log.WARNING, "Invalid user data")
     return render_template("login.html", form=form)
 
+
+@auth_blueprint.route('/two_factor_setup')
+def two_factor_setup():
+    pass
 
 @auth_blueprint.route("/logout")
 @login_required

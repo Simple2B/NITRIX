@@ -52,10 +52,11 @@ class User(db.Model, UserMixin, ModelMixin):
         return f'otpauth://totp/NITRIX:{self.name}?secret={self.otp_secret}&issuer=NITRIX'
 
     def verify_totp(self, token):
+        ''' validates 6-digit OTP code retrieved from Google '''
         return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
-    def authenticate(cls, user_name, password):
+    def authenticate(cls, user_name, password, token):
         user = cls.query.filter(cls.name == user_name).first()
         if user is not None and check_password_hash(user.password, password):
             return user
