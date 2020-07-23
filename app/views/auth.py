@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, url_for, redirect, flash, request, session, abort
 from flask_login import login_user, logout_user, login_required
 from io import BytesIO
-from database import db
+from app.database import db
 
 from app.models import User
-from app.forms import LoginForm
+from app.forms import LoginForm, TwoFactorForm
 from app.forms import ChangePasswordForm
 from app.logger import log
 
@@ -18,29 +18,54 @@ def login():
     form = LoginForm(request.form)
     log(log.INFO, '/login')
     if form.validate_on_submit():
-        # check if user has active two-factor auth
-        user = User.query.filter(form.user_name.data).first()
-        if not user.otp_active:
-            # pass corresponding user_name with redirect
-            session['user_name'] = user.user_name
-            return redirect(url_for('auth.two_factor_setup'))
         user = User.authenticate(form.user_name.data, form.password.data)
         if user is not None:
-            if user.verify_totp(form.token.data):
-                login_user(user)
-                flash("Login successful.", "success")
-                return redirect(url_for("main.index"))
+            session['user_name'] = form.user_name.data
+            # check if user has OTP activated
+            if user.otp_active:
+                session['auth_status'] = True
+                return redirect(url_for('auth.otp_verify'))
+
+            # redirect to Two Factor Setup
             else:
-                flash("Your OTP password is invalid. Please try again.", "danger")
-                log(log.WARNING, "Invalid OTP token")
+                return redirect(url_for('auth.two_factor_warning'))
         flash("Wrong user name or password.", "danger")
         log(log.WARNING, "Invalid user data")
     return render_template("login.html", form=form)
 
 
+@auth_blueprint.route('/otp_verify', methods=['GET', 'POST'])
+def otp_verify():
+    # check if user passed username & password verification
+    if 'auth_status' not in session:
+        log(log.WARNING, 'auth_status not confirmed')
+        return redirect(url_for('auth.login'))
+    form = TwoFactorForm()
+    if form.validate_on_submit():
+        user = User.query.filter(session['user_name']).first()
+        if session['auth_status'] and user.verify_totp(form.token.data):
+            login_user(user)
+
+            # remove session data for added security
+            del session['user_name']
+            del session['auth_status']
+
+            flash("Login successful.", "success")
+            return redirect(url_for('main.index'))
+        flash("Invalid OTP token", "danger")
+        log(log.WARNING, "Invalid OTP token")
+    return render_template('otp_form.html', form=form)
+
+
+@auth_blueprint.route('/two_factor_warning')
+def two_factor_warning():
+    return render_template('two_factor_warning.html')
+
+
 @auth_blueprint.route('/two_factor_setup')
 def two_factor_setup():
-    if 'username' not in session:
+    if 'user_name' not in session:
+        log(log.WARNING, 'user_name not in session')
         return redirect(url_for('auth.login'))
     user = User.query.filter_by(user_name=session['user_name']).first()
     if user is None:

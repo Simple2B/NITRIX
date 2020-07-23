@@ -56,7 +56,7 @@ class User(db.Model, UserMixin, ModelMixin):
         return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
-    def authenticate(cls, user_name, password, token):
+    def authenticate(cls, user_name, password):
         user = cls.query.filter(cls.name == user_name).first()
         if user is not None and check_password_hash(user.password, password):
             return user

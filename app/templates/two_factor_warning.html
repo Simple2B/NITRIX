@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Two Factor Authentication Setup</h1>
+    <p>Please make sure you have Google Authenticator application installed on your smartphone. Start Google Authenticator and scan QR Code which will be displayed on the following page:</p>
+    <p><strong>GOOGLE AUTH</strong> <strong>FREE OTP</strong>></p>
+    <p><storng>SECURITY ALERT: The following page contains sensitive information. Make sure you are not sharing your screen to anybody while setting up two factor authentication.</storng></p>
+    <p><a href="{{ url_for('auth.two_factor_setup') }}">Scan QR code</a></p>
+{% endblock %}
