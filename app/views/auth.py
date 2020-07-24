@@ -81,12 +81,11 @@ def two_factor_setup():
         log(log.WARNING, 'user_name not in session')
         # TODO flash
         return redirect(url_for('auth.login'))
-    # TODO refactor with id instead of user_name
     user = User.query.filter(User.id == user_id, User.deleted == False).first()  # noqa E712
     if not user:
         return redirect(url_for('auth.login'))
     # render QR code without caching it in browser
-    return render_template('two-factor-setup.html'), 200, {
+    return render_template('two-factor-setup.html', user=user), 200, {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'}
@@ -98,16 +97,11 @@ def qrcode():
         flash("You do not have permissions to access this page.", "danger")
         return redirect(url_for('auth.login'))
     user = User.query.filter(User.id == session.get('id')).first()
+    if user.otp_active:
+        flash('Two-factor authentication is activated`. Please log in.', 'warning')
+        return redirect(url_for('auth.login'))
     if user is None:
         abort(404)
-
-    # remove user id from session for added security
-    del session['id']
-
-    # update otp status in users DB
-    user.otp_active = True
-    db.session.commit()
-
     # render qrcode for Google Authenticator
     url = pyqrcode.create(user.get_totp_uri())
     stream = BytesIO()
@@ -117,6 +111,21 @@ def qrcode():
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'}
+
+
+@auth_blueprint.route('/otp_set_up_verification')
+def otp_set_up_verification():
+    ''' This route finalises 2FA process set up '''
+    user = User.query.filter(User.id == session.get('id')).first()
+    # remove user id from session for added security
+    if not user.otp_active:
+        del session['id']
+        # update otp status in users DB
+        user.otp_active = True
+        db.session.commit()
+        flash('Two-Factor Authentication is set up successfully. You can now log in.', 'success')
+        return redirect(url_for('auth.login'))
+    
 
 
 @auth_blueprint.route("/logout")
