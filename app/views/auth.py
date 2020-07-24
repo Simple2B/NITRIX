@@ -22,7 +22,6 @@ def login():
         log(log.INFO, 'username password form validated')
         user = User.authenticate(form.user_name.data, form.password.data)
         if user is not None:
-            user = User.query.get(user.id)
             session['id'] = user.id
             # check if user has OTP activated
             if user.otp_active:
@@ -60,10 +59,10 @@ def otp_verify():
             log(log.INFO, 'session cookie cleared')
             flash("Login successful.", "success")
             return redirect(url_for('main.index'))
-        flash("Invalid OTP token", "danger")
+        flash("Invalid OTP token. Try again.", "danger")
         log(log.WARNING, "Invalid OTP token")
-    else:
-        log(log.INFO, 'VALIDATION ERROR')
+    elif form.is_submitted():
+        log(log.WARNING, 'OTP form validation error')
     return render_template('otp_form.html', form=form)
 
 
@@ -79,10 +78,12 @@ def two_factor_setup():
     user_id = session.get('id', None)
     if user_id is None:
         log(log.WARNING, 'user_name not in session')
-        # TODO flash
+        flash('We could not verify your credentials. Please log in first.')
         return redirect(url_for('auth.login'))
     user = User.query.filter(User.id == user_id, User.deleted == False).first()  # noqa E712
     if not user:
+        log(log.WARNING, 'user not found in database.')
+        flash('We could not verify your credentials. Please try loggin in first.')
         return redirect(url_for('auth.login'))
     # render QR code without caching it in browser
     return render_template('two-factor-setup.html', user=user), 200, {
@@ -94,6 +95,7 @@ def two_factor_setup():
 @auth_blueprint.route('/qrcode')
 def qrcode():
     if not session.get('id'):
+        log(log.WARNING, 'no such user id in session')
         flash("You do not have permissions to access this page.", "danger")
         return redirect(url_for('auth.login'))
     user = User.query.filter(User.id == session.get('id')).first()
