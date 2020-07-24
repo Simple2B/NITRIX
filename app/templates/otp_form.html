@@ -4,12 +4,15 @@
 <div class="container py-4">
   <div class="card w-50 mx-auto">
     <div class="card-header">
-      <h4 class="card-title">OTP Verification</h4>
+      <h4 class="card-title text-center">OTP Verification</h4>
     </div>
     <div class="card-body">
+      <div class="row mx-auto">
+        <img class="mb-3 mx-auto" src="{{url_for('main.images', filename='/google_otp_logo.svg') }}", height="75">
+        <p>Open your Google Authenticator and enter the 6-digit OTP code below:</p>
+      </div>
       <form class="form" role="form" method="post">
         <div class="form-group">
-          {{form.token.label}}
           {{form.token(class='form-control')}}
         </div>
         <div class="row">

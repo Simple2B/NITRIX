@@ -39,12 +39,12 @@ def login():
 
 
 @auth_blueprint.route('/otp_verify', methods=['GET', 'POST'])
-def otp_verify():
+def otp_verify(): 
     log(log.INFO, '/otp_verify')
     # check if user passed username & password verification
     if not session.get('id'):
         log(log.WARNING, 'user auth_status not confirmed')
-        flash("user auth_status not confirmed.", "danger")
+        flash("Please login to your account first", "danger")
         return redirect(url_for('auth.login'))
     form = TwoFactorForm(request.form)
     if form.validate_on_submit():
@@ -53,7 +53,7 @@ def otp_verify():
         if session['id'] and user.verify_totp(form.token.data):
             log(log.INFO, 'user logged in')
             login_user(user)
-            
+
             # remove session data for added security
             del session['id']
 
@@ -94,13 +94,14 @@ def two_factor_setup():
 
 @auth_blueprint.route('/qrcode')
 def qrcode():
-    if 'id' not in session:
-        abort(404)
+    if not session.get('id'):
+        flash("You do not have permissions to access this page.", "danger")
+        return redirect(url_for('auth.login'))
     user = User.query.filter(User.id == session.get('id')).first()
     if user is None:
         abort(404)
 
-    # remove user_name from session for added security
+    # remove user id from session for added security
     del session['id']
 
     # update otp status in users DB
