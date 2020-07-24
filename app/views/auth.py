@@ -39,7 +39,7 @@ def login():
 
 
 @auth_blueprint.route('/otp_verify', methods=['GET', 'POST'])
-def otp_verify(): 
+def otp_verify():
     log(log.INFO, '/otp_verify')
     # check if user passed username & password verification
     if not session.get('id'):
@@ -125,7 +125,8 @@ def otp_set_up_verification():
         db.session.commit()
         flash('Two-Factor Authentication is set up successfully. You can now log in.', 'success')
         return redirect(url_for('auth.login'))
-    
+    flash('Two-Factor Authentication is active. Please log in.', 'warning')
+    return redirect(url_for('auth.login'))
 
 
 @auth_blueprint.route("/logout")
