@@ -25,7 +25,7 @@ class AccountChanges(db.Model, ModelMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer, db.ForeignKey("accounts.id"), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), default=1)
     date = db.Column(db.DateTime, default=datetime.now)
     change_type = db.Column(Enum(ChangeType), default=ChangeType.name)
     value_str = db.Column(db.String(60), nullable=False)
