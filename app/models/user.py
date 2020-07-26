@@ -16,7 +16,7 @@ class User(db.Model, UserMixin, ModelMixin):
     __tablename__ = 'users'
 
     @staticmethod
-    def __gen_secret():
+    def gen_secret():
         return base64.b32encode(os.urandom(10)).decode('utf-8')
 
     class Type(enum.Enum):
@@ -34,7 +34,7 @@ class User(db.Model, UserMixin, ModelMixin):
     password_hash = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
     deleted = db.Column(db.Boolean, default=False)
-    otp_secret = db.Column(db.String(16), default=__gen_secret)
+    otp_secret = db.Column(db.String(16), default=gen_secret)
     otp_active = db.Column(db.Boolean, default=False)
 
     def __init__(self, **kwargs):
