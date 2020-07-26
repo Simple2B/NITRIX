@@ -1,13 +1,17 @@
+import base64
+import os
 import enum
+import onetimepass
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from sqlalchemy import Enum
 from .. import db
 from ..utils import ModelMixin
-from sqlalchemy import Enum
-import base64
-import os
-import onetimepass
+
+
+def gen_secret_key():
+    return base64.b32encode(os.urandom(20)).decode('utf-8')
 
 
 class User(db.Model, UserMixin, ModelMixin):
@@ -17,7 +21,7 @@ class User(db.Model, UserMixin, ModelMixin):
 
     @staticmethod
     def gen_secret():
-        return base64.b32encode(os.urandom(10)).decode('utf-8')
+        return gen_secret_key()
 
     class Type(enum.Enum):
         super_admin = 'super_admin'
@@ -34,14 +38,8 @@ class User(db.Model, UserMixin, ModelMixin):
     password_hash = db.Column(db.String(255))
     activated = db.Column(Enum(Status), default=Status.active)
     deleted = db.Column(db.Boolean, default=False)
-    otp_secret = db.Column(db.String(16), default=gen_secret)
+    otp_secret = db.Column(db.String(32), default=gen_secret_key)
     otp_active = db.Column(db.Boolean, default=False)
-
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-        if self.otp_secret is None:
-            # generate a random otp secret (16 chars)
-            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
     @hybrid_property
     def password(self):
