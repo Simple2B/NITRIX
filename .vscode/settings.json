@@ -4,6 +4,9 @@
         "NITRIX",
         "imei",
         "noqa",
+        "otpauth",
+        "totp",
+        "urandom",
         "wtforms"
     ],
     "python.linting.pylintEnabled": false,
