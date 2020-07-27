@@ -8,6 +8,7 @@ from flask_login import UserMixin
 from sqlalchemy import Enum
 from .. import db
 from ..utils import ModelMixin
+from config import BaseConfig
 
 
 def gen_secret_key():
@@ -51,7 +52,7 @@ class User(db.Model, UserMixin, ModelMixin):
 
     def get_totp_uri(self):
         ''' generate authentication URI for Google Authenticator '''
-        return f'otpauth://totp/NITRIX:{self.name}?secret={self.otp_secret}&issuer=NITRIX'
+        return f'otpauth://totp/{BaseConfig.APP_NAME}:{self.name}?secret={self.otp_secret}&issuer={BaseConfig.APP_NAME}'
 
     def verify_totp(self, token):
         ''' validates 6-digit OTP code retrieved from Google '''

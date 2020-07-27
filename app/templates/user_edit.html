@@ -47,14 +47,11 @@
         {{form.activated(class='form-control')}}
       </div>
     </div>
-    <!-- <div>
-      <p>Reset OTP secret token <a class="btn btn-primary btn-danger ml-auto" href="#">Reset OTP token</a><p>
-      
-    </div> -->
   </form>
 </div>
 
 <!-- Modal -->
+{% if form.is_edit %}
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -73,4 +70,5 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}
