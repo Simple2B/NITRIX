@@ -7,7 +7,7 @@
             <h2 class="text-center">You are almost done!</h2>
             <p class="text-center">Please scan QR-code with Google Authenticator</p>
             <div class="text-center mb-3">
-                <a href="otpauth://totp/NITRIX:{{user.name}}?secret={{user.otp_secret}}&issuer=NITRIX"><img id="qrcode" src="{{ url_for('auth.qrcode') }}"></a>
+                <a href="{{ user.get_totp_uri() }}"><img id="qrcode" src="{{ url_for('auth.qrcode') }}"></a>
             </div>
             <div class="text-center">
                 <h5>OR</h5><br>

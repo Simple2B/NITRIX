@@ -2,13 +2,13 @@ import base64
 import os
 import enum
 import onetimepass
+from flask import current_app
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from sqlalchemy import Enum
 from .. import db
 from ..utils import ModelMixin
-from config import BaseConfig
 
 
 def gen_secret_key():
@@ -52,7 +52,8 @@ class User(db.Model, UserMixin, ModelMixin):
 
     def get_totp_uri(self):
         ''' generate authentication URI for Google Authenticator '''
-        return f'otpauth://totp/{BaseConfig.APP_NAME}:{self.name}?secret={self.otp_secret}&issuer={BaseConfig.APP_NAME}'
+        return 'otpauth://totp/{0}:{1}?secret={2}&issuer={0}'.format(
+            current_app.config['APP_NAME'], self.name, self.otp_secret)
 
     def verify_totp(self, token):
         ''' validates 6-digit OTP code retrieved from Google '''
