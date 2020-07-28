@@ -72,9 +72,10 @@ def two_factor_warning():
     return render_template('two_factor_warning.html')
 
 
-@auth_blueprint.route('/two_factor_setup')
+@auth_blueprint.route('/two_factor_setup', methods=['GET', 'POST'])
 def two_factor_setup():
     log(log.INFO, '/two_factor_setup')
+    form = TwoFactorForm(request.form)
     user_id = session.get('id', None)
     if user_id is None:
         log(log.WARNING, 'user_name not in session')
@@ -85,8 +86,14 @@ def two_factor_setup():
         log(log.WARNING, 'user not found in database.')
         flash('We could not verify your credentials. Please try loggin in first.')
         return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        if form.validate_on_submit() and user.verify_totp(form.token.data):
+            return redirect(url_for('auth.otp_set_up_verification'))
+        else:
+            flash('Invalid OTP token. Please try again.', 'danger')
+            return redirect(url_for('auth.two_factor_setup'))
     # render QR code without caching it in browser
-    return render_template('two-factor-setup.html', user=user), 200, {
+    return render_template('two-factor-setup.html', user=user, form=form), 200, {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'}

@@ -1,12 +1,9 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from app.models import User
+from app.models import User, gen_secret_key
 from app.forms import UserForm
 from app.logger import log
 from ..database import db
-
-import base64
-import os
 
 
 user_blueprint = Blueprint('user', __name__)
@@ -103,7 +100,7 @@ def otp_reset():
         user_id = int(request.args['id'])
         user = User.query.filter(User.id == user_id).first()
         # set new 16-digit OTP secret key
-        user.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
+        user.otp_secret = gen_secret_key()
         user.otp_active = False
         db.session.commit()
         flash('OTP token was reset successfuly', 'success')

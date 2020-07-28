@@ -4,16 +4,25 @@
 <div class="container py-4">
     <div class="row">
         <div class="mx-auto col-md-8">
-            <h2 class="text-center">You are almost done!</h2>
-            <p class="text-center">Please scan QR-code with Google Authenticator</p>
+            <p class="text-center">Please scan QR-code with Google Authenticator app</p>
             <div class="text-center mb-3">
                 <a href="{{ user.get_totp_uri() }}"><img id="qrcode" src="{{ url_for('auth.qrcode') }}"></a>
             </div>
             <div class="text-center">
-                <h5>OR</h5><br>
+                <h5>OR</h5>
                 <p>If you are using your mobile device to log in, you can click on the QR-code to automatically add it to Google Authenticator.</p>
             </div>
-            <p class="text-center"><a class="btn btn-primary btn-info"href="{{ url_for('auth.otp_set_up_verification') }}">Verify OTP</a></p>
+            <div>
+                <form method="POST">
+                    <div class="form-group">
+                        {{form.token(class='form-control col-3 mx-auto')}}
+                    </div>
+                    <div class="row">
+                        {{form.submit(class='btn btn-primary mx-auto')}}
+                    </div>
+                </form>
+            </div>
+            
         </div>
     </div>    
 </div>
