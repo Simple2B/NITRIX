@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card col-md-6 col-sm-10 col-10 mx-auto">
+    <div class="card-header">
+      <h4 class="card-title text-center">OTP Verification</h4>
+    </div>
+    <div class="card-body">
+      <div class="row mx-auto">
+        <img class="mb-3 mx-auto" src="{{url_for('main.images', filename='/google_otp_logo.svg') }}", height="75">
+        <p>Open your Google Authenticator and enter the 6-digit OTP code below:</p>
+      </div>
+      <form class="form" role="form" method="post">
+        <div class="form-group">
+          {{form.token(class='form-control')}}
+        </div>
+        <div class="row">
+          <div class="col col-sm-6 col-md-4 mb-3">
+            {{form.submit(class='btn btn-primary')}}
+          </div>
+        </div>
+        <p class="text-muted mx-auto">
+          <small>
+            Don't have access to the OTP application? Contact administrator and request new OTP.<br> 
+            <a href="{{url_for('auth.login')}}">Go back to login page</a>
+          </small></p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

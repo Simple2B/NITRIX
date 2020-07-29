@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from app.models import User
+from app.models import User, gen_secret_key
 from app.forms import UserForm
 from app.logger import log
 from ..database import db
@@ -35,7 +35,7 @@ def edit():
         form.close_button = url_for('main.users')
         return render_template(
                 "user_edit.html",
-                form=form
+                form=form, user=user
             )
     else:
         form = UserForm()
@@ -85,6 +85,25 @@ def delete():
         user_id = int(request.args['id'])
         User.query.filter(User.id == user_id).delete()
         db.session.commit()
+        return redirect(url_for('main.users'))
+    flash('Wrong request', 'danger')
+    return redirect(url_for('main.users'))
+
+
+@user_blueprint.route('/otp_reset', methods=["POST"])
+@login_required
+def otp_reset():
+    ''' Reset user OTP from Super Admin panel '''
+    if current_user.user_type.name not in ['super_admin']:
+        return redirect(url_for("main.index"))
+    if 'id' in request.args:
+        user_id = int(request.args['id'])
+        user = User.query.filter(User.id == user_id).first()
+        # set new 16-digit OTP secret key
+        user.otp_secret = gen_secret_key()
+        user.otp_active = False
+        db.session.commit()
+        flash('OTP token was reset successfuly', 'success')
         return redirect(url_for('main.users'))
     flash('Wrong request', 'danger')
     return redirect(url_for('main.users'))

@@ -16,3 +16,6 @@ sqlalchemy_utils
 requests
 python-dateutil
 Flask-Migrate
+onetimepass
+pyqrcode
+timecop

@@ -1,4 +1,4 @@
-from .user import User  # noqa
+from .user import User, gen_secret_key  # noqa
 from .reseller import Reseller  # noqa
 from .account import Account  # noqa
 from .product import Product  # noqa

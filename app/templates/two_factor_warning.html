@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container py-4">
+        <div class="row">
+            <div class="mx-auto col-md-8">
+                <h2 class="text-center">2-Step Verification Setup</h2>
+                <p>To set up two-factor authentication, Google Authenticator applicaion is required. You can download it using following links:</p>
+                <div class="text-center mb-3">
+                    <a href='https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' width="200" height="75" src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/></a>
+                    <a href='https://apps.apple.com/us/app/google-authenticator/id388497605'><img alt='Get it on App Store' height="51" src="{{ url_for('main.images', filename='/apple_logo.svg') }}"/></a>
+                </div>
+                <div>
+                    <h5>Follow this instructions to complete the set up</h5>
+                    <ol>
+                        <li>Open Google Authenticator application on your mobile device</li>
+                        <li>Press “ + “ button at the top-right corner of the screen</li>
+                        <li>Select “Scan barcode” option from the pop-up menu</li>
+                        <li>Scan QR-code which will appear on the next page with your mobile device</li>
+                        <li>Verify your username under the 6-digit OTP code generated in Google Authenticator application</li>
+                    </ol>
+                </div>
+                <div class="mb-5">
+                    <p><strong>SECURITY ALERT :</strong>The following page contains sensitive information. Make sure you are not sharing your screen to anybody while setting up two-factor authentication.</p>
+                </div>
+                <p class="text-center"><a class="btn btn-primary btn-info"href="{{ url_for('auth.two_factor_setup') }}">Show me QR code</a></p>
+            </div>
+        </div>    
+    </div>
+{% endblock %}
