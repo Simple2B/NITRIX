@@ -10,5 +10,6 @@
         "wtforms"
     ],
     "python.linting.pylintEnabled": false,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.pythonPath": ".venv/bin/python"
 }
