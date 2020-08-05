@@ -34,15 +34,8 @@
     <div class="form-group row">
     <label class="col-sm-2 col-form-label">Product:</label>
         <div class="col-sm-10">
-            <select class="form-control" name="product_id">
-              {% for record in form.products %}
-              {% if form.is_edit and record.id == form.product_id.data %}
-              <option value="{{record.id}}" selected>{{ record.name }}</option>
-              {% elif record.status.value == "Active" %}
-              <option value="{{record.id}}">{{ record.name }}</option>
-              {% endif %}
-              {%endfor%}
-            </select>
+          {{form.product_id(type='hidden')}}
+          {{form.product(class="form-control")}}
         </div>
     </div>
     <div class="form-group row">
