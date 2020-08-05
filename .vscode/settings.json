@@ -5,6 +5,7 @@
         "imei",
         "noqa",
         "otpauth",
+        "skipif",
         "totp",
         "urandom",
         "wtforms"
