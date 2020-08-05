@@ -14,7 +14,7 @@ def get_context():
     return dict(app=app, db=db, models=models, forms=forms)
 
 
-def create_database():
+def create_database(test_data=False):
     """ build database """
 
     def add_reseller_product(product, months, initprice, extprice, reseller):
@@ -47,6 +47,44 @@ def create_database():
             phone.ninja_product_id = ninja_product.id
             phone.save(False)
 
+    def add_reseller(name: str, comments: str):
+        reseller = Reseller(name=name, comments=comments).save(False)
+        ninja_client = (
+            ninja.add_client(name=reseller.name) if ninja.configured else None
+        )
+        if ninja_client:
+            reseller.ninja_client_id = ninja_client.id
+        return reseller
+
+    def add_reseller_with_test_products(name: str, comments: str):
+        reseller = add_reseller(name=name, comments=comments)
+        PRODUCT_NAME = "Gold"
+        product = Product.query.filter(Product.name == PRODUCT_NAME).first()
+        if not product:
+            product = Product(name=PRODUCT_NAME).save(False)
+        add_reseller_product(
+            months=1,
+            initprice=6.78,
+            extprice=4.55,
+            product=product,
+            reseller=reseller,
+        )
+        add_reseller_product(
+            months=3,
+            initprice=16.50,
+            extprice=10.55,
+            product=product,
+            reseller=reseller,
+        )
+        add_reseller_product(
+            months=6,
+            initprice=30.45,
+            extprice=19.55,
+            product=product,
+            reseller=reseller,
+        )
+        return reseller
+
     db.create_all()
     Phone(name="None", price=0.00).save(False)
     User(
@@ -61,59 +99,23 @@ def create_database():
         user_type=User.Type.user,
         activated=User.Status.active,
     ).save(False)
-    reseller_nitrix = Reseller(name="NITRIX", comments="Main reseller").save(False)
-    ninja_client = (
-        ninja.add_client(name=reseller_nitrix.name) if ninja.configured else None
-    )
-    if ninja_client:
-        reseller_nitrix.ninja_client_id = ninja_client.id
-    product_gold = Product(name="Gold").save(False)
-    add_reseller_product(
-        months=1,
-        initprice=6.78,
-        extprice=4.55,
-        product=product_gold,
-        reseller=reseller_nitrix,
-    )
-    add_reseller_product(
-        months=3,
-        initprice=16.50,
-        extprice=10.55,
-        product=product_gold,
-        reseller=reseller_nitrix,
-    )
-    add_reseller_product(
-        months=6,
-        initprice=30.45,
-        extprice=19.55,
-        product=product_gold,
-        reseller=reseller_nitrix,
-    )
+    add_reseller_with_test_products(name="NITRIX", comments="Main reseller")
     add_phone(name="Samsung", price=54.00)
     add_phone(name="Nokia", price=38.00)
     add_phone(name="Lg", price=30.00)
+    if test_data:
+        for n in range(10):
+            add_reseller_with_test_products(name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}")
     db.session.commit()
 
 
 @app.cli.command()
-def create_db():
-    """Create the configured database."""
-    create_database()
-
-
-@app.cli.command()
+@click.option('--test-data', is_flag=True, help='if include test data')
 @click.confirmation_option(prompt="Are you sure?")
-def drop_db():
-    """Drop the current database."""
-    db.drop_all()
-
-
-@app.cli.command()
-@click.confirmation_option(prompt="Are you sure?")
-def reset_db():
+def reset_db(test_data=False):
     """Reset the current database."""
     db.drop_all()
-    create_database()
+    create_database(test_data)
 
 
 if __name__ == "__main__":

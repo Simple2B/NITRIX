@@ -203,6 +203,7 @@
     </div>
     {% endfor %}
     {% endif %}
+    {% if form.history %}
     <button class="btn btn-secondary mt-4 mb-3" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
       Detailed history
     </button>
@@ -213,6 +214,7 @@
       {% endfor %}
       </ul>
     </div>
+    {% endif %}
   </div>
 </div>
 
