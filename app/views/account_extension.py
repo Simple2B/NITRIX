@@ -21,11 +21,12 @@ VALIDATION_ERROR = 'Form validation error'
 def add():
     log(log.INFO, '%s /account_extension_add', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if not hasValidIdentificator(request):
+    if not has_valid_id(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     account_id = int(request.args['id'])
-    form = AccountExtensionForm(id=account_id)
+    account = Account.query.filter(Account.id == account_id).first()
+    form = AccountExtensionForm(id=account_id, reseller_id=account.reseller_id)
     form.products = Product.query.filter(Product.deleted == False).order_by(Product.name).all() # noqa E712
     form.resellers = organize_list_starting_with_value(Reseller.query.order_by(Reseller.name).all(), 'NITRIX')  # noqa E712
     form.is_edit = False
@@ -39,7 +40,7 @@ def add():
 def edit():
     log(log.INFO, '%s /account_extension_edit', request.method)
     log(log.DEBUG, 'args: %s', request.args)
-    if not hasValidIdentificator(request):
+    if not has_valid_id(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
@@ -127,7 +128,7 @@ def save_update():
 @login_required
 def delete():
     log(log.INFO, '%s /account_ext_delete', request.method)
-    if not hasValidIdentificator(request):
+    if not has_valid_id(request):
         flash(UNKNOWN_ID, 'danger')
         return redirect(url_for('main.accounts'))
     extension = AccountExtension.query.filter(AccountExtension.id == int(request.args['id'])).first()
@@ -139,5 +140,5 @@ def delete():
     return redirect(url_for('account.edit', id=account_id))
 
 
-def hasValidIdentificator(obj):
+def has_valid_id(obj):
     return 'id' in obj.args and obj.args.get('id').isnumeric()

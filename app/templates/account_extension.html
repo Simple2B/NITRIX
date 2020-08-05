@@ -16,7 +16,7 @@
     <div class="col-sm-10">
         <select class="form-control" name="reseller_id">
             {% for record in form.resellers %}
-            {% if form.is_edit and record.id == 2 %}
+            {% if record.id == form.reseller_id.data %}
             <option value="{{record.id}}" selected>{{ record.name }}</option>
             {% elif record.status.value == "Active" %}
             <option value="{{record.id}}">{{ record.name }}</option>
