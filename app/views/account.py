@@ -4,6 +4,7 @@ from io import TextIOWrapper
 from datetime import datetime
 from flask import render_template, Blueprint, request, flash, redirect, url_for, session
 from flask_login import login_required
+from cerberus import Validator
 
 from app.models import (
     Account,
@@ -16,7 +17,7 @@ from app.models import (
 )
 from app.forms import AccountForm
 
-# from ..database import db
+from app.database import db
 from app.logger import log
 from app.ninja import NinjaInvoice
 from app.utils import ninja_product_name, organize_list_starting_with_value
@@ -31,9 +32,24 @@ SIM_COST_ACCOUNT_COMMENT = os.environ.get(
 )
 
 
+def name_in_db(field, value, error):
+    if Account.query.filter(Account.name == value).first():
+        error(field, f'Account for {value} is already created.')
+
+
+def date_is_valid(field, value, error):
+    try:
+        past = datetime.strptime(value, "%Y-%m-%d")
+        present = datetime.now()
+        if past.date() > present.date():
+            error(field, f'{past} can not be a date in future')
+    except Exception:
+        error(field, f'{value} is not valid date')
+
+
 def all_phones():
     phones = Phone.query.filter(
-        Phone.deleted == False, Phone.status == Phone.Status.active
+        Phone.deleted == False, Phone.status == Phone.Status.active  # noqa E712
     ).order_by(
         Phone.name
     )  # noqa E712
@@ -363,30 +379,54 @@ def delete():
 @account_blueprint.route("/account_import", methods=["POST"])
 @login_required
 def account_import():
-    if request.method == "POST":
-        if "file" not in request.files:
-            flash("No file part")
-            return redirect(request.url)
-        _file = request.files["file"]
-        if _file.filename == "":
-            flash("No selected file")
-            return redirect(request.url)
-        _file = TextIOWrapper(_file, encoding="utf-8")
-        csv_reader = csv.DictReader(_file, delimiter=",")
-        for row in csv_reader:
-            # TODO: validation
+    ''' Provides validation for imported CSV file '''
+    ALLOWED_PRODUCTS = [i.name for i in Product.query.all()]
+    ALLOWED_PHONES = [i.name for i in Phone.query.all()]
+    ALLOWED_RESELLERS = [i.name for i in Reseller.query.all()]
+    schema = {
+        'name':   {'type': 'string', 'maxlength': 60, 'check_with': name_in_db, 'empty': False},
+        'product':   {'type': 'string', 'allowed': ALLOWED_PRODUCTS, 'empty': False},
+        'phone':   {'type': 'string', 'allowed': ALLOWED_PHONES, 'empty': False},
+        'imei':   {'type': 'string', 'nullable': True, 'maxlength': 60},
+        'reseller':   {'type': 'string', 'allowed': ALLOWED_RESELLERS, 'empty': False},
+        'sim':   {'type': 'string', 'nullable': True, 'maxlength': 20},
+        'activation_date':   {'type': 'string', 'nullable': False, 'check_with': date_is_valid},
+        'months':   {'type': 'string', 'empty': False, 'allowed': [
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']},
+    }
 
-            imported_account = Account(
-                name=row[0],
-                product_id=row[1],
-                phone_id=row[2],
-                reseller_id=row[3],
-                sim=row[4],
-                imei=row[5],
-                comment=row[6],
-                activation_date=row[7],
-                months=row[8],
-            )
-            Account.session.add(imported_account)
-            Account.session.commit()
-        return redirect(url_for("upload_csv"))
+    if request.method == "POST":
+        if "csv-file" not in request.files:
+            log(log.WARNING, "No file submitted in request")
+            flash("File was not submitted. Please try again.", 'danger')
+            return redirect(url_for("main.accounts"))
+        _file = request.files["csv-file"]
+        if _file.filename == "":
+            log(log.WARNING, "File name is empty")
+            flash("Could not import file without name. Check if your file is formatted properly and try again.",
+                  'danger')
+            return redirect(url_for("main.accounts"))
+        # _file = TextIOWrapper(_file, encoding="utf-8")
+        with TextIOWrapper(_file, encoding="utf-8") as _file:
+            csv_reader = csv.DictReader(_file, delimiter=",")
+            v = Validator(schema)
+            for i, row in enumerate(csv_reader):
+                if not v.validate(row):
+                    flash(f'Could not validate row {i+1}. Please check imported data and try again. {v.errors}', 'danger')
+                    log(log.WARNING, f"{v.errors}")
+                    return redirect(url_for("main.accounts"))
+                imported_account = Account(
+                    name=row['name'],
+                    product_id=Product.query.filter(Product.name == row['product']).first().id,
+                    phone_id=Phone.query.filter(Phone.name == row['phone']).first().id,
+                    imei=row['imei'],
+                    reseller_id=Reseller.query.filter(Reseller.name == row['reseller']).first().id,
+                    sim=row['sim'],
+                    activation_date=datetime.strptime(row['activation_date'], "%Y-%m-%d"),
+                    months=int(row['months'])
+                )
+                db.session.add(imported_account)
+            db.session.commit()
+            log(log.INFO, "Import successfull")
+            flash("Accounts are successfully imported", 'info')
+    return redirect(url_for("main.accounts"))

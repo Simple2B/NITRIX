@@ -1,4 +1,4 @@
-from ..models import Product, Phone, Reseller, Account
+from app.models import Product, Phone, Reseller, Account
 from datetime import datetime
 
 
@@ -22,7 +22,7 @@ def date_is_valid(field, value, error):
         error(field, f'{value} is not valid date')
 
 
-schema = { 
+schema = {
     'name':   {'type': 'string', 'maxlength': 60, 'check_with': name_in_db, 'empty': False},
     'product':   {'type': 'string', 'allowed': ALLOWED_PRODUCTS, 'empty': False},
     'phone':   {'type': 'string', 'allowed': ALLOWED_PHONES, 'empty': False},
@@ -30,6 +30,6 @@ schema = {
     'resseler':   {'type': 'string', 'allowed': ALLOWED_RESELLERS, 'empty': False},
     'sim':   {'type': 'string', 'nullable': True, 'maxlength': 20},
     'activation_date':   {'type': 'string', 'nullable': False, 'check_with': date_is_valid},
-    'month':   {'type': 'string', 'empty': False, 'allowed': [
+    'months':   {'type': 'string', 'empty': False, 'allowed': [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']},
     }
