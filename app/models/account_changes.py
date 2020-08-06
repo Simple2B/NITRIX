@@ -40,11 +40,11 @@ class AccountChanges(db.Model, ModelMixin):
         elif self.change_type == self.ChangeType.deleted:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted by user [{self.user.name}]"
         return "[{}] User [{}] changed [{}] value from [{}] to [{}]".format(
-            self.date.strftime('%Y/%m/%d, %H:%M:%S'),
+            self.date.strftime("%Y/%m/%d, %H:%M:%S"),
             self.user.name,
             self.change_type.name,
             self.value_str,
-            self.new_value_str
+            self.new_value_str,
         )
 
     @property
@@ -54,11 +54,11 @@ class AccountChanges(db.Model, ModelMixin):
         elif self.change_type == self.ChangeType.deleted:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted account [{self.account.name}]"
         return "[{}] Changed [{}] value from [{}] to [{}] in account [{}]".format(
-            self.date.strftime('%Y/%m/%d, %H:%M:%S'),
+            self.date.strftime("%Y/%m/%d, %H:%M:%S"),
             self.change_type.value,
             self.value_str,
             self.new_value_str,
-            self.account.name
+            self.account.name,
         )
 
     @classmethod

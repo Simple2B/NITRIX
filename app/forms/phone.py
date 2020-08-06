@@ -8,6 +8,7 @@ class PhoneForm(FlaskForm):
     name = StringField("Model:", validators=[DataRequired()])
     price = FloatField("Price:", validators=[DataRequired()])
     status = SelectField(
-        "Status:", default='active',
-        choices=[('not_active', 'Not Active'), ('active', 'Active')]
-        )
+        "Status:",
+        default="active",
+        choices=[("not_active", "Not Active"), ("active", "Active")],
+    )

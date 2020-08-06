@@ -63,11 +63,7 @@ def create_database(test_data=False):
         if not product:
             product = Product(name=PRODUCT_NAME).save(False)
         add_reseller_product(
-            months=1,
-            initprice=6.78,
-            extprice=4.55,
-            product=product,
-            reseller=reseller,
+            months=1, initprice=6.78, extprice=4.55, product=product, reseller=reseller,
         )
         add_reseller_product(
             months=3,
@@ -105,12 +101,14 @@ def create_database(test_data=False):
     add_phone(name="Lg", price=30.00)
     if test_data:
         for n in range(10):
-            add_reseller_with_test_products(name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}")
+            add_reseller_with_test_products(
+                name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}"
+            )
     db.session.commit()
 
 
 @app.cli.command()
-@click.option('--test-data', is_flag=True, help='if include test data')
+@click.option("--test-data", is_flag=True, help="if include test data")
 @click.confirmation_option(prompt="Are you sure?")
 def reset_db(test_data=False):
     """Reset the current database."""

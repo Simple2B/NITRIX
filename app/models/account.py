@@ -22,9 +22,9 @@ class Account(db.Model, ModelMixin):
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
     deleted = db.Column(db.Boolean, default=False)
-    product = relationship('Product')
-    phone = relationship('Phone')
-    reseller = relationship('Reseller')
+    product = relationship("Product")
+    phone = relationship("Phone")
+    reseller = relationship("Reseller")
 
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:
@@ -40,21 +40,43 @@ class Account(db.Model, ModelMixin):
 
     def to_dict(self) -> dict:
         return {
-            'id': self.id,
-            'name': self.name,
-            'product': self.product.name if self.product else '-=NONE=-',
-            'phone': self.phone.name if self.phone else '',
-            'imei': self.imei if self.imei else '',
-            'reseller': self.reseller.name if self.reseller else '-=NONE=-',
-            'sim': self.sim,
-            'expiration_date': self.expiration_date.strftime("%Y-%m-%d"),
-            'activation_date': self.activation_date.strftime("%Y-%m-%d"),
-            'months': self.months,
-            'prev_names': ", ".join([change.value_str for change in self.changes.filter_by(change_type='name').all()]),
-            'prev_sims': ", ".join([change.value_str for change in self.changes.filter_by(change_type='sim').all()])
+            "id": self.id,
+            "name": self.name,
+            "product": self.product.name if self.product else "-=NONE=-",
+            "phone": self.phone.name if self.phone else "",
+            "imei": self.imei if self.imei else "",
+            "reseller": self.reseller.name if self.reseller else "-=NONE=-",
+            "sim": self.sim,
+            "expiration_date": self.expiration_date.strftime("%Y-%m-%d"),
+            "activation_date": self.activation_date.strftime("%Y-%m-%d"),
+            "months": self.months,
+            "prev_names": ", ".join(
+                [
+                    change.value_str
+                    for change in self.changes.filter_by(change_type="name").all()
+                ]
+            ),
+            "prev_sims": ", ".join(
+                [
+                    change.value_str
+                    for change in self.changes.filter_by(change_type="sim").all()
+                ]
+            ),
         }
 
     @staticmethod
     def columns():
-        return ['ID', 'Name', 'Product', 'Phone', 'IMEI',
-                'Re-seller', 'SIM', 'Expiration Date', 'Activation Date', 'Months', 'Prev. names', 'Prev. SIMs']
+        return [
+            "ID",
+            "Name",
+            "Product",
+            "Phone",
+            "IMEI",
+            "Re-seller",
+            "SIM",
+            "Expiration Date",
+            "Activation Date",
+            "Months",
+            "Prev. names",
+            "Prev. SIMs",
+        ]
