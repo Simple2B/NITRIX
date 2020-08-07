@@ -58,3 +58,8 @@ config = {
     "testing": TestingConfig,
     "production": ProductionConfig,
 }
+
+SIM_COST_DISCOUNT = float(os.environ.get("SIM_COST_DISCOUNT", 10)) * (-1.0)
+SIM_COST_ACCOUNT_COMMENT = os.environ.get(
+    "SIM_COST_ACCOUNT_COMMENT", "IMPORTANT! Sim cost discounted."
+)
