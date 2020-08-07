@@ -41,7 +41,9 @@ class CsvValidator():
                 "type": "string",
                 "empty": False,
                 "allowed": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-            }
+            },
+            "comment": {"type": "string", "nullable": True, "maxlength": 200},
+            "sim_discount": {"type": "string", "nullable": True, "empty": True}
         }
         self.v = Validator(SCHEMA)
         self.csv_file = file_object
@@ -56,8 +58,7 @@ class CsvValidator():
             present = datetime.now()
             if past.date() > present.date():
                 error(field, f"{past} can not be a date in future")
-        # TODO: check Exception type 
-        except Exception:
+        except ValueError:
             error(field, f"{value} is not valid date")
 
     def verify_file_integrity(self):
@@ -86,7 +87,8 @@ class CsvValidator():
                     reseller_id=Reseller.query.filter(Reseller.name == row['reseller']).first().id,
                     sim=row['sim'],
                     activation_date=datetime.strptime(row['activation_date'], "%Y-%m-%d"),
-                    months=int(row['months'])
+                    months=int(row['months']),
+                    comment=row['comment'] if not row['sim_discount'] else row['comment'] + "\r\n\r\nIMPORTANT! Sim cost discounted."                        
                 )
                 db.session.add(imported_account)
         db.session.commit()
