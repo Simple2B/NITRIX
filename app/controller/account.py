@@ -211,7 +211,7 @@ def document_changes_if_exist(account, form):
 
 
 class AccountController(object):
-    def __init__(self, account_id=None):
+    def __init__(self, account_id=None, file_object=None):
         if account_id is not None:
             account_id = int(account_id)
             self.account = Account.query.filter(Account.id == account_id).first()
@@ -221,6 +221,53 @@ class AccountController(object):
             self.new_account = False
         else:
             self.new_account = True
+        ALLOWED_PRODUCTS = [i.name for i in Product.query.all()]
+        ALLOWED_PHONES = [i.name for i in Phone.query.all()]
+        ALLOWED_RESELLERS = [i.name for i in Reseller.query.all()]
+        SCHEMA = {
+            "name": {
+                "type": "string",
+                "maxlength": 60,
+                "check_with": self.name_in_db,
+                "empty": False,
+            },
+            "product": {"type": "string", "allowed": ALLOWED_PRODUCTS, "empty": False},
+            "phone": {"type": "string", "allowed": ALLOWED_PHONES, "empty": False},
+            "imei": {"type": "string", "nullable": True, "maxlength": 60},
+            "reseller": {
+                "type": "string",
+                "allowed": ALLOWED_RESELLERS,
+                "empty": False,
+            },
+            "sim": {"type": "string", "nullable": True, "maxlength": 20},
+            "activation_date": {
+                "type": "string",
+                "nullable": False,
+                "check_with": self.date_is_valid,
+            },
+            "months": {
+                "type": "string",
+                "empty": False,
+                "allowed": [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "10",
+                    "11",
+                    "12",
+                ],
+            },
+            "comment": {"type": "string", "nullable": True, "maxlength": 200},
+            "sim_cost": {"type": "string", "empty": True},
+        }
+        self.v = Validator(SCHEMA)
+        self.csv_file = file_object
 
     def account_form_edit(self):
         form = AccountForm(
@@ -360,58 +407,6 @@ class AccountController(object):
         flash("Account successfully deleted.", "success")
         return True
 
-
-class CsvValidator(AccountController):
-    def __init__(self, file_object):
-        super().__init__(self)
-        ALLOWED_PRODUCTS = [i.name for i in Product.query.all()]
-        ALLOWED_PHONES = [i.name for i in Phone.query.all()]
-        ALLOWED_RESELLERS = [i.name for i in Reseller.query.all()]
-        SCHEMA = {
-            "name": {
-                "type": "string",
-                "maxlength": 60,
-                "check_with": self.name_in_db,
-                "empty": False,
-            },
-            "product": {"type": "string", "allowed": ALLOWED_PRODUCTS, "empty": False},
-            "phone": {"type": "string", "allowed": ALLOWED_PHONES, "empty": False},
-            "imei": {"type": "string", "nullable": True, "maxlength": 60},
-            "reseller": {
-                "type": "string",
-                "allowed": ALLOWED_RESELLERS,
-                "empty": False,
-            },
-            "sim": {"type": "string", "nullable": True, "maxlength": 20},
-            "activation_date": {
-                "type": "string",
-                "nullable": False,
-                "check_with": self.date_is_valid,
-            },
-            "months": {
-                "type": "string",
-                "empty": False,
-                "allowed": [
-                    "1",
-                    "2",
-                    "3",
-                    "4",
-                    "5",
-                    "6",
-                    "7",
-                    "8",
-                    "9",
-                    "10",
-                    "11",
-                    "12",
-                ],
-            },
-            "comment": {"type": "string", "nullable": True, "maxlength": 200},
-            "sim_cost": {"type": "string", "empty": True},
-        }
-        self.v = Validator(SCHEMA)
-        self.csv_file = file_object
-
     def name_in_db(self, field, value, error):
         if Account.query.filter(Account.name == value).first():
             error(field, f"Account for {value} is already created.")
@@ -469,9 +464,8 @@ class CsvValidator(AccountController):
                     else row["comment"] + f"\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}",
                 )
                 db.session.add(imported_account)
-                AccountController.connect_to_ninja(imported_account)
+                self.connect_to_ninja(imported_account)
         db.session.commit()
-        
         log(log.INFO, "Import successfull")
         flash("Accounts are successfully imported", "info")
         return True

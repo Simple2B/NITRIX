@@ -8,7 +8,7 @@ from app.forms import AccountExtensionForm
 from app.logger import log
 from app.ninja import api as ninja
 from app.utils import organize_list_starting_with_value
-from app.views.account import add_ninja_invoice
+from app.controller.account import add_ninja_invoice
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
 
