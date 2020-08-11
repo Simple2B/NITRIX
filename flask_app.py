@@ -28,8 +28,9 @@ def create_database(test_data=False):
         product_key = f"{product.name} {months} Months"
         ninja_product = None
         if ninja.configured:
-            for prod in [prod for prod in ninja.products if not prod.is_deleted]:
-                if prod.notes == reseller.name and prod.product_key == product_key and prod.cost == initprice:
+            prods = [prod for prod in ninja.products if not prod.is_deleted]
+            for prod in prods:
+                if prod.notes == reseller.name and prod.product_key == product_key:
                     ninja_product = prod
                     break
             else:

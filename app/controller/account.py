@@ -2,6 +2,7 @@ import csv
 from io import TextIOWrapper
 from datetime import datetime
 from flask import request, flash, url_for, session
+from flask import current_app as app
 from flask_login import current_user
 from cerberus import Validator
 
@@ -467,5 +468,6 @@ class AccountController(object):
                 self.connect_to_ninja(imported_account)
         db.session.commit()
         log(log.INFO, "Import successfull")
-        flash("Accounts are successfully imported", "info")
+        if not app.config["TESTING"]:
+            flash("Accounts are successfully imported", "info")
         return True
