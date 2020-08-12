@@ -62,27 +62,40 @@ def create_database(test_data=False):
         product = Product.query.filter(Product.name == PRODUCT_NAME).first()
         if not product:
             product = Product(name=PRODUCT_NAME).save(False)
-        add_reseller_product(
-            months=1,
-            initprice=6.78,
-            extprice=4.55,
-            product=product,
-            reseller=reseller,
-        )
-        add_reseller_product(
-            months=3,
-            initprice=16.50,
-            extprice=10.55,
-            product=product,
-            reseller=reseller,
-        )
-        add_reseller_product(
-            months=6,
-            initprice=30.45,
-            extprice=19.55,
-            product=product,
-            reseller=reseller,
-        )
+        for months in (1, 3, 6, 12):
+            add_reseller_product(
+                months=months,
+                initprice=round(6.78*months, 2),
+                extprice=round(4.55*months, 2),
+                product=product,
+                reseller=reseller,
+            )
+        if test_data:
+            PRODUCT_NAME = "Silver"
+            product = Product.query.filter(Product.name == PRODUCT_NAME).first()
+            if not product:
+                product = Product(name=PRODUCT_NAME).save(False)
+            for months in (1, 3, 6, 12):
+                add_reseller_product(
+                    months=months,
+                    initprice=round(4.57*months, 2),
+                    extprice=round(3.84*months, 2),
+                    product=product,
+                    reseller=reseller,
+                )
+            PRODUCT_NAME = "Bronsa"
+            product = Product.query.filter(Product.name == PRODUCT_NAME).first()
+            if not product:
+                product = Product(name=PRODUCT_NAME).save(False)
+            for months in (1, 3, 6, 12):
+                add_reseller_product(
+                    months=months,
+                    initprice=round(2.32*months, 2),
+                    extprice=round(2.05*months, 2),
+                    product=product,
+                    reseller=reseller,
+                )
+
         return reseller
 
     db.create_all()
