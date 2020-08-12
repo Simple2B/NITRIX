@@ -91,8 +91,8 @@ def two_factor_setup():
         flash("We could not verify your credentials. Please log in first.")
         return redirect(url_for("auth.login"))
     user = User.query.filter(
-        User.id == user_id, User.deleted == False
-    ).first()  # noqa E712
+        User.id == user_id, User.deleted == False  # noqa E712
+    ).first()
     if not user:
         log(log.WARNING, "user not found in database.")
         flash("We could not verify your credentials. Please try loggin in first.")

@@ -27,8 +27,8 @@ def add():
     account_id = int(request.args["id"])
     form = AccountExtensionForm(id=account_id)
     form.products = (
-        Product.query.filter(Product.deleted == False).order_by(Product.name).all()
-    )  # noqa E712
+        Product.query.filter(Product.deleted == False).order_by(Product.name).all()  # noqa E712
+    )
     form.resellers = organize_list_starting_with_value(
         Reseller.query.order_by(Reseller.name).all(), "NITRIX"
     )  # noqa E712

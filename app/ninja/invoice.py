@@ -31,7 +31,13 @@ class NinjaInvoice(object):
         """
         log(log.DEBUG, "NinjaApi.invoices")
         res = api.do_get(api.BASE_URL + "invoices")
-        return [NinjaInvoice(data) for data in res["data"]] if res else []
+        invoices = [NinjaInvoice(data) for data in res["data"]] if res else []
+        next_link = api.get_next_link(res)
+        while next_link:
+            res = api.do_get(next_link)
+            invoices += [NinjaInvoice(data) for data in res["data"]] if res else []
+            next_link = api.get_next_link(res)
+        return invoices
 
     @property
     def items(self):

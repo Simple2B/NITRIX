@@ -87,7 +87,13 @@ class NinjaApi(object):
         """
         log(log.DEBUG, "NinjaApi.clients")
         res = self.do_get(self.BASE_URL + "clients")
-        return [NinjaClient(client_data) for client_data in res["data"]] if res else []
+        clients = [NinjaClient(client_data) for client_data in res["data"]] if res else []
+        next_link = NinjaApi.get_next_link(res)
+        while next_link:
+            res = self.do_get(next_link)
+            clients += [NinjaClient(client_data) for client_data in res["data"]] if res else []
+            next_link = NinjaApi.get_next_link(res)
+        return clients
 
     def get_client(self, client_id: int):
         """gets client by id
@@ -123,6 +129,18 @@ class NinjaApi(object):
         log(log.DEBUG, "NinjaApi.delete_client %d", client_id)
         return self.do_delete("{}clients/{}".format(self.BASE_URL, client_id))
 
+    @staticmethod
+    def get_next_link(response):
+        if 'meta' in response:
+            meta = response['meta']
+            if 'pagination' in meta:
+                pagination = meta['pagination']
+                if 'links' in pagination:
+                    links = pagination['links']
+                    if 'next' in links:
+                        return links['next']
+        return None
+
     @property
     def products(self):
         """gets list of clients
@@ -130,7 +148,13 @@ class NinjaApi(object):
         """
         log(log.DEBUG, "NinjaApi.products")
         res = self.do_get(self.BASE_URL + "products")
-        return [NinjaProduct(data) for data in res["data"]] if res else []
+        prods = [NinjaProduct(data) for data in res["data"]] if res else []
+        next_link = NinjaApi.get_next_link(res)
+        while next_link:
+            res = self.do_get(next_link)
+            prods += [NinjaProduct(data) for data in res["data"]] if res else []
+            next_link = NinjaApi.get_next_link(res)
+        return prods
 
     def get_product(self, prod_id: int):
         """gets client by id

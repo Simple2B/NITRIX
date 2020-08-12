@@ -52,7 +52,8 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
         )
     invoice_date = account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
     current_invoice = None
-    for invoice in NinjaInvoice.all():
+    invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+    for invoice in invoices:
         if (
             invoice.invoice_date == invoice_date
             and invoice.client_id == account.reseller.ninja_client_id
