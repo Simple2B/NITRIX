@@ -28,9 +28,15 @@ def create_database(test_data=False):
         product_key = f"{product.name} {months} Months"
         ninja_product = None
         if ninja.configured:
-            ninja_product = ninja.add_product(
-                product_key=product_key, notes=reseller.name, cost=initprice
-            )
+            prods = [prod for prod in ninja.products if not prod.is_deleted]
+            for prod in prods:
+                if prod.notes == reseller.name and prod.product_key == product_key:
+                    ninja_product = prod
+                    break
+            else:
+                ninja_product = ninja.add_product(
+                    product_key=product_key, notes=reseller.name, cost=initprice
+                )
         if ninja_product:
             reseller_product.ninja_product_id = ninja_product.id
             reseller_product.save(False)
@@ -38,20 +44,31 @@ def create_database(test_data=False):
     def add_phone(name, price):
         phone = Phone(name=name, price=price).save(False)
         product_key = f"Phone-{phone.name}"
-        ninja_product = (
-            ninja.add_product(product_key=product_key, notes="Phone", cost=price)
-            if ninja.configured
-            else None
-        )
+        ninja_product = None
+        if ninja.configured:
+            for prod in [prod for prod in ninja.products if not prod.is_deleted]:
+                if prod.notes == "Phone" and prod.product_key == product_key and prod.cost == price:
+                    ninja_product = prod
+                    break
+            else:
+                ninja_product = ninja.add_product(
+                    product_key=product_key, notes="Phone", cost=price
+                )
         if ninja_product:
             phone.ninja_product_id = ninja_product.id
             phone.save(False)
 
     def add_reseller(name: str, comments: str):
         reseller = Reseller(name=name, comments=comments).save(False)
-        ninja_client = (
-            ninja.add_client(name=reseller.name) if ninja.configured else None
-        )
+        ninja_client = None
+        if ninja.configured:
+            for client in [c for c in ninja.clients if not c.is_deleted and c.name == name]:
+                ninja_client = client
+                break
+            else:
+                ninja_client = (
+                    ninja.add_client(name=reseller.name)
+                )
         if ninja_client:
             reseller.ninja_client_id = ninja_client.id
         return reseller
@@ -118,12 +135,14 @@ def create_database(test_data=False):
     add_phone(name="Lg", price=30.00)
     if test_data:
         for n in range(10):
-            add_reseller_with_test_products(name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}")
+            add_reseller_with_test_products(
+                name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}"
+            )
     db.session.commit()
 
 
 @app.cli.command()
-@click.option('--test-data', is_flag=True, help='if include test data')
+@click.option("--test-data", is_flag=True, help="if include test data")
 @click.confirmation_option(prompt="Are you sure?")
 def reset_db(test_data=False):
     """Reset the current database."""

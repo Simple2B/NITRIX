@@ -6,62 +6,56 @@ from app.logger import log
 from ..database import db
 
 
-user_blueprint = Blueprint('user', __name__)
+user_blueprint = Blueprint("user", __name__)
 
 
 @user_blueprint.route("/user_edit")
 @login_required
 def edit():
-    if current_user.user_type.name not in ['super_admin']:
+    if current_user.user_type.name not in ["super_admin"]:
         return redirect(url_for("main.index"))
-    log(log.INFO, '/user_edit')
-    if 'id' in request.args:
-        id = int(request.args['id'])
+    log(log.INFO, "/user_edit")
+    if "id" in request.args:
+        id = int(request.args["id"])
         user = User.query.filter(User.id == id).first()
         if user is None:
             flash("Wrong account id.", "danger")
             log(log.WARNING, "Wrong account id.")
-            return redirect(url_for('main.accounts'))
+            return redirect(url_for("main.accounts"))
         form = UserForm(
             id=user.id,
             name=user.name,
             user_type=user.user_type.name,
-            activated=user.activated.name
-            )
+            activated=user.activated.name,
+        )
 
         form.is_edit = True
-        form.save_route = url_for('user.save')
-        form.delete_route = url_for('user.delete')
-        form.close_button = url_for('main.users')
-        return render_template(
-                "user_edit.html",
-                form=form, user=user
-            )
+        form.save_route = url_for("user.save")
+        form.delete_route = url_for("user.delete")
+        form.close_button = url_for("main.users")
+        return render_template("user_edit.html", form=form, user=user)
     else:
         form = UserForm()
         form.is_edit = False
-        form.save_route = url_for('user.save')
-        form.delete_route = url_for('user.delete')
-        form.close_button = url_for('main.users')
-        return render_template(
-                "user_edit.html",
-                form=form
-            )
+        form.save_route = url_for("user.save")
+        form.delete_route = url_for("user.delete")
+        form.close_button = url_for("main.users")
+        return render_template("user_edit.html", form=form)
 
 
 @user_blueprint.route("/user_save", methods=["POST"])
 @login_required
 def save():
-    if current_user.user_type.name not in ['super_admin']:
+    if current_user.user_type.name not in ["super_admin"]:
         return redirect(url_for("main.index"))
-    log(log.INFO, '/user_save')
+    log(log.INFO, "/user_save")
     form = UserForm(request.form)
     if form.validate_on_submit():
         if form.id.data > 0:
             user = User.query.filter(User.id == form.id.data).first()
             if user is None:
                 flash("Wrong user id.", "danger")
-                return redirect(url_for('main.users'))
+                return redirect(url_for("main.users"))
             for k in request.form.keys():
                 user.__setattr__(k, form.__getattribute__(k).data)
         else:
@@ -69,41 +63,41 @@ def save():
             user.password = form.password.data
         user.save()
         log(log.INFO, "User-{} was saved".format(user.id))
-        return redirect(url_for('main.users'))
+        return redirect(url_for("main.users"))
     else:
-        flash('Form validation error', 'danger')
+        flash("Form validation error", "danger")
         log(log.ERROR, "Form validation error")
-    return redirect(url_for('user.edit', id=form.id.data))
+    return redirect(url_for("user.edit", id=form.id.data))
 
 
 @user_blueprint.route("/user_delete", methods=["GET"])
 @login_required
 def delete():
-    if current_user.user_type.name not in ['super_admin']:
+    if current_user.user_type.name not in ["super_admin"]:
         return redirect(url_for("main.index"))
-    if 'id' in request.args:
-        user_id = int(request.args['id'])
+    if "id" in request.args:
+        user_id = int(request.args["id"])
         User.query.filter(User.id == user_id).delete()
         db.session.commit()
-        return redirect(url_for('main.users'))
-    flash('Wrong request', 'danger')
-    return redirect(url_for('main.users'))
+        return redirect(url_for("main.users"))
+    flash("Wrong request", "danger")
+    return redirect(url_for("main.users"))
 
 
-@user_blueprint.route('/otp_reset', methods=["POST"])
+@user_blueprint.route("/otp_reset", methods=["POST"])
 @login_required
 def otp_reset():
-    ''' Reset user OTP from Super Admin panel '''
-    if current_user.user_type.name not in ['super_admin']:
+    """ Reset user OTP from Super Admin panel """
+    if current_user.user_type.name not in ["super_admin"]:
         return redirect(url_for("main.index"))
-    if 'id' in request.args:
-        user_id = int(request.args['id'])
+    if "id" in request.args:
+        user_id = int(request.args["id"])
         user = User.query.filter(User.id == user_id).first()
         # set new 16-digit OTP secret key
         user.otp_secret = gen_secret_key()
         user.otp_active = False
         db.session.commit()
-        flash('OTP token was reset successfuly', 'success')
-        return redirect(url_for('main.users'))
-    flash('Wrong request', 'danger')
-    return redirect(url_for('main.users'))
+        flash("OTP token was reset successfuly", "success")
+        return redirect(url_for("main.users"))
+    flash("Wrong request", "danger")
+    return redirect(url_for("main.users"))

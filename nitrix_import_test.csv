@@ -1,0 +1,6 @@
+name,product,phone,imei,reseller,sim,activation_date,months,comment,sim_cost
+John Doe,Gold,Nokia,12312515,NITRIX,8715,2020-07-15,6,cool guy,yes
+Jane Polix,Gold,Lg,,NITRIX,,2020-07-16,6,cool gal,
+Monthy Python,Gold,Samsung,251235,NITRIX,12312312,2020-07-17,6,,yes
+Big Ben,Gold,Nokia,,NITRIX,,2020-07-18,6,,yes
+Charles Clark,Gold,Samsung,,NITRIX,,2020-07-19,6,,

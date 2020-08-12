@@ -15,6 +15,6 @@ class AccountExtension(db.Model, ModelMixin):
     end_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
-    reseller = relationship('Reseller')
+    reseller = relationship("Reseller")
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"))
-    product = relationship('Product')
+    product = relationship("Product")

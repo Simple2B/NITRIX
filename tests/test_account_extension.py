@@ -299,4 +299,3 @@ def remove_data(ids):
     Phone.query.filter(Phone.id == ids["phone_id"]).first().delete()
     Reseller.query.filter(Reseller.id == ids["reseller_id"]).first().delete()
     Account.query.filter(Account.id == ids["account_id"]).first().delete()
-

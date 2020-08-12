@@ -137,3 +137,4 @@ database-test.sqlite3
 /backup.*
 
 .DS_Store
+/database-test.sqlite3-journal

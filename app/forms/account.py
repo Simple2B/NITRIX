@@ -13,11 +13,12 @@ class AccountForm(FlaskForm):
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])
     sim = StringField("SIM", [DataRequired()])
     sim_cost = SelectField(
-        "Sim Cost:", default='yes',
-        choices=[('yes', 'Yes'), ('no', 'No')]
+        "Sim Cost:", default="yes", choices=[("yes", "Yes"), ("no", "No")]
     )
     imei = StringField("IMEI")
     comment = StringField("Comment", widget=TextArea())
-    activation_date = DateField("Activation date", validators=[DataRequired()], default=datetime.now)
+    activation_date = DateField(
+        "Activation date", validators=[DataRequired()], default=datetime.now
+    )
     months = IntegerField("Month", [DataRequired()])
     submit = SubmitField("Save")

@@ -1,7 +1,7 @@
 import logging
 import sys
 
-LOGGER_NAME = 'NITRIX'
+LOGGER_NAME = "NITRIX"
 
 
 class Logger(object):
@@ -18,7 +18,7 @@ class Logger(object):
     def __init__(self):
         self.__log = logging.getLogger(LOGGER_NAME)
         # create formatter
-        formatter = logging.Formatter('%(asctime)-15s [%(levelname)-8s] %(message)s')
+        formatter = logging.Formatter("%(asctime)-15s [%(levelname)-8s] %(message)s")
         ch = logging.StreamHandler(sys.stderr)
         ch.setLevel(logging.DEBUG)
         ch.setFormatter(formatter)

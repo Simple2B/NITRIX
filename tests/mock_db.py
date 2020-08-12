@@ -6,4 +6,4 @@ def create_mock_db():
     """create test DB
     """
     db.drop_all()
-    create_database()
+    create_database(test_data=True)

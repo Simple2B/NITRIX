@@ -12,26 +12,26 @@ from ..utils import ModelMixin
 
 
 def gen_secret_key():
-    return base64.b32encode(os.urandom(20)).decode('utf-8')
+    return base64.b32encode(os.urandom(20)).decode("utf-8")
 
 
 class User(db.Model, UserMixin, ModelMixin):
     """User entity"""
 
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     @staticmethod
     def gen_secret():
         return gen_secret_key()
 
     class Type(enum.Enum):
-        super_admin = 'super_admin'
-        admin = 'admin'
-        user = 'user'
+        super_admin = "super_admin"
+        admin = "admin"
+        user = "user"
 
     class Status(enum.Enum):
-        active = 'Active'
-        not_active = 'Not active'
+        active = "Active"
+        not_active = "Not active"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
@@ -51,12 +51,13 @@ class User(db.Model, UserMixin, ModelMixin):
         self.password_hash = generate_password_hash(password)
 
     def get_totp_uri(self):
-        ''' generate authentication URI for Google Authenticator '''
-        return 'otpauth://totp/{0}:{1}?secret={2}&issuer={0}'.format(
-            current_app.config['APP_NAME'], self.name, self.otp_secret)
+        """ generate authentication URI for Google Authenticator """
+        return "otpauth://totp/{0}:{1}?secret={2}&issuer={0}".format(
+            current_app.config["APP_NAME"], self.name, self.otp_secret
+        )
 
     def verify_totp(self, token):
-        ''' validates 6-digit OTP code retrieved from Google '''
+        """ validates 6-digit OTP code retrieved from Google """
         return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
@@ -66,16 +67,16 @@ class User(db.Model, UserMixin, ModelMixin):
             return user
 
     def __str__(self):
-        return f'<User: {self.name}>'
+        return f"<User: {self.name}>"
 
     def to_dict(self) -> dict:
         return {
-            'id': self.id,
-            'name': self.name,
-            'type': (self.user_type.name if self.user_type else 'None'),
-            'status': self.activated.name
+            "id": self.id,
+            "name": self.name,
+            "type": (self.user_type.name if self.user_type else "None"),
+            "status": self.activated.name,
         }
 
     @staticmethod
     def columns():
-        return ['ID', 'Name', 'Type', 'Status']
+        return ["ID", "Name", "Type", "Status"]

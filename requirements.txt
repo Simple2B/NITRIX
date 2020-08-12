@@ -19,3 +19,4 @@ Flask-Migrate
 onetimepass
 pyqrcode
 timecop
+cerberus

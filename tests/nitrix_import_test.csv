@@ -1,0 +1,6 @@
+name,product,phone,imei,reseller,sim,activation_date,months,comment,sim_cost
+Test Account 1,Gold,Nokia,12312515,Reseller 1,8715,2020-07-15,6,cool guy,yes
+Test Account 2,Gold,Lg,,Reseller 1,,2020-07-16,6,cool gal,
+Test Account 3,Gold,Samsung,251235,Reseller 1,12312312,2020-08-01,6,,yes
+Test Account 4,Gold,Nokia,,Reseller 1,,2020-08-02,6,,yes
+Test Account 5,Gold,Samsung,,Reseller 1,,2020-08-08,6,,

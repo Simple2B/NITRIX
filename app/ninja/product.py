@@ -1,6 +1,7 @@
 class NinjaProduct(object):
     """Ninja Product entity
     """
+
     def __init__(self, data={}):
         self.__data_keys = [k for k in data]
         for k in data:
