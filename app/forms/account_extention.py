@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, DateField
+from wtforms import IntegerField, DateField, StringField
 from wtforms.validators import DataRequired
 
 
@@ -12,3 +12,4 @@ class AccountExtensionForm(FlaskForm):
     )
     months = IntegerField("Month", [DataRequired()])
     product_id = IntegerField("Product", validators=[DataRequired()])
+    product = StringField("Product", render_kw={'readonly': True})

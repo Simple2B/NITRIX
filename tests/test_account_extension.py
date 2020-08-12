@@ -39,7 +39,20 @@ def test_add(client):
     login(client, LOGIN)
     check_id(client, "account_extension.add")
     # what if correct id
-    response = client.get(url_for("account_extension.add", id=CORRECT_ID))
+    prod_id = Product(name="TEST_NAME", status=Product.Status.active).save().id
+    phone_id = Phone(name="TEST_NAME", status=Phone.Status.active).save().id
+    res_id = Reseller(name="TEST_NAME", status=Reseller.Status.active).save().id
+    acc_id = Account(
+        name="TEST_NAME",
+        product_id=prod_id,
+        phone_id=phone_id,
+        reseller_id=res_id,
+        sim="TEST_SIM",
+        imei="TEST_IMEI",
+        comment="TEST_COMMENT",
+        months=CORRECT_MONTHS,
+    ).save().id
+    response = client.get(url_for("account_extension.add", id=acc_id))
     assert response.status_code == 200
 
 
