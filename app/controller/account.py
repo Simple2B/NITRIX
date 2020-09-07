@@ -50,7 +50,13 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    invoice_date = account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
+    invoice_date = datetime.now()
+    if account.activation_date > invoice_date:
+        invoice_date = invoice_date.date().replace(day=1).strftime("%Y-%m-%d")
+    else:
+        invoice_date = (
+            account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
+        )
     current_invoice = None
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
     for invoice in invoices:
@@ -378,7 +384,9 @@ class AccountController(object):
             change.value_str = "None"
             change.save()
             self.connect_to_ninja(self.account)
-        reseller = Reseller.query.filter(Reseller.id == self.account.reseller_id).first()
+        reseller = Reseller.query.filter(
+            Reseller.id == self.account.reseller_id
+        ).first()
         reseller.last_activity = datetime.now()
         reseller.save()
         log(log.INFO, "Account data was saved")
