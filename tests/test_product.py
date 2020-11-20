@@ -63,3 +63,20 @@ def test_save_product(client):
     # send wrong form data
     response = client.post("/product_save", data=dict(id=2), follow_redirects=True)
     assert b"Form validation error" in response.data
+
+
+def test_delete_product(client):
+    # delete certain product
+    response = client.post(
+        "/product_save",
+        data=dict(id=-1, name="TEST PRODUCT NAME", status="active"),
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"TEST PRODUCT NAME" in response.data
+    product = Product.query.first()
+    assert product
+    product_id = product.id
+    response = client.get(f"/product_delete?id={product_id}")
+    assert response.status_code == 302
+    assert product.deleted

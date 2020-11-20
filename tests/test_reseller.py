@@ -87,3 +87,19 @@ def test_save_reseller_with_same_name(client):
         follow_redirects=True,
     )
     assert b"This name is already taken" in response.data
+
+
+def test_delete_reseller(client):
+    # delete certain reseller
+    response = client.post(
+        "/reseller_save",
+        data=dict(id=-1, name="TEST RESELLER NAME", status="active"),
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    reseller = Reseller.query.first()
+    assert reseller
+    reseller_id = reseller.id
+    response = client.get(f"/reseller_delete?id={reseller_id}")
+    assert response.status_code == 302
+    assert reseller.deleted
