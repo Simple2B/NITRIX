@@ -20,7 +20,9 @@ def edit():
         form = controller.account_form_edit()
         return render_template("account_details.html", form=form)
     else:
-        form = controller.account_form_new(request.args.get('prev_product'), request.args.get('prev_reseller'))
+        form = controller.account_form_new(request.args.get('prev_product'), request.args.get('prev_reseller'),
+                                           request.args.get('prev_phone'), request.args.get('prev_month'),
+                                           request.args.get('prev_simcost'))
         return render_template("account_details.html", form=form)
 
 
@@ -39,6 +41,9 @@ def save():
                     "account.edit",
                     prev_reseller=account.reseller.name,
                     prev_product=account.product.name,
+                    prev_phone=account.phone.name,
+                    prev_month=account.months,
+                    prev_simcost=form.sim_cost.data
                 )
             )
         if request.form["submit"] == "save_and_edit":
