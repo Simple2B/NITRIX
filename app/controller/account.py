@@ -314,8 +314,14 @@ class AccountController(object):
         form.history = AccountChanges.get_history(self.account)
         return form
 
-    def account_form_new(self, prev_product=None, prev_reseller=None, prev_phone=None,
-                         prev_month=None, prev_simcost="yes"):
+    def account_form_new(
+        self,
+        prev_product=None,
+        prev_reseller=None,
+        prev_phone=None,
+        prev_month=None,
+        prev_simcost="yes",
+    ):
         form = AccountForm()
         form.products = (
             organize_list_starting_with_value(

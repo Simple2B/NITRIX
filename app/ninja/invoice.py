@@ -3,8 +3,7 @@ from app.ninja import api
 
 
 class NinjaInvoice(object):
-    """Ninja Invoice entity
-    """
+    """Ninja Invoice entity"""
 
     class Item:
         def __init__(self, data={}):
@@ -27,7 +26,7 @@ class NinjaInvoice(object):
     @staticmethod
     def all():
         """gets list of invoices
-            HTTP: GET ninja.test/api/v1/invoices -H "X-Ninja-Token: TOKEN"
+        HTTP: GET ninja.test/api/v1/invoices -H "X-Ninja-Token: TOKEN"
         """
         log(log.DEBUG, "NinjaApi.invoices")
         res = api.do_get(api.BASE_URL + "invoices")

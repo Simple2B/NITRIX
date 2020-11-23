@@ -37,7 +37,10 @@ def login(client, user_name, password="password"):
         assert user
         user.otp_secret = secret
         user.otp_active = True
-        hotp = get_hotp(secret=secret, intervals_no=int(time.time()) // 30,)
+        hotp = get_hotp(
+            secret=secret,
+            intervals_no=int(time.time()) // 30,
+        )
         totp = get_totp(secret=secret)
         assert hotp == totp
         res = client.post(

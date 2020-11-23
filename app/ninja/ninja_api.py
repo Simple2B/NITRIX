@@ -16,7 +16,10 @@ class NinjaApi(object):
     def __init__(self):
         super().__init__()
         # NINJA_API_BASE_URL=http://ec2-52-14-0-156.us-east-2.compute.amazonaws.com:8080/api/v1/
-        self.BASE_URL = os.environ.get("NINJA_API_BASE_URL", "",)
+        self.BASE_URL = os.environ.get(
+            "NINJA_API_BASE_URL",
+            "",
+        )
         self.NINJA_TOKEN = os.environ.get("NINJA_API_TOKEN", "")
 
     @property
@@ -83,15 +86,19 @@ class NinjaApi(object):
     @property
     def clients(self):
         """gets list of clients
-            HTTP: GET ninja.test/api/v1/clients -H "X-Ninja-Token: TOKEN"
+        HTTP: GET ninja.test/api/v1/clients -H "X-Ninja-Token: TOKEN"
         """
         log(log.DEBUG, "NinjaApi.clients")
         res = self.do_get(self.BASE_URL + "clients")
-        clients = [NinjaClient(client_data) for client_data in res["data"]] if res else []
+        clients = (
+            [NinjaClient(client_data) for client_data in res["data"]] if res else []
+        )
         next_link = NinjaApi.get_next_link(res)
         while next_link:
             res = self.do_get(next_link)
-            clients += [NinjaClient(client_data) for client_data in res["data"]] if res else []
+            clients += (
+                [NinjaClient(client_data) for client_data in res["data"]] if res else []
+            )
             next_link = NinjaApi.get_next_link(res)
         return clients
 
@@ -131,20 +138,20 @@ class NinjaApi(object):
 
     @staticmethod
     def get_next_link(response):
-        if 'meta' in response:
-            meta = response['meta']
-            if 'pagination' in meta:
-                pagination = meta['pagination']
-                if 'links' in pagination:
-                    links = pagination['links']
-                    if 'next' in links:
-                        return links['next']
+        if "meta" in response:
+            meta = response["meta"]
+            if "pagination" in meta:
+                pagination = meta["pagination"]
+                if "links" in pagination:
+                    links = pagination["links"]
+                    if "next" in links:
+                        return links["next"]
         return None
 
     @property
     def products(self):
         """gets list of clients
-            HTTP: GET ninja.test/api/v1/products -H "X-Ninja-Token: TOKEN"
+        HTTP: GET ninja.test/api/v1/products -H "X-Ninja-Token: TOKEN"
         """
         log(log.DEBUG, "NinjaApi.products")
         res = self.do_get(self.BASE_URL + "products")
