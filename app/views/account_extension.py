@@ -26,11 +26,18 @@ def add():
         return redirect(url_for("main.accounts"))
     account_id = int(request.args["id"])
     account = Account.query.filter(Account.id == account_id).first()
+    account_extension = AccountExtension.query.order_by(AccountExtension.end_date.desc()).filter(
+        AccountExtension.account_id == account_id).first()
+    if not account_extension:
+        account_extension = account
+        end_date = account.activation_date + relativedelta(months=account.months)
+        account_extension.end_date = end_date
     form = AccountExtensionForm(
         id=account_id,
         reseller_id=account.reseller_id,
         product_id=account.product.id,
         product=account.product.name,
+        extension_date=account_extension.end_date,
     )
     form.products = (
         Product.query.filter(Product.deleted == False)  # noqa E712
@@ -70,7 +77,7 @@ def edit():
     form.is_edit = True
     form.products = Product.query.filter(Product.deleted == False).all()  # noqa E712
     form.resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
-    form.close_button = url_for("account.edit", id=extension.id)
+    form.close_button = url_for("account.edit", id=extension.account_id)
     form.save_route = url_for("account_extension.save_update")
     form.delete_route = url_for("account_extension.delete")
     return render_template("account_extension.html", form=form)
@@ -98,14 +105,14 @@ def save_new():
     account_ext.reseller_id = account.reseller_id
     account_ext.product_id = account.product_id
     account_ext.months = account.months
-    account_ext.extension_date = account.activation_date
+    account_ext.extension_date = form.extension_date.data
     m = account_ext.months if account_ext.months else 0
     account_ext.end_date = account_ext.extension_date + relativedelta(months=m)
     account_ext.save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
     account.months = form.months.data
-    account.activation_date = form.extension_date.data
+    # account.activation_date = form.extension_date.data
     account.save()
     account.is_new = False
     # Register product in Invoice Ninja

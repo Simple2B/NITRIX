@@ -1,7 +1,15 @@
 #!python
 import click
 from app import create_app, db, models, forms
-from app.models import User, Product, Reseller, ResellerProduct, Phone
+from app.models import (
+    User,
+    Product,
+    Reseller,
+    ResellerProduct,
+    Phone,
+    Account,
+    AccountExtension,
+)
 from app.ninja import api as ninja
 
 app = create_app()
@@ -152,6 +160,20 @@ def reset_db(test_data=False):
     """Reset the current database."""
     db.drop_all()
     create_database(test_data)
+
+
+@app.cli.command()
+def fix_activation_date():
+    """Fix tool"""
+    accounts = Account.query.all()
+    # account_extensions = AccountExtension.query.all()
+    for account in accounts:
+        extensions = AccountExtension.query.filter(
+            AccountExtension.account_id == account.id
+        ).order_by(AccountExtension.extension_date.asc()).first()
+        if extensions:
+            if account.activation_date > extensions.extension_date:
+                print(account.activation_date, extensions.extension_date)
 
 
 if __name__ == "__main__":

@@ -129,6 +129,7 @@ dmypy.json
 .nfs*
 
 # SQLite data bases
+*.sqlite3
 database-devel.sqlite3
 database-develop.sqlite3
 database-test.sqlite3
