@@ -11,6 +11,8 @@ else{
 
 $(document).ready(function() {
     $('#theTable').DataTable({
+        "info" : false,
+        "paging" : false,
         "pageLength": linesPerPage,
         "order": [],
         "displayStart": (page ? page : 0)

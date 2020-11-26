@@ -9,7 +9,7 @@ from flask import (
     send_from_directory,
     flash,
 )
-from flask import current_app as app, send_file, request
+from flask import current_app as app, send_file, request, session
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
@@ -29,13 +29,21 @@ def index():
 @login_required
 def accounts():
     log(log.INFO, "/accounts")
-    ordered_accounts = Account.query.order_by(Account.id.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    session['page'] = page
+    ordered_accounts = Account.query.order_by(Account.id.desc()).paginate(
+        page, app.config['ACCOUNTS_PER_PAGE'], False)
+    next_url = url_for('main.accounts', page=ordered_accounts.next_num) if ordered_accounts.has_next else None
+    prev_url = url_for('main.accounts', page=ordered_accounts.prev_num) if ordered_accounts.has_prev else None
     return render_template(
         "index.html",
         main_content="Accounts",
-        table_data=[acc.to_dict() for acc in ordered_accounts],
+        table_data=[acc.to_dict() for acc in ordered_accounts.items],
         columns=Account.columns(),
         edit_href=url_for("account.edit"),
+        accounts=ordered_accounts,
+        next_url=next_url,
+        prev_url=prev_url
     )
 
 

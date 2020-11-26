@@ -7,6 +7,7 @@ class BaseConfig(object):
     """Base configuration."""
 
     APP_NAME = os.environ.get("APP_NAME", "NITRIX")
+    ACCOUNTS_PER_PAGE = 50
     DEBUG_TB_ENABLED = False
     SECRET_KEY = os.environ.get(
         "SECRET_KEY", "Ensure you set a secret key, this is important!"
@@ -29,7 +30,7 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEVELOP_DATABASE_URL",
-        "sqlite:///" + os.path.join(base_dir, "test-database-develop.sqlite3"),
+        "sqlite:///" + os.path.join(base_dir, "database-develop.sqlite3"),
     )
 
 
