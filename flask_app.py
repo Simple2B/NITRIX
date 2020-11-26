@@ -173,7 +173,9 @@ def fix_activation_date():
         ).order_by(AccountExtension.extension_date.asc()).first()
         if extensions:
             if account.activation_date > extensions.extension_date:
-                print(account.activation_date, extensions.extension_date)
+                account.activation_date = extensions.extension_date
+                db.session.add(account)
+    db.session.commit()
 
 
 if __name__ == "__main__":

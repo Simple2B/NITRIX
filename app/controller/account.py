@@ -168,23 +168,10 @@ def document_changes_if_exist(account, form):
         change.value_str = account.activation_date.strftime("%Y-%m-%d")
         change.save()
         flash(
-            f'In account {account.name} activation date changed to {form.activation_date.strftime("%Y-%m-%d")}',
+            f'In account {account.name} activation date changed to {form.activation_date.data.strftime("%Y-%m-%d")}',
             "info",
         )
-    # if account.activation_date.strftime(
-    #     "%Y-%m-%d"
-    # ) != form.extension_date.data.strftime("%Y-%m-%d"):
-    #     # Changed account activation date
-    #     change = AccountChanges(account=account)
-    #     change.user_id = session.get("_user_id")
-    #     change.change_type = AccountChanges.ChangeType.activation_date
-    #     change.new_value_str = form.extension.data.strftime("%Y-%m-%d")
-    #     change.value_str = account.activation_date.strftime("%Y-%m-%d")
-    #     change.save()
-    #     flash(
-    #         f'In account {account.name} activation date changed to {form.extension_date.strftime("%Y-%m-%d")}',
-    #         "info",
-    #     )
+
     if account.months != form.months.data:
         # Changed account months
         change = AccountChanges(account=account)
@@ -237,7 +224,6 @@ class AccountController(object):
         if account_id is not None:
             account_id = int(account_id)
             self.account = Account.query.filter(Account.id == account_id).first()
-            # self.account_extensions = AccountExtension.query.filter(AccountExtension.account_id == account_id).first()
         else:
             self.account = None
         if self.account:
@@ -303,8 +289,6 @@ class AccountController(object):
             imei=self.account.imei,
             comment=self.account.comment,
             activation_date=self.account.activation_date,
-            # extension_date=self.account.activation_date,
-            # activation_date=self.account_extensions.extension_date,
             months=self.account.months,
         )
         form.products = Product.query.filter(Product.deleted == False)  # noqa E712
