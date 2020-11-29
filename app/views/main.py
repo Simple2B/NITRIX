@@ -13,6 +13,7 @@ from flask import current_app as app, send_file, request, session
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
+from sqlalchemy import or_
 
 main_blueprint = Blueprint("main", __name__)
 
@@ -29,12 +30,37 @@ def index():
 @login_required
 def accounts():
     log(log.INFO, "/accounts")
-    page = request.args.get('page', 1, type=int)
-    session['page'] = page
-    ordered_accounts = Account.query.order_by(Account.id.desc()).paginate(
-        page, app.config['ACCOUNTS_PER_PAGE'], False)
-    next_url = url_for('main.accounts', page=ordered_accounts.next_num) if ordered_accounts.has_next else None
-    prev_url = url_for('main.accounts', page=ordered_accounts.prev_num) if ordered_accounts.has_prev else None
+    page = request.args.get("page", 1, type=int)
+    filter = request.args.get("filter", "")
+    rows_per_page = request.args.get("rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int)
+    session["rows_per_page"] = rows_per_page
+    # Search is a formatted filter for db query, example : "startsfrom%"
+    search = f"{filter}%"
+    session["page"] = page
+    query = Account.query.join(Product, Account.product_id == Product.id).join(
+        Reseller, Account.reseller_id == Reseller.id
+    )
+    if filter:
+        query = query.filter(
+            or_(
+                Account.name.like(search),
+                Product.name.like(search),
+                Reseller.name.like(search)
+            )
+        )
+    ordered_accounts = query.order_by(Account.id.desc()).paginate(
+        page, rows_per_page, False
+    )
+    next_url = (
+        url_for("main.accounts", page=ordered_accounts.next_num)
+        if ordered_accounts.has_next
+        else None
+    )
+    prev_url = (
+        url_for("main.accounts", page=ordered_accounts.prev_num)
+        if ordered_accounts.has_prev
+        else None
+    )
     return render_template(
         "index.html",
         main_content="Accounts",
@@ -43,7 +69,9 @@ def accounts():
         edit_href=url_for("account.edit"),
         accounts=ordered_accounts,
         next_url=next_url,
-        prev_url=prev_url
+        prev_url=prev_url,
+        filter=filter,
+        rows_per_page=session['rows_per_page']
     )
 
 

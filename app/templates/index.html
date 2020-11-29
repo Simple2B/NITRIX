@@ -88,8 +88,72 @@
     {% endfor %}
     {% endif %}
     {% endwith %}
+  </div> 
+  {% if accounts %}
+  <div class="container-fluid mt-5 table-responsive">
+    <div class=" m-0 float-left">
+      Show
+    <select id="rows_per_page" name="rows_per_page" data-row="{{session['rows_per_page']}}">
+      <option value="1">1</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select>
+    entries
   </div>
-    <!-- Content table -->
+    <form class="form-inline float-right" action="{{ url_for('main.accounts', filter=filter, rows_per_page=session['rows_per_page'])}}">
+     
+      <div class="form-row mb-1">
+        <input type="text" class="form-control form-control-outline-secondary my-sm-0 " name="filter" value={{filter}} >
+      <div class="col-1.5 form-group m-0 "></div>
+        <input class="btn btn-outline-secondary my-sm-0" type="submit" value="search">
+      </div>
+    </div>
+    <input style="display: none;" name='rows_per_page' value="{{session['rows_per_page']}}"></div>
+    </form>
+    <table id="theAccountTable" class="table table-striped table-sm" cellspacing="0" width="100%">
+      <thead class="black white-text bg-secondary">
+        <tr>
+          {% for value in columns %}
+          <th>{{value}}</th>
+          {%endfor%}
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in table_data %}
+        <tr id="{{record.id}}">
+          {% for key in record %}
+          {% if key == 'name' %}
+          <td> <a href="{{ edit_href }}?id={{record['id']}}">{{ record[key] }}</a> </td>
+          {% else %}
+          <td>{{ record[key] }}</td>
+          {% endif %}
+          {%endfor%}
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+  </div>
+  <div class="d-flex justify-content-end px-md-4 mt-2"> 
+  {% for page_num in accounts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+  {% if page_num %}
+    {% if accounts.page == page_num %}
+    <div class="px-md-1">
+      <a class="btn btn-dark mb-4" href="{{ url_for('main.accounts', page=page_num, filter=filter, rows_per_page=session['rows_per_page']) }}">{{ page_num }}</a>
+    </div>
+    {% else %}
+    <div class="px-md-1">
+      <a class="btn btn-outline-secondary mb-4 " href="{{ url_for('main.accounts', page=page_num, filter=filter, rows_per_page=session['rows_per_page']) }}">{{ page_num }}</a>
+    </div>
+    {% endif %}
+  {% else %}
+  <div class="bottom-align-text">
+    <h3>...</h3>
+   </div> 
+  {% endif %}
+{% endfor %}
+</div>
+{% else %}
+  <!-- Content table -->
   <div class="container-fluid mt-5 table-responsive">
     <table id="theTable" class="table table-striped table-sm" cellspacing="0" width="100%">
       <thead class="black white-text bg-secondary">
@@ -114,26 +178,6 @@
       </tbody>
     </table>
   </div>
-  {% if accounts %}
-  <div class="d-flex justify-content-end px-md-4 mt-2"> 
-  {% for page_num in accounts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-  {% if page_num %}
-    {% if accounts.page == page_num %}
-    <div class="px-md-1">
-      <a class="btn btn-dark mb-4" href="{{ url_for('main.accounts', page=page_num) }}">{{ page_num }}</a>
-    </div>
-    {% else %}
-    <div class="px-md-1">
-      <a class="btn btn-outline-secondary mb-4 " href="{{ url_for('main.accounts', page=page_num) }}">{{ page_num }}</a>
-    </div>
-    {% endif %}
-  {% else %}
-  <div class="bottom-align-text">
-    <h3>...</h3>
-   </div> 
-  {% endif %}
-{% endfor %}
-</div>
 {% endif %}
 {% if users %}
 {% endif%}

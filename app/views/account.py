@@ -20,7 +20,7 @@ def edit():
     if controller.account:
         form = controller.account_form_edit()
         form.close_button = url_for("main.accounts", page=session.get('page', 1))
-        return render_template("account_details.html", form=form)    
+        return render_template("account_details.html", form=form)
     else:
         form = controller.account_form_new(
             request.args.get("prev_product"),
