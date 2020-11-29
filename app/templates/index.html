@@ -94,14 +94,13 @@
     <div class=" m-0 float-left">
       Show
     <select id="rows_per_page" name="rows_per_page" data-row="{{session['rows_per_page']}}">
-      <option value="1">1</option>
+      <option value="15">15</option>
       <option value="25">25</option>
       <option value="50">50</option>
     </select>
     entries
   </div>
-    <form class="form-inline float-right" action="{{ url_for('main.accounts', filter=filter, rows_per_page=session['rows_per_page'])}}">
-     
+    <form class="form-inline float-right" action="{{ url_for('main.accounts')}}">
       <div class="form-row mb-1">
         <input type="text" class="form-control form-control-outline-secondary my-sm-0 " name="filter" value={{filter}} >
       <div class="col-1.5 form-group m-0 "></div>
