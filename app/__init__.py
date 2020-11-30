@@ -74,7 +74,6 @@ def create_app(environment="development"):
     @app.before_request
     def before_request():
         session.permanent = True
-        # TODO: DONT COMMIT IT !!!
-        app.permanent_session_lifetime = timedelta(days=20)
+        app.permanent_session_lifetime = timedelta(hours=2)
 
     return app

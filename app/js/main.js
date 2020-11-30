@@ -27,7 +27,7 @@ $("#rows_per_page").change(function(){
         urlParams.append(rows_param, rows_per_page)
     }
     else if(urlParams.get(rows_param)==rows_per_page){
-        return
+        return;
     }
     else{
         urlParams.set(rows_param, rows_per_page)

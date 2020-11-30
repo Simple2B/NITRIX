@@ -164,9 +164,8 @@ def reset_db(test_data=False):
 
 @app.cli.command()
 def fix_activation_date():
-    """Fix tool"""
+    """Fix wrong activation date"""
     accounts = Account.query.all()
-    # account_extensions = AccountExtension.query.all()
     for account in accounts:
         extensions = AccountExtension.query.filter(
             AccountExtension.account_id == account.id
