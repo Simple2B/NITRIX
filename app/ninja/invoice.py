@@ -1,3 +1,4 @@
+from app import database
 from app.logger import log
 from app.ninja import api
 
@@ -52,11 +53,13 @@ class NinjaInvoice(object):
         return result if result else None
 
     def delete_item(self, invoice_items):
-        self.invoice_items = [
-            data
-            for data in self.invoice_items
-            if data["invoice_items"] != invoice_items
-        ]
+        # self.invoice_items = [
+        #     data
+        #     for data in self.invoice_items
+        #     if data != invoice_items
+        # ]
+        test_array = [data for data in self.invoice_items if data != invoice_items]
+        self.invoice_items = test_array
 
     def save(self):
         log(log.DEBUG, "NinjaApi.update_product %d", self.id)

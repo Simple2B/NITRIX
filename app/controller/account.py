@@ -54,9 +54,7 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
     if account.activation_date > invoice_date:
         invoice_date = invoice_date.date().replace(day=1).strftime("%Y-%m-%d")
     else:
-        invoice_date = (
-            account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
-        )
+        invoice_date = account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
     current_invoice = None
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
     for invoice in invoices:
@@ -168,7 +166,7 @@ def document_changes_if_exist(account, form):
         change.value_str = account.activation_date.strftime("%Y-%m-%d")
         change.save()
         flash(
-            f'In account {account.name} activation date changed to {form.activation_date.strftime("%Y-%m-%d")}',
+            f'In account {account.name} activation date changed to {form.activation_date.data.strftime("%Y-%m-%d")}',
             "info",
         )
     if account.months != form.months.data:
@@ -365,8 +363,32 @@ class AccountController(object):
 
         if self.account:
             document_changes_if_exist(self.account, form)
-            for k in request.form.keys():
-                self.account.__setattr__(k, form.__getattribute__(k).data)
+            if self.account.activation_date != form.activation_date.data:
+                invoice_date = self.account.activation_date.replace(day=1).strftime(
+                    "%Y-%m-%d"
+                )
+                invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+                for invoice in invoices:
+                    if (
+                        invoice.invoice_date == invoice_date
+                        and invoice.client_id == self.account.reseller.ninja_client_id
+                    ):
+                        # found invoice
+                        for item in invoice.invoice_items:
+                            log(log.DEBUG, item["notes"])
+                            log(
+                                log.DEBUG,
+                                f"{self.account.name}.  "
+                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}',
+                            )
+                            if item["notes"] == (
+                                f"{self.account.name}.  "
+                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}'
+                            ):
+                                invoice.delete_item(item)
+                                break
+                        break
+
         else:
             if Account.query.filter(
                 Account.name == form.name.data,
@@ -396,6 +418,7 @@ class AccountController(object):
             flash("Months must be in 1-12", "danger")
             return False
         self.account.save()
+
         if self.new_account:
             change = AccountChanges(account=self.account)
             change.user_id = session.get("_user_id")
