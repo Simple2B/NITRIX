@@ -63,3 +63,19 @@ def test_save_phone(client):
     # send wrong form data
     response = client.post("/phone_save", data=dict(id=2), follow_redirects=True)
     assert b"Form validation error" in response.data
+
+
+def test_delete_phone(client):
+    # delete certain phone
+    response = client.post(
+        "/phone_save",
+        data=dict(id=-1, name="TEST PHONE NAME", price=5.00, status="active"),
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    phone = Phone.query.first()
+    assert phone
+    phone_id = phone.id
+    response = client.get(f"/phone_delete?id={phone_id}")
+    assert response.status_code == 302
+    assert phone.deleted

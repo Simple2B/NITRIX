@@ -1,6 +1,5 @@
 class NinjaClient(object):
-    """Ninja Client entity
-    """
+    """Ninja Client entity"""
 
     def __init__(self, data={}):
         self.__data_keys = [k for k in data]

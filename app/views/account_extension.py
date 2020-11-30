@@ -30,7 +30,7 @@ def add():
         id=account_id,
         reseller_id=account.reseller_id,
         product_id=account.product.id,
-        product=account.product.name
+        product=account.product.name,
     )
     form.products = (
         Product.query.filter(Product.deleted == False)  # noqa E712

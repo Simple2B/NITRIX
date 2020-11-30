@@ -110,7 +110,8 @@ def delete():
         reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
         reseller.deleted = True
         reseller.save()
-        ninja.delete_client(client_id=reseller.ninja_client_id)
+        if ninja.configured:
+            ninja.delete_client(client_id=reseller.ninja_client_id)
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.resellers"))

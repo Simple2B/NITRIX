@@ -47,7 +47,11 @@ def create_database(test_data=False):
         ninja_product = None
         if ninja.configured:
             for prod in [prod for prod in ninja.products if not prod.is_deleted]:
-                if prod.notes == "Phone" and prod.product_key == product_key and prod.cost == price:
+                if (
+                    prod.notes == "Phone"
+                    and prod.product_key == product_key
+                    and prod.cost == price
+                ):
                     ninja_product = prod
                     break
             else:
@@ -62,13 +66,13 @@ def create_database(test_data=False):
         reseller = Reseller(name=name, comments=comments).save(False)
         ninja_client = None
         if ninja.configured:
-            for client in [c for c in ninja.clients if not c.is_deleted and c.name == name]:
+            for client in [
+                c for c in ninja.clients if not c.is_deleted and c.name == name
+            ]:
                 ninja_client = client
                 break
             else:
-                ninja_client = (
-                    ninja.add_client(name=reseller.name)
-                )
+                ninja_client = ninja.add_client(name=reseller.name)
         if ninja_client:
             reseller.ninja_client_id = ninja_client.id
         return reseller
@@ -82,8 +86,8 @@ def create_database(test_data=False):
         for months in (1, 3, 6, 12):
             add_reseller_product(
                 months=months,
-                initprice=round(6.78*months, 2),
-                extprice=round(4.55*months, 2),
+                initprice=round(6.78 * months, 2),
+                extprice=round(4.55 * months, 2),
                 product=product,
                 reseller=reseller,
             )
@@ -95,8 +99,8 @@ def create_database(test_data=False):
             for months in (1, 3, 6, 12):
                 add_reseller_product(
                     months=months,
-                    initprice=round(4.57*months, 2),
-                    extprice=round(3.84*months, 2),
+                    initprice=round(4.57 * months, 2),
+                    extprice=round(3.84 * months, 2),
                     product=product,
                     reseller=reseller,
                 )
@@ -107,8 +111,8 @@ def create_database(test_data=False):
             for months in (1, 3, 6, 12):
                 add_reseller_product(
                     months=months,
-                    initprice=round(2.32*months, 2),
-                    extprice=round(2.05*months, 2),
+                    initprice=round(2.32 * months, 2),
+                    extprice=round(2.05 * months, 2),
                     product=product,
                     reseller=reseller,
                 )

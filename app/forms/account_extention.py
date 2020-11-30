@@ -12,4 +12,4 @@ class AccountExtensionForm(FlaskForm):
     )
     months = IntegerField("Month", [DataRequired()])
     product_id = IntegerField("Product", validators=[DataRequired()])
-    product = StringField("Product", render_kw={'readonly': True})
+    product = StringField("Product", render_kw={"readonly": True})

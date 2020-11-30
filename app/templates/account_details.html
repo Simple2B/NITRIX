@@ -116,7 +116,9 @@
       <div class="col-sm-2 mt-2">
         {% if form.is_edit %}
         {{form.months(class='form-control', id='months')}}
-        {% else %}
+        {% elif form.month %}
+        <input name="months" id="months" list="months-list" class="form-control" value="{{form.month}}">
+        {% else  %}
         <input name="months" id="months" list="months-list" class="form-control" value="6">
         {% endif %}
         <datalist id="months-list">

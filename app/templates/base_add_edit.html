@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang='en'>
-
+  {% from "_macros.html" import delete_item with context %}
 <head>
   <title>{{ config.APP_NAME }}</title>
   <!-- meta -->
@@ -21,8 +21,8 @@
     <div class="card">
       <div class="card-header px-0 py-0">
         <nav class="navbar navbar-expand-lg navbar-light d-flex justify-content-between">
-                <a class="navbar-brand" href="{{ form.close_button }}">NITRIX</a>
-                <a class="btn btn-outline-secondary btn-sm my-sm-0" href="{{ form.close_button }}">X</a>
+          <a class="navbar-brand" href="{{ form.close_button }}">NITRIX</a>
+          <a class="btn btn-outline-secondary btn-sm my-sm-0" href="{{ form.close_button }}">X</a>
         </nav>
       </div>
       <div class="card-body px-0 py-0">
@@ -62,9 +62,13 @@
               </div>
               {% if form.is_edit %}
               <div class="col-sm-2 my-1 d-flex justify-content-around">
-                <a class="btn btn-danger" value="save_and_edit"
-                  href="{{ form.delete_route}}?id={{ form.id.data }}">Delete</a>
-              </div>
+                <button type="button" class="btn btn-danger btn-lg btn-block  " data-toggle="modal"
+             data-target="#exampleModal1">
+             Delete 
+           </button>
+             </div>
+              {{ delete_item("given account")}} 
+
               {% endif %}
             </div>
           </div>
@@ -86,9 +90,14 @@
                 value="save_and_edit">Save
                 and edit</button>
             </div>
+            
             <div class="col-sm-4 my-1 d-flex justify-content-around">
-              <a href="{{ form.delete_route}}?id={{ form.id.data }}" class="btn btn-danger btn-lg btn-block">Delete</a>
+             <button type="button" class="btn btn-danger btn-lg btn-block  " data-toggle="modal"
+              data-target="#exampleModal1">
+              Delete 
+            </button>
             </div>
+           {{ delete_item("given reseller")}} 
             {% endif %}
           </div>
         </div>
@@ -101,11 +110,18 @@
               <div class="col-sm-6 my-1 d-flex justify-content-around">
                 <button class="btn btn-success btn-lg btn-block" type="submit" form="main-form">Save</button>
               </div>
-              {% if form.is_edit %}
+              {% if form.is_edit  %}
               <div class="col-sm-6 my-1 d-flex justify-content-around">
-                <a href="{{ form.delete_route}}?id={{ form.id.data }}"
-                  class="btn btn-danger btn-lg btn-block">Delete</a>
-              </div>
+              
+              <button type="button" class="btn btn-danger btn-lg btn-block  " data-toggle="modal"
+              data-target="#exampleModal1">
+              Delete 
+            </button>
+          
+          </div>
+        
+            {{ delete_item("this item") }} 
+           
               {% endif %}
             </div>
           </div>

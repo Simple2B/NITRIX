@@ -15,12 +15,18 @@ account_blueprint = Blueprint("account", __name__)
 @login_required
 def edit():
     log(log.INFO, "/account_details")
-    controller = AccountController(request.args.get('id'))
+    controller = AccountController(request.args.get("id"))
     if controller.account:
         form = controller.account_form_edit()
         return render_template("account_details.html", form=form)
     else:
-        form = controller.account_form_new(request.args.get('prev_product'), request.args.get('prev_reseller'))
+        form = controller.account_form_new(
+            request.args.get("prev_product"),
+            request.args.get("prev_reseller"),
+            request.args.get("prev_phone"),
+            request.args.get("prev_month"),
+            request.args.get("prev_simcost"),
+        )
         return render_template("account_details.html", form=form)
 
 
@@ -39,6 +45,9 @@ def save():
                     "account.edit",
                     prev_reseller=account.reseller.name,
                     prev_product=account.product.name,
+                    prev_phone=account.phone.name,
+                    prev_month=account.months,
+                    prev_simcost=form.sim_cost.data,
                 )
             )
         if request.form["submit"] == "save_and_edit":
@@ -53,7 +62,7 @@ def save():
 @account_blueprint.route("/account_delete", methods=["GET"])
 @login_required
 def delete():
-    controller = AccountController(request.args.get('id'))
+    controller = AccountController(request.args.get("id"))
     if controller.account:
         controller.delete()
     return redirect(url_for("main.accounts"))
@@ -62,14 +71,14 @@ def delete():
 @account_blueprint.route("/account_import", methods=["POST"])
 @login_required
 def account_import():
-    ''' Provides validation for imported CSV file '''
+    """ Provides validation for imported CSV file """
 
     if request.method == "POST":
         if "csv-file" not in request.files:
             log(log.WARNING, "No file submitted in request")
-            flash("File was not submitted. Please try again.", 'danger')
+            flash("File was not submitted. Please try again.", "danger")
             return redirect(url_for("main.accounts"))
-        validator = AccountController(file_object=request.files['csv-file'])
+        validator = AccountController(file_object=request.files["csv-file"])
         if not validator.verify_file_integrity():
             return redirect(url_for("main.accounts"))
         if not validator.import_data_from_file():

@@ -13,7 +13,7 @@ app = create_app(environment="testing")
 app.config["TESTING"] = True
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEST_CSV_FILE = os.path.join(BASE_DIR, 'nitrix_import_test.csv')
+TEST_CSV_FILE = os.path.join(BASE_DIR, "nitrix_import_test.csv")
 
 TEST_INVOICE_DATE_1 = "2020-07-01"
 TEST_INVOICE_DATE_2 = "2020-08-01"
@@ -44,12 +44,12 @@ def api():
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_import(api):
-    with open(TEST_CSV_FILE, 'rb') as f:
+    with open(TEST_CSV_FILE, "rb") as f:
         controller = AccountController(file_object=f)
         controller.import_data_from_file()
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
     assert len(invoices) == 2
-    invoices = [i for i in invoices if i.invoice_date == '2020-07-01']
+    invoices = [i for i in invoices if i.invoice_date == "2020-07-01"]
     assert len(invoices) == 1
     items = invoices[0].items
     assert len(items) == 5

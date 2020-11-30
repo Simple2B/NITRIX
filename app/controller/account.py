@@ -314,7 +314,14 @@ class AccountController(object):
         form.history = AccountChanges.get_history(self.account)
         return form
 
-    def account_form_new(self, prev_product=None, prev_reseller=None):
+    def account_form_new(
+        self,
+        prev_product=None,
+        prev_reseller=None,
+        prev_phone=None,
+        prev_month=None,
+        prev_simcost="yes",
+    ):
         form = AccountForm()
         form.products = (
             organize_list_starting_with_value(
@@ -326,11 +333,24 @@ class AccountController(object):
             if prev_product
             else Product.query.all()
         )
+        if prev_simcost:
+            form.sim_cost.default = prev_simcost
+            form.process()
+        form.month = prev_month
         form.resellers = organize_list_starting_with_value(
             Reseller.query.order_by(Reseller.name).all(),
             prev_reseller if prev_reseller else "NITRIX",
         )
-        form.phones = all_phones()
+        form.phones = (
+            organize_list_starting_with_value(
+                Phone.query.filter(Phone.deleted == False)  # noqa E712
+                .order_by(Phone.name)
+                .all(),
+                prev_phone,
+            )
+            if prev_phone
+            else Phone.query.all()
+        )
         form.is_edit = False
         form.save_route = url_for("account.save")
         form.delete_route = url_for("account.delete")
