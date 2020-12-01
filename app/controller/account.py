@@ -368,22 +368,6 @@ class AccountController(object):
         if self.account:
             document_changes_if_exist(self.account, form)
             if self.account.activation_date != form.activation_date.data:
-                # reseller_product = (
-                #     ResellerProduct.query.filter(
-                #         ResellerProduct.reseller_id == self.account.reseller_id
-                #     )
-                #     .filter(ResellerProduct.product_id == self.account.product_id)
-                #     .filter(ResellerProduct.months == self.account.months)
-                #     .first()
-                # )
-                # if not reseller_product:
-                #     # Locking for this product in NITRIX reseller
-                #     reseller_product = (
-                #         ResellerProduct.query.filter(ResellerProduct.reseller_id == 1)
-                #         .filter(ResellerProduct.product_id == self.account.product_id)
-                #         .filter(ResellerProduct.months == self.account.months)
-                #         .first()
-                #     )
                 new_invoice_date = form.activation_date.data.replace(day=1).strftime(
                     "%Y-%m-%d"
                 )
@@ -412,24 +396,6 @@ class AccountController(object):
                                 f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}'
                             ):
                                 invoice.delete_item(item)
-                                # item[
-                                #     "notes"
-                                # ] = f'Activated: {form.activation_date.data.strftime("%Y-%m-%d")}'
-                                # invoice.add_item(
-                                #     ninja_product_name(
-                                #         self.account.product.name, self.account.months
-                                #     ),
-                                #     f'{self.account.name}.  Activated: {form.activation_date.data.strftime("%Y-%m-%d")}',
-                                #     cost=reseller_product.init_price
-                                #     if reseller_product
-                                #     else 0,
-                                # )
-                                # if SIM_COST_ACCOUNT_COMMENT in form.comment.data:
-                                #     invoice.add_item(
-                                #         "SIM Cost",
-                                #         f'{self.account.name}.  Activated: {form.activation_date.data.strftime("%Y-%m-%d")}',
-                                #         SIM_COST_DISCOUNT,
-                                #     )
                                 invoice.save()
                                 break
                         break
