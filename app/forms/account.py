@@ -21,7 +21,7 @@ class AccountForm(FlaskForm):
         "Activation date", validators=[DataRequired()], default=datetime.now
     )
     extension_date = DateField(
-        "Activation date", validators=[DataRequired()], default=datetime.now
+        "Extensions date", validators=[DataRequired()], default=datetime.now
     )
     months = IntegerField("Month", [DataRequired()])
     submit = SubmitField("Save")

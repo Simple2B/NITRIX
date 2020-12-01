@@ -55,7 +55,7 @@ class NinjaInvoice(object):
         self.invoice_items = [
             data
             for data in self.invoice_items
-            if data["notes"] != invoice_items['notes']
+            if data.get("notes") != invoice_items.get('notes')
         ]
 
     def save(self):

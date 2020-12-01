@@ -50,10 +50,6 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    # invoice_date = datetime.now()
-    # if account.activation_date > invoice_date:
-    #     invoice_date = invoice_date.date().replace(day=1).strftime("%Y-%m-%d")
-    # else:
     invoice_date = (
             account.activation_date.replace(day=1).strftime("%Y-%m-%d")
         )

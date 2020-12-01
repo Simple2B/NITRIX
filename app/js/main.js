@@ -37,9 +37,6 @@ $("#rows_per_page").change(function(){
 })
 
     $('#theTable').DataTable({
-        // "searching":false,
-        // "info" : false,
-        // "paging" : false,
         "pageLength": linesPerPage,
         "order": [],
         "displayStart": (page ? page : 0)
