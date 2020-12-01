@@ -1,7 +1,5 @@
-from flask.globals import session
-from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask import render_template, Blueprint, request, flash, redirect, url_for, session
 from flask_login import login_required
-
 from app.forms import AccountForm
 
 from app.logger import log
