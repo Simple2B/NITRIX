@@ -50,12 +50,12 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    invoice_date = datetime.now()
-    if account.activation_date > invoice_date:
-        invoice_date = invoice_date.date().replace(day=1).strftime("%Y-%m-%d")
-    else:
-        invoice_date = (
-            account.activation_date.date().replace(day=1).strftime("%Y-%m-%d")
+    # invoice_date = datetime.now()
+    # if account.activation_date > invoice_date:
+    #     invoice_date = invoice_date.date().replace(day=1).strftime("%Y-%m-%d")
+    # else:
+    invoice_date = (
+            account.activation_date.replace(day=1).strftime("%Y-%m-%d")
         )
     current_invoice = None
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
@@ -362,12 +362,88 @@ class AccountController(object):
         log(log.INFO, "/account_save")
         form.name.data = form.name.data.strip()
         form.sim.data = form.sim.data.strip()
+        form.comment.data = form.comment.data.strip()
         self.new_account = False
-
+        new_invoice = False
         if self.account:
             document_changes_if_exist(self.account, form)
-            for k in request.form.keys():
-                self.account.__setattr__(k, form.__getattribute__(k).data)
+            if self.account.activation_date != form.activation_date.data:
+                # reseller_product = (
+                #     ResellerProduct.query.filter(
+                #         ResellerProduct.reseller_id == self.account.reseller_id
+                #     )
+                #     .filter(ResellerProduct.product_id == self.account.product_id)
+                #     .filter(ResellerProduct.months == self.account.months)
+                #     .first()
+                # )
+                # if not reseller_product:
+                #     # Locking for this product in NITRIX reseller
+                #     reseller_product = (
+                #         ResellerProduct.query.filter(ResellerProduct.reseller_id == 1)
+                #         .filter(ResellerProduct.product_id == self.account.product_id)
+                #         .filter(ResellerProduct.months == self.account.months)
+                #         .first()
+                #     )
+                new_invoice_date = form.activation_date.data.replace(day=1).strftime(
+                    "%Y-%m-%d"
+                )
+                invoice_date = self.account.activation_date.replace(day=1).strftime(
+                    "%Y-%m-%d"
+                )
+                invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+
+                if new_invoice_date != invoice_date:
+                    new_invoice = True
+                for invoice in invoices:
+                    if (
+                        invoice.invoice_date == invoice_date
+                        and invoice.client_id == self.account.reseller.ninja_client_id
+                    ):
+                        # found invoice
+                        for item in invoice.invoice_items:
+                            log(log.DEBUG, item["notes"])
+                            log(
+                                log.DEBUG,
+                                f"{self.account.name}.  "
+                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}',
+                            )
+                            if item["notes"] == (
+                                f"{self.account.name}.  "
+                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}'
+                            ):
+                                invoice.delete_item(item)
+                                # item[
+                                #     "notes"
+                                # ] = f'Activated: {form.activation_date.data.strftime("%Y-%m-%d")}'
+                                # invoice.add_item(
+                                #     ninja_product_name(
+                                #         self.account.product.name, self.account.months
+                                #     ),
+                                #     f'{self.account.name}.  Activated: {form.activation_date.data.strftime("%Y-%m-%d")}',
+                                #     cost=reseller_product.init_price
+                                #     if reseller_product
+                                #     else 0,
+                                # )
+                                # if SIM_COST_ACCOUNT_COMMENT in form.comment.data:
+                                #     invoice.add_item(
+                                #         "SIM Cost",
+                                #         f'{self.account.name}.  Activated: {form.activation_date.data.strftime("%Y-%m-%d")}',
+                                #         SIM_COST_DISCOUNT,
+                                #     )
+                                invoice.save()
+                                break
+                        break
+            self.account.name = form.name.data
+            self.account.activation_date = form.activation_date.data
+            self.account.product_id = form.product_id.data
+            self.account.reseller_id = form.reseller_id.data
+            self.account.phone_id = form.phone_id.data
+            self.account.sim = form.sim.data
+            self.account.imei = form.imei.data
+            self.account.comment = form.comment.data
+            self.account.months = form.months.data
+            add_ninja_invoice(self.account, True, "Activated")
+
         else:
             if Account.query.filter(
                 Account.name == form.name.data,
