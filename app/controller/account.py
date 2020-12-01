@@ -1,7 +1,7 @@
 import csv
 from io import TextIOWrapper
 from datetime import datetime
-from flask import request, flash, url_for, session
+from flask import flash, url_for, session
 from flask import current_app as app
 from flask_login import current_user
 from cerberus import Validator
@@ -364,20 +364,13 @@ class AccountController(object):
         form.sim.data = form.sim.data.strip()
         form.comment.data = form.comment.data.strip()
         self.new_account = False
-        new_invoice = False
         if self.account:
             document_changes_if_exist(self.account, form)
             if self.account.activation_date != form.activation_date.data:
-                new_invoice_date = form.activation_date.data.replace(day=1).strftime(
-                    "%Y-%m-%d"
-                )
                 invoice_date = self.account.activation_date.replace(day=1).strftime(
                     "%Y-%m-%d"
                 )
                 invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
-
-                if new_invoice_date != invoice_date:
-                    new_invoice = True
                 for invoice in invoices:
                     if (
                         invoice.invoice_date == invoice_date
