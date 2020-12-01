@@ -1,6 +1,5 @@
-from flask import render_template, Blueprint, request, flash, redirect, url_for
+from flask import render_template, Blueprint, request, flash, redirect, url_for, session
 from flask_login import login_required
-
 from app.forms import AccountForm
 
 from app.logger import log
@@ -18,6 +17,7 @@ def edit():
     controller = AccountController(request.args.get("id"))
     if controller.account:
         form = controller.account_form_edit()
+        form.close_button = url_for("main.accounts", page=session.get('page', 1))
         return render_template("account_details.html", form=form)
     else:
         form = controller.account_form_new(
@@ -27,6 +27,7 @@ def edit():
             request.args.get("prev_month"),
             request.args.get("prev_simcost"),
         )
+        form.close_button = url_for("main.accounts", page=session.get('page', 1))
         return render_template("account_details.html", form=form)
 
 

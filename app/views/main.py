@@ -9,10 +9,11 @@ from flask import (
     send_from_directory,
     flash,
 )
-from flask import current_app as app, send_file, request
+from flask import current_app as app, send_file, request, session
 from flask_login import login_required, current_user
 from app.models import User, Product, Account, Reseller, Phone
 from app.logger import log
+from sqlalchemy import or_
 
 main_blueprint = Blueprint("main", __name__)
 
@@ -29,13 +30,48 @@ def index():
 @login_required
 def accounts():
     log(log.INFO, "/accounts")
-    ordered_accounts = Account.query.order_by(Account.id.desc()).all()
+    page = request.args.get("page", 1, type=int)
+    filter = request.args.get("filter", "")
+    rows_per_page = request.args.get("rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int)
+    session["rows_per_page"] = rows_per_page
+    # Search is a formatted filter for db query, example : "startsfrom%"
+    search = f"{filter}%"
+    session["page"] = page
+    query = Account.query.join(Product, Account.product_id == Product.id).join(
+        Reseller, Account.reseller_id == Reseller.id
+    )
+    if filter:
+        query = query.filter(
+            or_(
+                Account.name.like(search),
+                Product.name.like(search),
+                Reseller.name.like(search)
+            )
+        )
+    ordered_accounts = query.order_by(Account.id.desc()).paginate(
+        page, rows_per_page, False
+    )
+    next_url = (
+        url_for("main.accounts", page=ordered_accounts.next_num)
+        if ordered_accounts.has_next
+        else None
+    )
+    prev_url = (
+        url_for("main.accounts", page=ordered_accounts.prev_num)
+        if ordered_accounts.has_prev
+        else None
+    )
     return render_template(
         "index.html",
         main_content="Accounts",
-        table_data=[acc.to_dict() for acc in ordered_accounts],
+        table_data=[acc.to_dict() for acc in ordered_accounts.items],
         columns=Account.columns(),
         edit_href=url_for("account.edit"),
+        accounts=ordered_accounts,
+        next_url=next_url,
+        prev_url=prev_url,
+        filter=filter,
+        rows_per_page=session['rows_per_page']
     )
 
 
@@ -64,8 +100,7 @@ def resellers():
         "index.html",
         main_content="Resellers",
         table_data=[
-            i.to_dict()
-            for i in Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+            i.to_dict()  for i in Reseller.query.filter(Reseller.deleted == False)  # noqa E712
         ],
         columns=Reseller.columns(),
         edit_href=url_for("reseller.edit"),
@@ -81,8 +116,7 @@ def products():
         "index.html",
         main_content="Products",
         table_data=[
-            p.to_dict()
-            for p in Product.query.filter(Product.deleted == False)  # noqa E712
+            p.to_dict() for p in Product.query.filter(Product.deleted == False)  # noqa E712
         ],
         columns=Product.columns(),
         edit_href=url_for("product.edit"),
