@@ -104,14 +104,14 @@ def save_new():
     account_ext.account_id = account.id
     account_ext.reseller_id = account.reseller_id
     account_ext.product_id = account.product_id
-    account_ext.months = account.months
+    account_ext.months = form.months.data
     account_ext.extension_date = form.extension_date.data
     m = account_ext.months if account_ext.months else 0
     account_ext.end_date = account_ext.extension_date + relativedelta(months=m)
     account_ext.save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
-    account.months = form.months.data
+    # account.months = form.months.data
     # account.activation_date = form.extension_date.data
     account.save()
     account.is_new = False
