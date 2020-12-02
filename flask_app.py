@@ -1,4 +1,5 @@
 #!python
+from dateutil.relativedelta import relativedelta
 import click
 from app import create_app, db, models, forms
 from app.models import (
@@ -172,7 +173,9 @@ def fix_activation_date():
         ).order_by(AccountExtension.extension_date.asc()).first()
         if extensions:
             if account.activation_date > extensions.extension_date:
+                swap_value = account.activation_date - relativedelta(months=extensions.months)
                 account.activation_date = extensions.extension_date
+                extensions.extension_date = swap_value
                 db.session.add(account)
     db.session.commit()
 
