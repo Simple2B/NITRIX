@@ -23,6 +23,8 @@ from app.ninja import NinjaInvoice
 from app.utils import ninja_product_name, organize_list_starting_with_value
 from app.ninja import api as ninja
 
+EXTENDED = "Extended"
+
 
 def all_phones():
     phones = Phone.query.filter(
@@ -50,9 +52,11 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    invoice_date = (
-            account.activation_date.replace(day=1).strftime("%Y-%m-%d")
-        )
+    if mode == EXTENDED:
+        extension_date = account.extensions[-1].extension_date
+        invoice_date = extension_date.replace(day=1).strftime("%Y-%m-%d")
+    else:
+        invoice_date = account.activation_date.replace(day=1).strftime("%Y-%m-%d")
     current_invoice = None
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
     for invoice in invoices:
@@ -69,11 +73,20 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             account.reseller.ninja_client_id, invoice_date
         )
     if current_invoice:
-        added_item = current_invoice.add_item(
-            ninja_product_name(account.product.name, account.months),
-            f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
-            cost=reseller_product.init_price if reseller_product else 0,
-        )
+        if mode == EXTENDED:
+            extension_date = account.extensions[-1].extension_date
+            extension_month = account.extensions[-1].months
+            added_item = current_invoice.add_item(
+                ninja_product_name(account.product.name, extension_month),
+                f'{account.name}.  {mode}: {extension_date.strftime("%Y-%m-%d")}',
+                cost=reseller_product.init_price if reseller_product else 0,
+            )
+        else:
+            added_item = current_invoice.add_item(
+                ninja_product_name(account.product.name, account.months),
+                f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
+                cost=reseller_product.init_price if reseller_product else 0,
+            )
         if not added_item:
             log(log.ERROR, "Could not add item to invoice in invoice Ninja!")
             return None
@@ -465,7 +478,15 @@ class AccountController(object):
         change.new_value_str = "None"
         change.value_str = "Deleted"
         change.save()
-        self.account.delete()
+        invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+        for invoice in invoices:
+            for item in invoice.invoice_items:
+                if self.account.name in item.get('notes'):
+                    log(log.DEBUG, "deleting item for account [%s]", self.account.name)
+                    invoice.delete_item(item)
+                    invoice.save()
+        self.account.deleted = True
+        self.account.save()
         flash("Account successfully deleted.", "success")
         return True
 

@@ -35,19 +35,21 @@ def accounts():
     rows_per_page = request.args.get("rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int)
     session["rows_per_page"] = rows_per_page
     # Search is a formatted filter for db query, example : "startsfrom%"
-    search = f"{filter}%"
     session["page"] = page
     query = Account.query.join(Product, Account.product_id == Product.id).join(
         Reseller, Account.reseller_id == Reseller.id
-    )
+    ).filter(Account.deleted == False)  # noqa 712
     if filter:
-        query = query.filter(
-            or_(
-                Account.name.like(search),
-                Product.name.like(search),
-                Reseller.name.like(search)
+        filters = filter.split(";")
+        for flt in filters:
+            search = f"{flt}%"
+            query = query.filter(
+                or_(
+                    Account.name.like(search),
+                    Product.name.like(search),
+                    Reseller.name.like(search)
+                )
             )
-        )
     ordered_accounts = query.order_by(Account.id.desc()).paginate(
         page, rows_per_page, False
     )

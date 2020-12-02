@@ -2,6 +2,7 @@
 $(document).ready(function() {
     function update_end_date() {
         let endDate = new Date($('#activation_date').val());
+        endDate.setHours(12,0,0,0);
         let month = +$('#months').val();
         endDate.setMonth(endDate.getMonth() + month);
         $("#endDate")[0].valueAsDate = endDate;
