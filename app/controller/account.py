@@ -485,7 +485,8 @@ class AccountController(object):
                     log(log.DEBUG, "deleting item for account [%s]", self.account.name)
                     invoice.delete_item(item)
                     invoice.save()
-        self.account.delete()
+        self.account.deleted = True
+        self.account.save()
         flash("Account successfully deleted.", "success")
         return True
 
