@@ -103,7 +103,7 @@ def save_new():
     account_ext = AccountExtension()
     account_ext.account_id = account.id
     account_ext.reseller_id = account.reseller_id
-    account_ext.product_id = account.product_id
+    account_ext.product_id = form.product_id.data
     account_ext.months = form.months.data
     account_ext.extension_date = form.extension_date.data
     m = account_ext.months if account_ext.months else 0
