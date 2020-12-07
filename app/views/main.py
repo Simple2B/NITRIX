@@ -11,7 +11,7 @@ from flask import (
 )
 from flask import current_app as app, send_file, request, session
 from flask_login import login_required, current_user
-from app.models import User, Product, Account, Reseller, Phone
+from app.models import User, Product, Account, Reseller, Phone, AccountChanges
 from app.logger import log
 from sqlalchemy import or_
 
@@ -34,20 +34,22 @@ def accounts():
     filter = request.args.get("filter", "")
     rows_per_page = request.args.get("rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int)
     session["rows_per_page"] = rows_per_page
-    # Search is a formatted filter for db query, example : "startsfrom%"
     session["page"] = page
     query = Account.query.join(Product, Account.product_id == Product.id).join(
         Reseller, Account.reseller_id == Reseller.id
-    ).filter(Account.deleted == False)  # noqa 712
+    ).join(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
     if filter:
         filters = filter.split(";")
         for flt in filters:
+            # Search is a formatted filter for db query, example : "startsfrom%"
             search = f"{flt}%"
             query = query.filter(
                 or_(
                     Account.name.like(search),
+                    Account.sim.like(search),
                     Product.name.like(search),
-                    Reseller.name.like(search)
+                    Reseller.name.like(search),
+                    AccountChanges.value_str.like(search)
                 )
             )
     ordered_accounts = query.order_by(Account.id.desc()).paginate(
