@@ -52,6 +52,7 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
+    # Invoice_date is always the first day of current month
     date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
     invoice_date = date
     current_invoice = None
@@ -482,7 +483,7 @@ class AccountController(object):
                     log(log.DEBUG, "deleting item for account [%s]", self.account.name)
                     invoice.delete_item(item)
                     invoice.save()
-        self.account.name = f'Deleted {self.account.name} {datetime.now()}'
+        self.account.name = f'{self.account.name}-Deleted-{datetime.now()}'
         self.account.deleted = True
         self.account.save()
         flash("Account successfully deleted.", "success")
