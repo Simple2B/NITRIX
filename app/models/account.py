@@ -4,6 +4,8 @@ from ..database import db
 from datetime import datetime, date
 from app.utils import ModelMixin
 from sqlalchemy.orm import relationship
+from sqlalchemy import desc
+from app.models.account_extensions import AccountExtension
 
 
 class Account(db.Model, ModelMixin):
@@ -37,7 +39,13 @@ class Account(db.Model, ModelMixin):
 
     @property
     def expiration_date(self):
-        return self.__add_months(self.activation_date, self.months)
+        enddate = AccountExtension.query.with_entities(AccountExtension.end_date).filter(
+            self.id == AccountExtension.account_id
+        ).order_by(desc(AccountExtension.end_date)).first()
+        if enddate:
+            return enddate.end_date
+        else:
+            return self.__add_months(self.activation_date, self.months)
 
     def to_dict(self) -> dict:
         return {
