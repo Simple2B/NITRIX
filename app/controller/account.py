@@ -52,11 +52,8 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .filter(ResellerProduct.months == account.months)
             .first()
         )
-    if mode == EXTENDED:
-        extension_date = account.extensions[-1].extension_date
-        invoice_date = extension_date.replace(day=1).strftime("%Y-%m-%d")
-    else:
-        invoice_date = account.activation_date.replace(day=1).strftime("%Y-%m-%d")
+    date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
+    invoice_date = date
     current_invoice = None
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
     for invoice in invoices:
@@ -485,6 +482,7 @@ class AccountController(object):
                     log(log.DEBUG, "deleting item for account [%s]", self.account.name)
                     invoice.delete_item(item)
                     invoice.save()
+        self.account.name = f'Deleted {self.account.name} {datetime.now()}'
         self.account.deleted = True
         self.account.save()
         flash("Account successfully deleted.", "success")
