@@ -37,7 +37,7 @@ def accounts():
     session["page"] = page
     query = Account.query.join(Product, Account.product_id == Product.id).join(
         Reseller, Account.reseller_id == Reseller.id
-    ).join(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
+    ).outerjoin(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
     if filter:
         filters = filter.split(";")
         for flt in filters:
@@ -52,9 +52,11 @@ def accounts():
                     AccountChanges.value_str.like(search)
                 )
             )
+
     ordered_accounts = query.order_by(Account.id.desc()).paginate(
         page, rows_per_page, False
     )
+    log(log.DEBUG, [acc for acc in ordered_accounts.items])
     next_url = (
         url_for("main.accounts", page=ordered_accounts.next_num)
         if ordered_accounts.has_next
@@ -65,6 +67,7 @@ def accounts():
         if ordered_accounts.has_prev
         else None
     )
+    log(log.DEBUG, filter)
     return render_template(
         "index.html",
         main_content="Accounts",
