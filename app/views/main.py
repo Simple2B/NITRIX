@@ -37,7 +37,7 @@ def accounts():
     session["page"] = page
     query = Account.query.join(Product, Account.product_id == Product.id).join(
         Reseller, Account.reseller_id == Reseller.id
-    ).join(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
+    ).outerjoin(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
     if filter:
         filters = filter.split(";")
         for flt in filters:
