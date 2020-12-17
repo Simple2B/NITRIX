@@ -137,11 +137,12 @@ def document_changes_if_exist(account, form):
     if account.product_id != form.product_id.data:
         # Changed account product
         new_product = Product.query.get(form.product_id.data).name
+        old_product = Product.query.get(account.product_id).name
         change = AccountChanges(account=account)
         change.user_id = session.get("_user_id")
         change.change_type = AccountChanges.ChangeType.product
         change.new_value_str = new_product
-        change.value_str = account.product.name
+        change.value_str = old_product
         change.save()
         flash(f"In account {account.name} product changed to {new_product}", "info")
     if account.phone_id != form.phone_id.data:
@@ -184,46 +185,46 @@ def document_changes_if_exist(account, form):
         change = AccountChanges(account=account)
         change.user_id = session.get("_user_id")
         change.change_type = AccountChanges.ChangeType.months
-        change.new_value_str = form.months
+        change.new_value_str = form.months.data
         change.value_str = account.months
         change.save()
-        flash(f"In account {account.name} months changed to {form.months}", "info")
+        flash(f"In account {account.name} months changed to {form.months.data}", "info")
 
-        form = AccountForm(
-            id=account.id,
-            name=account.name,
-            product_id=account.product_id,
-            phone_id=account.phone_id,
-            reseller_id=account.reseller_id,
-            sim=account.sim,
-            imei=account.imei,
-            comment=account.comment,
-            activation_date=account.activation_date,
-            months=account.months,
-        )
-        form.products = Product.query.filter(Product.deleted == False)  # noqa E712
-        form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
-        form.phones = all_phones()
-        form.extensions = AccountExtension.query.filter(
-            AccountExtension.account_id == form.id.data
-        ).all()
-        form.name_changes = (
-            AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-            .filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
-            .all()
-        )
-        form.sim_changes = (
-            AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-            .filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
-            .all()
-        )
-        form.is_edit = True
-        form.save_route = url_for("account.save")
-        form.delete_route = url_for("account.delete")
-        form.close_button = url_for("main.accounts")
-        form.reseller_name = account.reseller.name
-        form.history = AccountChanges.get_history(account)
-        return form
+    form = AccountForm(
+        id=account.id,
+        name=account.name,
+        product_id=account.product_id,
+        phone_id=account.phone_id,
+        reseller_id=account.reseller_id,
+        sim=account.sim,
+        imei=account.imei,
+        comment=account.comment,
+        activation_date=account.activation_date,
+        months=account.months,
+    )
+    form.products = Product.query.filter(Product.deleted == False)  # noqa E712
+    form.resellers = Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+    form.phones = all_phones()
+    form.extensions = AccountExtension.query.filter(
+        AccountExtension.account_id == form.id.data
+    ).all()
+    form.name_changes = (
+        AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
+        .filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
+        .all()
+    )
+    form.sim_changes = (
+        AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
+        .filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
+        .all()
+    )
+    form.is_edit = True
+    form.save_route = url_for("account.save")
+    form.delete_route = url_for("account.delete")
+    form.close_button = url_for("main.accounts")
+    form.reseller_name = account.reseller.name
+    form.history = AccountChanges.get_history(account)
+    return form
 
 
 class AccountController(object):
@@ -374,9 +375,8 @@ class AccountController(object):
         if self.account:
             document_changes_if_exist(self.account, form)
             if self.account.activation_date != form.activation_date.data:
-                invoice_date = self.account.activation_date.replace(day=1).strftime(
-                    "%Y-%m-%d"
-                )
+                date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
+                invoice_date = date
                 invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
                 for invoice in invoices:
                     if (
