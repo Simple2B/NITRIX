@@ -139,3 +139,5 @@ database-test.sqlite3
 
 .DS_Store
 /database-test.sqlite3-journal
+
+/logs/

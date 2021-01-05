@@ -476,13 +476,14 @@ class AccountController(object):
         change.new_value_str = "None"
         change.value_str = "Deleted"
         change.save()
-        invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
-        for invoice in invoices:
-            for item in invoice.invoice_items:
-                if self.account.name in item.get('notes'):
-                    log(log.DEBUG, "deleting item for account [%s]", self.account.name)
-                    invoice.delete_item(item)
-                    invoice.save()
+        # TODO: THIS IS BAD CODE - need todo this correct
+        # invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+        # for invoice in invoices:
+        #     for item in invoice.invoice_items:
+        #         if self.account.name in item.get('notes'):
+        #             log(log.DEBUG, "deleting item for account [%s]", self.account.name)
+        #             invoice.delete_item(item)
+        #             invoice.save()
         self.account.name = f'{self.account.name}-Deleted-{datetime.now()}'
         self.account.deleted = True
         self.account.save()
