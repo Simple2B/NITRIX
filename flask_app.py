@@ -164,6 +164,13 @@ def reset_db(test_data=False):
 
 
 @app.cli.command()
+def restore_ninja_db_invoice_items(test_data=False):
+    """Restore invoice items in the InvoiceNinja"""
+    from tools import restore_invoice_ninja_invoice_items
+    restore_invoice_ninja_invoice_items()
+
+
+@app.cli.command()
 def fix_activation_date():
     """Fix wrong activation date"""
     accounts = Account.query.all()
