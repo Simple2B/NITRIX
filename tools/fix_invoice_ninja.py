@@ -32,7 +32,11 @@ def restore_invoice_ninja_invoice_items():
                 return inv
         return None
 
+    total = len(accounts)
+    done = 0
     for account in accounts:
+        log(log.DEBUG, "Done %d from %d", done, total)
+        done += 1
         # Activation account
         if account.activation_date >= datetime.datetime(2020, 9, 1, 0, 0):
             invoice_date = account.activation_date.replace(day=1).strftime(
