@@ -4,6 +4,7 @@ from app.ninja import NinjaInvoice
 # from app.ninja import api
 from app.logger import log
 from app.utils import ninja_product_name
+from config import SIM_COST_DISCOUNT, SIM_COST_ACCOUNT_COMMENT
 
 
 def restore_invoice_ninja_invoice_items():
@@ -82,7 +83,7 @@ def restore_invoice_ninja_invoice_items():
                             notes,
                             cost=account.phone.price,
                         )
-                if account.comment.strip() == "IMPORTANT! Sim cost discounted.":
+                if account.comment.strip() == SIM_COST_ACCOUNT_COMMENT:
                     sim_cost = 'SIM Cost'
                     for invoice_item in invoice.invoice_items:
                         if notes == invoice_item['notes'] and sim_cost == invoice_item["product_key"]:
@@ -93,7 +94,7 @@ def restore_invoice_ninja_invoice_items():
                         invoice.add_item(
                             sim_cost,
                             notes,
-                            cost=-10,
+                            cost=SIM_COST_DISCOUNT,
                         )
 
             # 3 get activation sim discount invoice item note
