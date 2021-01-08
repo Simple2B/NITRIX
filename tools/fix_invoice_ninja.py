@@ -1,7 +1,10 @@
-from app.models.account import Account
+import datetime
+from app.models import Account, ResellerProduct
 from app.ninja import NinjaInvoice
 # from app.ninja import api
 from app.logger import log
+from app.utils import ninja_product_name
+
 
 
 def restore_invoice_ninja_invoice_items():
@@ -18,28 +21,69 @@ def restore_invoice_ninja_invoice_items():
 
     for account in accounts:
         # Activation account
-        invoice_date = account.activation_date.replace(day=1).strftime(
-            "%Y-%m-%d"
-        )
-        inv = get_invoice(invoice_date, account.reseller.ninja_client_id)
-        if not inv:
-            log(log.ERROR, "Could not find invoice for acc [%s]. Activation", account.name)
-        else:
-            invoice = inv["invoice"]
-            activation_exists = False
-            for invoice_items in invoice.invoice_items:
-                if account.name in invoice_items['notes']:
-                    activation_exists = True
-                    log(log.DEBUG, "Found activation for [%s] in invoice [%s]", account.name, invoice.id)
-                if account.name in invoice_items['notes']:
-                    pass
-            if not activation_exists:
-                log(log.DEBUG, "No activation for [%s] in invoice [%s]", account.name, invoice.id)
-                pass
+        if account.activation_date >= datetime.datetime(2020, 9, 1, 0, 0):
+            invoice_date = account.activation_date.replace(day=1).strftime(
+                "%Y-%m-%d"
+            )
+            inv = get_invoice(invoice_date, account.reseller.ninja_client_id)
+            if not inv:
+                log(log.ERROR, "Could not find invoice for acc [%s]. Activation", account.name)
+            else:
+                invoice = inv["invoice"]
+                notes = f"{account.name}.  Activated: {account.activation_date.strftime('%Y-%m-%d')}"
 
-            # 1 get activation invoice item note
-            # 2 get activation sim discount invoice item note
-            # 3 get activation phone invoice item note
+                reseller_product = (
+                    ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
+                    .filter(ResellerProduct.product_id == account.product_id)
+                    .filter(ResellerProduct.months == account.months)
+                    .first()
+                )
+                if not reseller_product:
+                    # Locking for this product in NITRIX reseller
+                    reseller_product = (
+                        ResellerProduct.query.filter(ResellerProduct.reseller_id == 1)
+                        .filter(ResellerProduct.product_id == account.product_id)
+                        .filter(ResellerProduct.months == account.months)
+                        .first()
+                    )
+                product_key = ninja_product_name(account.product.name, account.months)
+                for invoice_item in invoice.invoice_items:
+                    if notes == invoice_item['notes'] and product_key == invoice_item["product_key"]:
+                        log(log.DEBUG, "Found activation for [%s] in invoice [%s]", account.name, invoice.id)
+                        break
+                    else:
+                        extended_notes = f"{account.name}.  Extended: {account.activation_date.strftime('%Y-%m-%d')}"
+                        if extended_notes == invoice_item['notes'] and product_key == invoice_item["product_key"]:
+                            log(
+                                    log.DEBUG,
+                                    "Found extention as activation for [%s] in invoice [%s]",
+                                    account.name,
+                                    invoice.id
+                                )
+                            break
+                else:
+                    log(log.DEBUG, "RESTORE activation for [%s] in invoice [%s]", account.name, invoice.id)
+                    invoice.add_item(
+                        product_key,
+                        notes,
+                        cost=reseller_product.init_price if reseller_product else 0,
+                    )
+                    inv["fixed"] = True
+
+                if account.phone.name != "None":
+                    phone_name = f"Phone-{account.phone.name}"
+                    for invoice_items in invoice.invoice_items:
+                        if notes == invoice_item['notes'] and phone_name == invoice_item["product_key"]:
+                            log(log.DEBUG, "Found phone item for [%s] in invoice [%s]", account.name, invoice.id)
+                            break
+                    else:
+                        invoice.add_item(
+                            phone_name,
+                            notes,
+                            cost=account.phone.price,
+                        )
+
+            # 3 get activation sim discount invoice item note
             pass
         # Account extensions
         # for extension in account.extensions:
