@@ -77,7 +77,7 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             added_item = current_invoice.add_item(
                 ninja_product_name(account.product.name, extension_month),
                 f'{account.name}.  {mode}: {extension_date.strftime("%Y-%m-%d")}',
-                cost=reseller_product.init_price if reseller_product else 0,
+                cost=reseller_product.ext_price if reseller_product else 0,
             )
         else:
             added_item = current_invoice.add_item(
