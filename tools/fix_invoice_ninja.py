@@ -6,7 +6,6 @@ from app.logger import log
 from app.utils import ninja_product_name
 
 
-
 def restore_invoice_ninja_invoice_items():
     accounts = [i for i in Account.query.all() if not i.deleted]
     invoices = [dict(invoice=i, fixed=False) for i in NinjaInvoice.all() if not i.is_deleted]
@@ -72,35 +71,31 @@ def restore_invoice_ninja_invoice_items():
 
                 if account.phone.name != "None":
                     phone_name = f"Phone-{account.phone.name}"
-                    for invoice_items in invoice.invoice_items:
+                    for invoice_item in invoice.invoice_items:
                         if notes == invoice_item['notes'] and phone_name == invoice_item["product_key"]:
                             log(log.DEBUG, "Found phone item for [%s] in invoice [%s]", account.name, invoice.id)
                             break
                     else:
+                        log(log.DEBUG, "Restore phone item  for [%s] in invoice [%s]", account.name, invoice.id)
                         invoice.add_item(
                             phone_name,
                             notes,
                             cost=account.phone.price,
                         )
+                if account.comment.strip() == "IMPORTANT! Sim cost discounted.":
+                    sim_cost = 'SIM Cost'
+                    for invoice_item in invoice.invoice_items:
+                        if notes == invoice_item['notes'] and sim_cost == invoice_item["product_key"]:
+                            log(log.DEBUG, "Found sim cost item for [%s] in invoice [%s]", account.name, invoice.id)
+                            break
+                    else:
+                        log(log.DEBUG, "Restore sim cost item for [%s] in invoice [%s]", account.name, invoice.id)
+                        invoice.add_item(
+                            sim_cost,
+                            notes,
+                            cost=-10,
+                        )
 
             # 3 get activation sim discount invoice item note
             pass
-        # Account extensions
-        # for extension in account.extensions:
-        #     invoice_date = extension.extension_date.replace(day=1).strftime("%Y-%m-%d")
-        #     inv = get_invoice(invoice_date, account.reseller.name)
-        #     if not inv:
-        #         log(log.ERROR, "Could not find invoice for acc [%s]. Extension", account.name)
-        #     else:
-        #         pass
-
-        # for invoice in invoices:
-        #     if (
-        #         invoice.client_id == account.reseller.ninja_client_id
-        #         and account_invoice_date == invoice.invoice_date
-        #         and account_invoice_date > "2020-08-01"
-        #     ):
-        #         log(log.DEBUG, "Client id is [%s]", invoice.invoice_date)
-        #         for items in invoice.invoice_items:
-        #             pass
     pass
