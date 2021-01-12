@@ -59,7 +59,7 @@ class NinjaInvoice(object):
         ]
 
     def save(self):
-        log(log.DEBUG, "NinjaApi.update_product %d", self.id)
+        log(log.DEBUG, "NinjaApi.update_invoice %d", self.id)
         api_result = api.do_put(
             "{}invoices/{}".format(api.BASE_URL, self.id), **(self.to_dict())
         )

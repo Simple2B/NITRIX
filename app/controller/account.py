@@ -374,7 +374,7 @@ class AccountController(object):
         self.new_account = False
         if self.account:
             document_changes_if_exist(self.account, form)
-            if self.account.activation_date != form.activation_date.data:
+            if self.account.activation_date.date() != form.activation_date.data:
                 date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
                 invoice_date = date
                 invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
@@ -399,16 +399,16 @@ class AccountController(object):
                                 invoice.save()
                                 break
                         break
-            self.account.name = form.name.data
-            self.account.activation_date = form.activation_date.data
-            self.account.product_id = form.product_id.data
-            self.account.reseller_id = form.reseller_id.data
-            self.account.phone_id = form.phone_id.data
-            self.account.sim = form.sim.data
-            self.account.imei = form.imei.data
-            self.account.comment = form.comment.data
-            self.account.months = form.months.data
-            add_ninja_invoice(self.account, True, "Activated")
+                self.account.name = form.name.data
+                self.account.activation_date = form.activation_date.data
+                self.account.product_id = form.product_id.data
+                self.account.reseller_id = form.reseller_id.data
+                self.account.phone_id = form.phone_id.data
+                self.account.sim = form.sim.data
+                self.account.imei = form.imei.data
+                self.account.comment = form.comment.data
+                self.account.months = form.months.data
+                add_ninja_invoice(self.account, True, "Activated")
 
         else:
             if Account.query.filter(
