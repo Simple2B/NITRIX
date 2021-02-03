@@ -38,12 +38,20 @@ def all_phones():
 
 
 def add_ninja_invoice(account: Account, is_new: bool, mode: str):
-    reseller_product = (
-        ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
-        .filter(ResellerProduct.product_id == account.product_id)
-        .filter(ResellerProduct.months == account.months)
-        .first()
-    )
+    if mode == EXTENDED:
+        reseller_product = (
+            ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
+            .filter(ResellerProduct.product_id == account.extensions[-1].product_id)
+            .filter(ResellerProduct.months == account.extensions[-1].months)
+            .first()
+        )
+    else:
+        reseller_product = (
+            ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
+            .filter(ResellerProduct.product_id == account.product_id)
+            .filter(ResellerProduct.months == account.months)
+            .first()
+        )
     if not reseller_product:
         # Locking for this product in NITRIX reseller
         reseller_product = (
@@ -74,10 +82,11 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
         if mode == EXTENDED:
             extension_date = account.extensions[-1].extension_date
             extension_month = account.extensions[-1].months
+            ext_price = reseller_product.ext_price
             added_item = current_invoice.add_item(
                 ninja_product_name(account.product.name, extension_month),
                 f'{account.name}.  {mode}: {extension_date.strftime("%Y-%m-%d")}',
-                cost=reseller_product.ext_price if reseller_product else 0,
+                cost=ext_price if reseller_product else 0,
             )
         else:
             added_item = current_invoice.add_item(
