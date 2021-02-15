@@ -10,7 +10,7 @@ from app.controller.account import AccountController
 account_blueprint = Blueprint("account", __name__)
 
 
-@account_blueprint.route("/account_details")
+@account_blueprint.route("/account_details", methods=["GET"])
 @login_required
 def edit():
     log(log.INFO, "/account_details")
