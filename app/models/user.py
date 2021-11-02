@@ -51,13 +51,13 @@ class User(db.Model, UserMixin, ModelMixin):
         self.password_hash = generate_password_hash(password)
 
     def get_totp_uri(self):
-        """ generate authentication URI for Google Authenticator """
+        """generate authentication URI for Google Authenticator"""
         return "otpauth://totp/{0}:{1}?secret={2}&issuer={0}".format(
             current_app.config["APP_NAME"], self.name, self.otp_secret
         )
 
     def verify_totp(self, token):
-        """ validates 6-digit OTP code retrieved from Google """
+        """validates 6-digit OTP code retrieved from Google"""
         return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
@@ -66,8 +66,8 @@ class User(db.Model, UserMixin, ModelMixin):
         if user is not None and check_password_hash(user.password, password):
             return user
 
-    def __str__(self):
-        return f"<User: {self.name}>"
+    def __repr__(self):
+        return f"<{self.id} {self.name}>"
 
     def to_dict(self) -> dict:
         return {

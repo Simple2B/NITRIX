@@ -17,7 +17,7 @@ def edit():
     controller = AccountController(request.args.get("id"))
     if controller.account:
         form = controller.account_form_edit()
-        form.close_button = url_for("main.accounts", page=session.get('page', 1))
+        form.close_button = url_for("main.accounts", page=session.get("page", 1))
         return render_template("account_details.html", form=form)
     else:
         form = controller.account_form_new(
@@ -27,7 +27,7 @@ def edit():
             request.args.get("prev_month"),
             request.args.get("prev_simcost"),
         )
-        form.close_button = url_for("main.accounts", page=session.get('page', 1))
+        form.close_button = url_for("main.accounts", page=session.get("page", 1))
         return render_template("account_details.html", form=form)
 
 
@@ -37,6 +37,7 @@ def save():
     form = AccountForm(request.form)
     if form.validate_on_submit():
         controller = AccountController(form.id.data)
+        log(log.INFO, "Save account %d", form.id.data)
         account = controller.save(form)
         if not account:
             return redirect(url_for("account.edit", id=controller.account.id))
@@ -72,7 +73,7 @@ def delete():
 @account_blueprint.route("/account_import", methods=["POST"])
 @login_required
 def account_import():
-    """ Provides validation for imported CSV file """
+    """Provides validation for imported CSV file"""
 
     if request.method == "POST":
         if "csv-file" not in request.files:

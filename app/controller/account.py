@@ -40,14 +40,18 @@ def all_phones():
 def add_ninja_invoice(account: Account, is_new: bool, mode: str):
     if mode == EXTENDED:
         reseller_product = (
-            ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
+            ResellerProduct.query.filter(
+                ResellerProduct.reseller_id == account.reseller_id
+            )
             .filter(ResellerProduct.product_id == account.extensions[-1].product_id)
             .filter(ResellerProduct.months == account.extensions[-1].months)
             .first()
         )
     else:
         reseller_product = (
-            ResellerProduct.query.filter(ResellerProduct.reseller_id == account.reseller_id)
+            ResellerProduct.query.filter(
+                ResellerProduct.reseller_id == account.reseller_id
+            )
             .filter(ResellerProduct.product_id == account.product_id)
             .filter(ResellerProduct.months == account.months)
             .first()
@@ -61,10 +65,12 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .first()
         )
     # Invoice_date is always the first day of current month
-    date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
+    date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
     invoice_date = date
     current_invoice = None
+    log(log.DEBUG, "Get all invoices...")
     invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
+    log(log.DEBUG, "Got [%s] invoices!", len(invoices))
     for invoice in invoices:
         if (
             invoice.invoice_date == invoice_date
@@ -392,7 +398,7 @@ class AccountController(object):
             self.account.months = form.months.data
             self.account.name = form.name.data
             if self.account.activation_date.date() != form.activation_date.data:
-                date = datetime.today().replace(day=1).strftime('%Y-%m-%d')
+                date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
                 invoice_date = date
                 invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
                 for invoice in invoices:
@@ -444,6 +450,7 @@ class AccountController(object):
                 months=form.months.data,
             )
             flash(f"Account {self.account.name} added", "info")
+            log(log.INFO, "Created account: [%s]", self.account.name)
         if not 0 < self.account.months <= 12:
             flash("Months must be in 1-12", "danger")
             return False
@@ -465,9 +472,10 @@ class AccountController(object):
         return self.account
 
     def connect_to_ninja(self, account):
+        log(log.DEBUG, "connect_to_ninja account:%d", account.id)
         if ninja.configured:
-            nina_api_result = add_ninja_invoice(account, self.new_account, "Activated")
-            if not nina_api_result:
+            ninja_api_result = add_ninja_invoice(account, self.new_account, "Activated")
+            if not ninja_api_result:
                 log(
                     log.ERROR,
                     "Could not register account as invoice in Invoice Ninja!",
@@ -493,7 +501,7 @@ class AccountController(object):
         #             log(log.DEBUG, "deleting item for account [%s]", self.account.name)
         #             invoice.delete_item(item)
         #             invoice.save()
-        self.account.name = f'{self.account.name}-Deleted-{datetime.now()}'
+        self.account.name = f"{self.account.name}-Deleted-{datetime.now()}"
         self.account.deleted = True
         self.account.save()
         flash("Account successfully deleted.", "success")
