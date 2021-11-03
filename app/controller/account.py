@@ -78,9 +78,11 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
         ):
             # found invoice
             current_invoice = invoice
+            log(log.DEBUG, "add_ninja_invoice: found invoice [%s]", invoice.id)
             break
     else:
         # need a new invoice
+        log(log.DEBUG, "add_ninja_invoice: need create new invoice!")
         current_invoice = NinjaInvoice.add(
             account.reseller.ninja_client_id, invoice_date
         )
