@@ -209,7 +209,7 @@
           "submit",
           () => {
             document.querySelectorAll(".btn-success").forEach(btn => {
-              btn.setAttribute("disabled", true);
+              btn.style.visibility = "hidden";
             });
           }
         );
