@@ -17,6 +17,7 @@ class BaseConfig(object):
     CSS_FOLDER = "css"
     JAVASCRIPT_FOLDER = "js"
     IMAGES_FOLDER = "images"
+    DISABLE_OTP = bool(int(os.environ.get("DISABLE_OTP", "0")))
 
     @staticmethod
     def configure(app):

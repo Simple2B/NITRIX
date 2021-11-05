@@ -7,6 +7,7 @@ from flask import (
     request,
     session,
     abort,
+    current_app,
 )
 from flask_login import login_user, logout_user, login_required
 from io import BytesIO
@@ -30,7 +31,11 @@ def login():
     if form.validate_on_submit():
         log(log.INFO, "username password form validated")
         user = User.authenticate(form.user_name.data, form.password.data)
-        if user is not None:
+        if user:
+            if current_app.config["DISABLE_OTP"]:
+                login_user(user)
+                flash("Login successful.", "success")
+                return redirect(url_for("main.index"))
             session["id"] = user.id
             # check if user has OTP activated
             if user.otp_active:
@@ -145,7 +150,7 @@ def qrcode():
 
 @auth_blueprint.route("/otp_set_up_verification")
 def otp_set_up_verification():
-    """ This route finalises 2FA process set up """
+    """This route finalises 2FA process set up"""
     user = User.query.filter(User.id == session.get("id")).first()
     # remove user id from session for added security
     if not user.otp_active:
