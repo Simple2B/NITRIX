@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 services:
   db:
     image: postgres:14
@@ -10,43 +10,6 @@ services:
       POSTGRES_DB: nitrix
     ports:
       - 127.0.0.1:54321:5432
-
-  # TODO: get solution from
-  # https://github.com/invoiceninja/dockerfiles/blob/master/docker-compose.yml
-  ninja_db:
-    image: mariadb:10
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ninja
-      MYSQL_PASSWORD: ninja
-      MYSQL_DATABASE: ninja
-      MYSQL_USER: ninja
-    volumes:
-      - db_data_ninja:/var/lib/mysql
-
-  ninja:
-    image: invoiceninja/invoiceninja:5.3
-    # restart: always
-    # volumes:
-    #   - ./invoiceninja/public:/var/app/public
-    #   - ./invoiceninja/storage:/var/app/storage
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=0
-      - APP_URL=${NINJA_URL}
-      - APP_KEY=${NINJA_API_TOKEN}
-      - APP_CIPHER=AES-256-CBC
-      - DB_TYPE=mysql
-      - DB_STRICT=false
-      - DB_HOST=ninja_db
-      - DB_DATABASE=ninja
-      - DB_USERNAME=ninja
-      - DB_PASSWORD=ninja
-    ports:
-      - 127.0.0.1:8080:80
-      - 127.0.0.1:9000:9000
-    depends_on:
-      - ninja_db
 
   app:
     build: .
@@ -67,4 +30,3 @@ services:
 
 volumes:
   db_data:
-  db_data_ninja:
