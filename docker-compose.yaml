@@ -16,8 +16,8 @@ services:
     # restart: always
     expose:
       - 5000
-    volumes:
-      - ./:/app
+    # volumes:
+    #   - ./:/app
     depends_on:
       - db
     environment:
@@ -25,8 +25,8 @@ services:
       - FLASK_APP=flask_app
       - FLASK_DEBUG=0
     ports:
-      - 127.0.0.1:5555:5000
-    command: flask run -h 0.0.0.0
+      - 127.0.0.1:7777:5000
+    command: poetry run flask run -h 0.0.0.0
 
 volumes:
   db_data:
