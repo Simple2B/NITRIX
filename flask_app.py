@@ -12,6 +12,7 @@ from app.models import (
     AccountExtension,
 )
 from app.ninja import api as ninja
+from config import BaseConfig as conf
 
 app = create_app()
 
@@ -24,7 +25,7 @@ def get_context():
 
 
 def create_database(test_data=False):
-    """ build database """
+    """build database"""
 
     def add_reseller_product(product, months, initprice, extprice, reseller):
         reseller_product = ResellerProduct(
@@ -131,8 +132,8 @@ def create_database(test_data=False):
     db.create_all()
     Phone(name="None", price=0.00).save(False)
     User(
-        name="admin",
-        password="ZAQ!xsw2",
+        name=conf.ADMIN_NAME,
+        password=conf.ADMIN_PASSWORD,
         user_type=User.Type.super_admin,
         activated=User.Status.active,
     ).save(False)
@@ -167,6 +168,7 @@ def reset_db(test_data=False):
 def restore_ninja_db_invoice_items(test_data=False):
     """Restore invoice items in the InvoiceNinja"""
     from tools import restore_invoice_ninja_invoice_items
+
     restore_invoice_ninja_invoice_items()
 
 
@@ -175,12 +177,16 @@ def fix_activation_date():
     """Fix wrong activation date"""
     accounts = Account.query.all()
     for account in accounts:
-        extensions = AccountExtension.query.filter(
-            AccountExtension.account_id == account.id
-        ).order_by(AccountExtension.extension_date.asc()).first()
+        extensions = (
+            AccountExtension.query.filter(AccountExtension.account_id == account.id)
+            .order_by(AccountExtension.extension_date.asc())
+            .first()
+        )
         if extensions:
             if account.activation_date > extensions.extension_date:
-                swap_value = account.activation_date - relativedelta(months=extensions.months)
+                swap_value = account.activation_date - relativedelta(
+                    months=extensions.months
+                )
                 account.activation_date = extensions.extension_date
                 extensions.extension_date = swap_value
                 db.session.add(account)
