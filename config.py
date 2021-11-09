@@ -1,6 +1,8 @@
 import os
+from dotenv import load_dotenv
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(os.path.dirname(BASE_DIR), ".env"))
 
 
 class BaseConfig(object):
@@ -18,6 +20,8 @@ class BaseConfig(object):
     JAVASCRIPT_FOLDER = "js"
     IMAGES_FOLDER = "images"
     DISABLE_OTP = bool(int(os.environ.get("DISABLE_OTP", "0")))
+    ADMIN_NAME = os.environ.get("ADMIN_NAME", "admin")
+    ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "1234")
 
     @staticmethod
     def configure(app):
@@ -31,7 +35,7 @@ class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEVELOP_DATABASE_URL",
-        "sqlite:///" + os.path.join(base_dir, "database-develop.sqlite3"),
+        "sqlite:///" + os.path.join(BASE_DIR, "database-develop.sqlite3"),
     )
 
 
@@ -42,7 +46,7 @@ class TestingConfig(BaseConfig):
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "TEST_DATABASE_URL",
-        "sqlite:///" + os.path.join(base_dir, "database-test.sqlite3"),
+        "sqlite:///" + os.path.join(BASE_DIR, "database-test.sqlite3"),
     )
 
 
@@ -50,7 +54,7 @@ class ProductionConfig(BaseConfig):
     """Production configuration."""
 
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "sqlite:///" + os.path.join(base_dir, "database.sqlite3")
+        "DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "database.sqlite3")
     )
     WTF_CSRF_ENABLED = True
 

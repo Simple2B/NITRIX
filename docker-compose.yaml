@@ -7,9 +7,11 @@ services:
       - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: nitrix
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+
     ports:
-      - 127.0.0.1:54321:5432
+      - 127.0.0.1:${LOCAL_DB_PORT}:5432
 
   app:
     build: .
@@ -23,10 +25,10 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_APP=flask_app
-      - FLASK_DEBUG=0
+      - FLASK_DEBUG=1
     ports:
       - 127.0.0.1:7777:5000
-    command: poetry run flask run -h 0.0.0.0
+    command: ./start_server.sh
 
 volumes:
   db_data:
