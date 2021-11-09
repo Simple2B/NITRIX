@@ -12,7 +12,7 @@
         <p>Open your Google Authenticator and enter the 6-digit OTP code below:</p>
       </div>
       <form class="form" role="form" method="post">
-        {{ form.csrf_token() }}
+        {{ form.hidden_tag() }}
         <div class="form-group">
           {{form.token(class='form-control')}}
         </div>
