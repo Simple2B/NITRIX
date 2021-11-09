@@ -144,10 +144,10 @@ def create_database(test_data=False):
         activated=User.Status.active,
     ).save(False)
     add_reseller_with_test_products(name="NITRIX", comments="Main reseller")
-    add_phone(name="Samsung", price=54.00)
-    add_phone(name="Nokia", price=38.00)
-    add_phone(name="Lg", price=30.00)
     if test_data:
+        add_phone(name="Samsung", price=54.00)
+        add_phone(name="Nokia", price=38.00)
+        add_phone(name="Lg", price=30.00)
         for n in range(10):
             add_reseller_with_test_products(
                 name=f"Reseller {n + 1}", comments=f"Test reseller {n + 1}"
@@ -161,6 +161,13 @@ def create_database(test_data=False):
 def reset_db(test_data=False):
     """Reset the current database."""
     db.drop_all()
+    create_database(test_data)
+
+
+@app.cli.command()
+@click.option("--test-data", is_flag=True, help="if include test data")
+def init_db(test_data=False):
+    """Initialization the current database."""
     create_database(test_data)
 
 
