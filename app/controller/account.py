@@ -1,6 +1,6 @@
 import csv
 from io import TextIOWrapper
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from flask import flash, url_for, session
 from flask import current_app as app
 from flask_login import current_user
@@ -65,7 +65,9 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .first()
         )
     # Invoice_date is always the first day of current month
-    date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
+    # date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
+    # day of monday on this week
+    date = get_monday(datetime.today()).strftime("%Y-%m-%d")
     invoice_date = date
     current_invoice = None
     log(log.DEBUG, "Get all invoices...")
@@ -400,7 +402,9 @@ class AccountController(object):
             self.account.months = form.months.data
             self.account.name = form.name.data
             if self.account.activation_date.date() != form.activation_date.data:
-                date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
+                # date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
+                # day of monday on this week
+                date = get_monday(datetime.today()).strftime("%Y-%m-%d")
                 invoice_date = date
                 invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
                 for invoice in invoices:
@@ -572,3 +576,10 @@ class AccountController(object):
         if not app.config["TESTING"]:
             flash("Accounts are successfully imported", "info")
         return True
+
+
+def get_monday(day: date):
+    """get date of monday on this week"""
+    day_of_week = day.isocalendar()[2]
+    delta = timedelta(days=(day_of_week - 1))
+    return day - delta
