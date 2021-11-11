@@ -1,8 +1,9 @@
-import enum
-from ..database import db
-from sqlalchemy import Enum
 from datetime import datetime
+import enum
+from sqlalchemy import Enum
 from sqlalchemy.orm import relationship
+
+from ..database import db
 from app.utils import ModelMixin
 
 
@@ -19,9 +20,11 @@ class HistoryChange(db.Model, ModelMixin):
 
     class EditType(enum.Enum):
         creation_account = "creation_account"
-        # extension_account = "extension_account"
         deletion_account = "deletion_account"
         changes_account = "changes_account"
+        extension_account_new = "extension_account_new"
+        extensions_account_change = "extensions_account_change"
+        extensions_account_delete = "extensions_account_delete"
         creation_reseller = "creation_reseller"
         deletion_reseller = "deletion_reseller"
         changes_reseller = "changes_reseller"
@@ -40,13 +43,13 @@ class HistoryChange(db.Model, ModelMixin):
     before_value_str = db.Column(db.String(64))
     after_value_str = db.Column(db.String(64))
     synced = db.Column(db.Boolean, default=False)
-    user = relationship("User", backref=db.backref("changes", lazy="dynamic"))
+    user = relationship("User", viewonly=True)
 
     @property
     def message_by_account(self):
         if self.change_type == self.EditType.creation_account:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Created by user [{self.user.name}]"
-        elif self.change_type == self.EditType.deletion_account:
+        if self.change_type == self.EditType.deletion_account:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted by user [{self.user.name}]"
         return "[{}] User [{}] changed [{}] value from [{}] to [{}]".format(
             self.date.strftime("%Y/%m/%d, %H:%M:%S"),
@@ -55,20 +58,6 @@ class HistoryChange(db.Model, ModelMixin):
             self.before_value_str,
             self.after_value_str,
         )
-
-    # @property
-    # def message_by_user(self):
-    #     if self.change_type == self.ChangeType.created:
-    #         return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Created account [{self.account.name}]"
-    #     elif self.change_type == self.ChangeType.deleted:
-    #         return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted account [{self.account.name}]"
-    #     return "[{}] Changed [{}] value from [{}] to [{}] in account [{}]".format(
-    #         self.date.strftime("%Y/%m/%d, %H:%M:%S"),
-    #         self.change_type.value,
-    #         self.value_str,
-    #         self.new_value_str,
-    #         self.account.name,
-    #     )
 
     @classmethod
     def get_history(cls, account):
