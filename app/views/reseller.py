@@ -45,13 +45,6 @@ def edit():
         form.delete_route = url_for("reseller.delete")
         form.close_button = url_for("main.resellers")
         form.product_forms = all_reseller_forms(reseller)
-        HistoryChange(
-            change_type=HistoryChange.EditType.changes_reseller,
-            item_id=reseller.id,  # request.args["id"] ?? from.id.data?
-            value_name="reseller",
-            before_value_str="",  # ??? what is edited
-            after_value_str="",  # "None" ?? ""
-        ).save()
         log(log.DEBUG, "products: %d", len(form.product_forms))
         return render_template("reseller_add_edit.html", form=form)
     else:
@@ -74,19 +67,20 @@ def save():
             if reseller is None:
                 flash("Wrong reseller id.", "danger")
                 return redirect(url_for("main.resellers"))
-            for k in request.form.keys():
-                reseller.__setattr__(k, form.__getattribute__(k).data)
+            HistoryChange(
+                change_type=HistoryChange.EditType.changes_reseller,
+                item_id=reseller.id,
+                value_name="name",
+                before_value_str=reseller.name,
+                after_value_str=form.name.data,
+            ).save()
+            reseller.name = form.name.data
+            reseller.save()
         else:
-            reseller = Reseller(
-                name=form.name.data,
-                status=form.status.data,
-                comments=form.comments.data,
-            )
             # Check uniqueness of Reseller name
-            # ????  DOUBLE creation of reseller
-            if Reseller.query.filter(Reseller.name == reseller.name).first():
+            if Reseller.query.filter(Reseller.name == form.name.data).first():
                 flash("This name is already taken!Try again", "danger")
-                return redirect(url_for("reseller.edit", id=reseller.id))
+                return redirect(url_for("reseller.edit", id=0))
             ninja_client = (
                 ninja.add_client(name=form.name.data) if ninja.configured else None
             )
@@ -96,15 +90,11 @@ def save():
                 status=form.status.data,
                 comments=form.comments.data,
                 ninja_client_id=ninja_client_id,
-            )
-        reseller.save()
-        HistoryChange(
-            change_type=HistoryChange.EditType.creation_reseller,
-            item_id=reseller.id,  # request.args["id"] ?? from.id.data?
-            value_name="reseller",
-            before_value_str="",  # ?? placed correct?
-            after_value_str="Created",  # "None" ?? ""
-        ).save()
+            ).save()
+            HistoryChange(
+                change_type=HistoryChange.EditType.creation_reseller,
+                item_id=reseller.id,
+            ).save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
             if request.form["submit"] == "save_and_edit":
@@ -127,16 +117,10 @@ def delete():
         reseller.save()
         HistoryChange(
             change_type=HistoryChange.EditType.deletion_reseller,
-            item_id=int(request.args["id"]),
-            value_name="reseller",
-            before_value_str="",  # ?? placed correct?
-            after_value_str="Deleted",  # "None" ?? ""
+            item_id=reseller.id,
         ).save()
-
         if ninja.configured:
-            ninja.delete_client(
-                client_id=reseller.ninja_client_id
-            )  # ??? ninja sync will do it?
+            ninja.delete_client(client_id=reseller.ninja_client_id)
 
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")

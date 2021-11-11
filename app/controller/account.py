@@ -208,8 +208,8 @@ def document_changes_if_exist(account, form):
             change_type=HistoryChange.EditType.changes_account,
             item_id=account.id,
             value_name="months",
-            before_value_str=account.months,
-            after_value_str=form.months.data,
+            before_value_str=str(account.months),
+            after_value_str=str(form.months.data),
         ).save()
         flash(f"In account {account.name} months changed to {form.months.data}", "info")
 
@@ -233,6 +233,7 @@ def document_changes_if_exist(account, form):
     ).all()
     form.name_changes = (
         HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+        .filter(HistoryChange.change_type == HistoryChange.EditType.changes_account)
         .filter(HistoryChange.value_name == "name")
         .all()
     )
@@ -330,6 +331,7 @@ class AccountController(object):
         ).all()
         form.name_changes = (
             HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+            .filter(HistoryChange.change_type == HistoryChange.EditType.changes_account)
             .filter(HistoryChange.value_name == "name")
             .all()
         )
@@ -467,9 +469,6 @@ class AccountController(object):
             HistoryChange(
                 change_type=HistoryChange.EditType.creation_account,
                 item_id=self.account.id,
-                value_name="account",
-                before_value_str="[Empty]",  # "None" ??
-                after_value_str="Created",
             ).save()
             self.connect_to_ninja(self.account)
         reseller = Reseller.query.filter(
@@ -499,9 +498,6 @@ class AccountController(object):
         HistoryChange(
             change_type=HistoryChange.EditType.deletion_account,
             item_id=self.account.id,
-            value_name="account",
-            before_value_str="Deleted",  # ??
-            after_value_str="[Empty]",  # "None" ??
         ).save()
 
         # TODO: THIS IS BAD CODE - need todo this correct
