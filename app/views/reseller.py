@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
-from flask_login import login_required
-from app.models import Reseller
+from flask_login import login_required, current_user
+from app.models import Reseller, HistoryChange
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
@@ -45,6 +45,13 @@ def edit():
         form.delete_route = url_for("reseller.delete")
         form.close_button = url_for("main.resellers")
         form.product_forms = all_reseller_forms(reseller)
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_reseller,
+            item_id=reseller.id,  # request.args["id"] ?? from.id.data?
+            value_name="reseller",
+            before_value_str="",  # ??? what is edited
+            after_value_str="",  # "None" ?? ""
+        ).save()
         log(log.DEBUG, "products: %d", len(form.product_forms))
         return render_template("reseller_add_edit.html", form=form)
     else:
@@ -76,6 +83,7 @@ def save():
                 comments=form.comments.data,
             )
             # Check uniqueness of Reseller name
+            # ????  DOUBLE creation of reseller
             if Reseller.query.filter(Reseller.name == reseller.name).first():
                 flash("This name is already taken!Try again", "danger")
                 return redirect(url_for("reseller.edit", id=reseller.id))
@@ -90,6 +98,13 @@ def save():
                 ninja_client_id=ninja_client_id,
             )
         reseller.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.creation_reseller,
+            item_id=reseller.id,  # request.args["id"] ?? from.id.data?
+            value_name="reseller",
+            before_value_str="",  # ?? placed correct?
+            after_value_str="Created",  # "None" ?? ""
+        ).save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
             if request.form["submit"] == "save_and_edit":
@@ -110,8 +125,19 @@ def delete():
         reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
         reseller.deleted = True
         reseller.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_reseller,
+            item_id=int(request.args["id"]),
+            value_name="reseller",
+            before_value_str="",  # ?? placed correct?
+            after_value_str="Deleted",  # "None" ?? ""
+        ).save()
+
         if ninja.configured:
-            ninja.delete_client(client_id=reseller.ninja_client_id)
+            ninja.delete_client(
+                client_id=reseller.ninja_client_id
+            )  # ??? ninja sync will do it?
+
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.resellers"))
