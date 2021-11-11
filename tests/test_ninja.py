@@ -30,11 +30,11 @@ def cleanup(api):
 def api():
     api = NinjaApi()
     yield api
-    cleanup(api)
+    # cleanup(api)
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_clients(api):
+def test_clients(api: NinjaApi):
     client = api.add_client(TEST_CLIENT_NAME)
     clients = api.clients
     assert clients
@@ -45,14 +45,14 @@ def test_clients(api):
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_add_delete_client(api):
+def test_add_delete_client(api: NinjaApi):
     client = api.add_client(TEST_CLIENT_NAME)
     assert client and client.name == TEST_CLIENT_NAME
     assert api.delete_client(client.id)
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_products(api):
+def test_products(api: NinjaApi):
     product = api.add_product(
         product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST
     )
@@ -65,7 +65,7 @@ def test_products(api):
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_add_delete_product(api):
+def test_add_delete_product(api: NinjaApi):
     product = api.add_product(
         product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST
     )
@@ -77,7 +77,7 @@ def test_add_delete_product(api):
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_add_update_product(api):
+def test_add_update_product(api: NinjaApi):
     product = api.add_product(
         product_key=TEST_PRODUCT_NAME, notes=TEST_PRODUCT_NOTES, cost=TEST_PRODUCT_COST
     )
@@ -101,7 +101,7 @@ def test_add_update_product(api):
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_invoice(api):
+def test_invoice(api: NinjaApi):
     client = api.add_client(TEST_CLIENT_NAME)
     assert client and client.name == TEST_CLIENT_NAME
     invoice = NinjaInvoice.add(client.id, TEST_INVOICE_DATE, TEST_INVOICE_DUE_DATE)
@@ -130,7 +130,7 @@ def test_invoice(api):
 
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
-def test_invoice_create_delete(api):
+def test_invoice_create_delete(api: NinjaApi):
     client = api.add_client(TEST_CLIENT_NAME)
     assert client and client.name == TEST_CLIENT_NAME
     invoice = NinjaInvoice.add(client.id, TEST_INVOICE_DATE, TEST_INVOICE_DUE_DATE)
