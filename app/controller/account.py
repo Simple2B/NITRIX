@@ -1,9 +1,8 @@
 import csv
 from io import TextIOWrapper
 from datetime import datetime
-from flask import flash, url_for, session
+from flask import flash, url_for
 from flask import current_app as app
-from flask_login import current_user
 from cerberus import Validator
 
 from config import SIM_COST_DISCOUNT, SIM_COST_ACCOUNT_COMMENT
@@ -12,9 +11,9 @@ from app.models import (
     Product,
     Reseller,
     AccountExtension,
-    AccountChanges,
     Phone,
     ResellerProduct,
+    HistoryChange,
 )
 from app.forms import AccountForm
 from app.database import db
@@ -135,63 +134,69 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
 def document_changes_if_exist(account, form):
     if account.name != form.name.data:
         # Changed account name
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.name
-        change.value_str = account.name
-        change.new_value_str = form.name.data
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="name",
+            before_value_str=account.name,
+            after_value_str=form.name.data,
+        ).save()
         flash(f"In account {account.name} name changed to {form.name.data}", "info")
     if account.sim != form.sim.data:
         # Changed account SIM
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.sim
-        change.new_value_str = form.sim.data
-        change.value_str = account.sim if account.sim else "Empty"
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="sim",
+            before_value_str=account.sim if account.sim else "[Empty]",
+            after_value_str=form.sim.data,
+        ).save()
         flash(f"In account {account.name} sim changed to {form.sim.data}", "info")
     if account.product_id != form.product_id.data:
         # Changed account product
         new_product = Product.query.get(form.product_id.data).name
         old_product = Product.query.get(account.product_id).name
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.product
-        change.new_value_str = new_product
-        change.value_str = old_product
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="product",
+            before_value_str=old_product,
+            after_value_str=new_product,
+        ).save()
         flash(f"In account {account.name} product changed to {new_product}", "info")
     if account.phone_id != form.phone_id.data:
         # Changed account phone
         new_phone = Phone.query.get(form.phone_id.data).name
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.phone
-        change.new_value_str = new_phone
-        change.value_str = account.phone.name if account.phone.name else "Empty"
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="phone",
+            before_value_str=(account.phone.name if account.phone.name else "[Empty]"),
+            after_value_str=new_phone,
+        ).save()
         flash(f"In account {account.name} phone changed to {new_phone}", "info")
     if account.reseller_id != form.reseller_id.data:
         # Changed account reseller
         new_reseller = Reseller.query.get(form.reseller_id.data).name
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.reseller
-        change.new_value_str = new_reseller
-        change.value_str = account.reseller.name
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="reseller",
+            before_value_str=account.reseller.name,
+            after_value_str=new_reseller,
+        ).save()
         flash(f"In account {account.name} reseller changed to {new_reseller}", "info")
     if account.activation_date.strftime(
         "%Y-%m-%d"
     ) != form.activation_date.data.strftime("%Y-%m-%d"):
         # Changed account activation date
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.activation_date
-        change.new_value_str = form.activation_date.data.strftime("%Y-%m-%d")
-        change.value_str = account.activation_date.strftime("%Y-%m-%d")
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="activation date",
+            before_value_str=account.activation_date.strftime("%Y-%m-%d"),
+            after_value_str=form.activation_date.data.strftime("%Y-%m-%d"),
+        ).save()
         flash(
             f'In account {account.name} activation date changed to {form.activation_date.data.strftime("%Y-%m-%d")}',
             "info",
@@ -199,12 +204,13 @@ def document_changes_if_exist(account, form):
 
     if account.months != form.months.data:
         # Changed account months
-        change = AccountChanges(account=account)
-        change.user_id = session.get("_user_id")
-        change.change_type = AccountChanges.ChangeType.months
-        change.new_value_str = form.months.data
-        change.value_str = account.months
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_account,
+            item_id=account.id,
+            value_name="months",
+            before_value_str=str(account.months),
+            after_value_str=str(form.months.data),
+        ).save()
         flash(f"In account {account.name} months changed to {form.months.data}", "info")
 
     form = AccountForm(
@@ -226,13 +232,14 @@ def document_changes_if_exist(account, form):
         AccountExtension.account_id == form.id.data
     ).all()
     form.name_changes = (
-        AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-        .filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
+        HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+        .filter(HistoryChange.change_type == HistoryChange.EditType.changes_account)
+        .filter(HistoryChange.value_name == "name")
         .all()
     )
     form.sim_changes = (
-        AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-        .filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
+        HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+        .filter(HistoryChange.value_name == "sim")
         .all()
     )
     form.is_edit = True
@@ -240,7 +247,7 @@ def document_changes_if_exist(account, form):
     form.delete_route = url_for("account.delete")
     form.close_button = url_for("main.accounts")
     form.reseller_name = account.reseller.name
-    form.history = AccountChanges.get_history(account)
+    form.history = HistoryChange.get_history(account)
     return form
 
 
@@ -323,13 +330,14 @@ class AccountController(object):
             AccountExtension.account_id == form.id.data
         ).all()
         form.name_changes = (
-            AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-            .filter(AccountChanges.change_type == AccountChanges.ChangeType.name)
+            HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+            .filter(HistoryChange.change_type == HistoryChange.EditType.changes_account)
+            .filter(HistoryChange.value_name == "name")
             .all()
         )
         form.sim_changes = (
-            AccountChanges.query.filter(AccountChanges.account_id == form.id.data)
-            .filter(AccountChanges.change_type == AccountChanges.ChangeType.sim)
+            HistoryChange.query.filter(HistoryChange.item_id == form.id.data)
+            .filter(HistoryChange.value_name == "sim")
             .all()
         )
         form.is_edit = True
@@ -337,7 +345,7 @@ class AccountController(object):
         form.delete_route = url_for("account.delete")
         form.close_button = url_for("main.accounts")
         form.reseller_name = self.account.reseller.name
-        form.history = AccountChanges.get_history(self.account)
+        form.history = HistoryChange.get_history(self.account)
         return form
 
     def account_form_new(
@@ -458,12 +466,10 @@ class AccountController(object):
             return False
         self.account.save()
         if self.new_account:
-            change = AccountChanges(account=self.account)
-            change.user_id = session.get("_user_id")
-            change.change_type = AccountChanges.ChangeType.created
-            change.new_value_str = "Created"
-            change.value_str = "None"
-            change.save()
+            HistoryChange(
+                change_type=HistoryChange.EditType.creation_account,
+                item_id=self.account.id,
+            ).save()
             self.connect_to_ninja(self.account)
         reseller = Reseller.query.filter(
             Reseller.id == self.account.reseller_id
@@ -489,12 +495,11 @@ class AccountController(object):
         if not self.account:
             flash("Wrong request", "danger")
             return False
-        change = AccountChanges(account=self.account)
-        change.user_id = current_user.id
-        change.change_type = AccountChanges.ChangeType.deleted
-        change.new_value_str = "None"
-        change.value_str = "Deleted"
-        change.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_account,
+            item_id=self.account.id,
+        ).save()
+
         # TODO: THIS IS BAD CODE - need todo this correct
         # invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
         # for invoice in invoices:
