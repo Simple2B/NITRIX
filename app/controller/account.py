@@ -1,9 +1,8 @@
 import csv
 from io import TextIOWrapper
 from datetime import datetime
-from flask import flash, url_for, session
+from flask import flash, url_for
 from flask import current_app as app
-from flask_login import current_user
 from cerberus import Validator
 
 from config import SIM_COST_DISCOUNT, SIM_COST_ACCOUNT_COMMENT
