@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-load_dotenv(os.path.join(os.path.dirname(BASE_DIR), ".env"))
+PATH_TO_DOT_ENV_FILE = os.path.join(BASE_DIR, ".env")
+load_dotenv(PATH_TO_DOT_ENV_FILE)
 
 
 class BaseConfig(object):
