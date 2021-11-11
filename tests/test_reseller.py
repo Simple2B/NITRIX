@@ -1,6 +1,6 @@
 import pytest
 from app import db, create_app
-from app.models import Reseller
+from app.models import Reseller, HistoryChange
 from .test_auth import register, login
 
 
@@ -54,7 +54,11 @@ def test_save_reseller(client):
     assert response.status_code == 200
     assert b"TEST RESELLER NAME" not in response.data
     assert b"ANOTHER RESELLER NAME" in response.data
-
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 2
+    assert history[1].before_value_str == "TEST RESELLER NAME"
+    assert history[1].after_value_str == "ANOTHER RESELLER NAME"
+    assert history[1].change_type == HistoryChange.EditType.changes_reseller
     # save reseller with wrong id
     response = client.post(
         "/reseller_save",
@@ -62,6 +66,8 @@ def test_save_reseller(client):
         follow_redirects=True,
     )
     assert b"Wrong reseller id." in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 2
     # send wrong form data
     response = client.post(
         "/reseller_save",
@@ -80,6 +86,9 @@ def test_save_reseller_with_same_name(client):
     )
     assert response.status_code == 200
     assert b"TEST RESELLER NAME" in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 1
+    assert history[0].change_type == HistoryChange.EditType.creation_reseller
     # add reseller with the same name
     response = client.post(
         "/reseller_save",
@@ -87,6 +96,8 @@ def test_save_reseller_with_same_name(client):
         follow_redirects=True,
     )
     assert b"This name is already taken" in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 1
 
 
 def test_delete_reseller(client):
@@ -103,3 +114,6 @@ def test_delete_reseller(client):
     response = client.get(f"/reseller_delete?id={reseller_id}")
     assert response.status_code == 302
     assert reseller.deleted
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 2
+    assert history[1].change_type == HistoryChange.EditType.deletion_reseller

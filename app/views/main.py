@@ -11,7 +11,13 @@ from flask import (
 )
 from flask import current_app as app, send_file, request, session
 from flask_login import login_required, current_user
-from app.models import User, Product, Account, Reseller, Phone, AccountChanges
+from app.models import (
+    User,
+    Product,
+    Account,
+    Reseller,
+    Phone,
+)
 from app.logger import log
 from sqlalchemy import or_
 
@@ -32,12 +38,16 @@ def accounts():
     log(log.INFO, "/accounts")
     page = request.args.get("page", 1, type=int)
     filter = request.args.get("filter", "")
-    rows_per_page = request.args.get("rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int)
+    rows_per_page = request.args.get(
+        "rows_per_page", app.config["ACCOUNTS_PER_PAGE"], type=int
+    )
     session["rows_per_page"] = rows_per_page
     session["page"] = page
-    query = Account.query.join(Product, Account.product_id == Product.id).join(
-        Reseller, Account.reseller_id == Reseller.id
-    ).outerjoin(AccountChanges, Account.id == AccountChanges.account_id ).filter(Account.deleted == False)  # noqa 712
+    query = (
+        Account.query.join(Product, Account.product_id == Product.id)
+        .join(Reseller, Account.reseller_id == Reseller.id)
+        .filter(Account.deleted == False)  # noqa 712
+    )
     if filter:
         filters = filter.split(";")
         for flt in filters:
@@ -49,7 +59,6 @@ def accounts():
                     Account.sim.like(search),
                     Product.name.like(search),
                     Reseller.name.like(search),
-                    AccountChanges.value_str.like(search)
                 )
             )
     ordered_accounts = query.order_by(Account.id.desc()).paginate(
@@ -75,7 +84,7 @@ def accounts():
         next_url=next_url,
         prev_url=prev_url,
         filter=filter,
-        rows_per_page=session['rows_per_page']
+        rows_per_page=session["rows_per_page"],
     )
 
 
@@ -104,7 +113,8 @@ def resellers():
         "index.html",
         main_content="Resellers",
         table_data=[
-            i.to_dict()  for i in Reseller.query.filter(Reseller.deleted == False)  # noqa E712
+            i.to_dict()
+            for i in Reseller.query.filter(Reseller.deleted == False)  # noqa E712
         ],
         columns=Reseller.columns(),
         edit_href=url_for("reseller.edit"),
@@ -120,7 +130,8 @@ def products():
         "index.html",
         main_content="Products",
         table_data=[
-            p.to_dict() for p in Product.query.filter(Product.deleted == False)  # noqa E712
+            p.to_dict()
+            for p in Product.query.filter(Product.deleted == False)  # noqa E712
         ],
         columns=Product.columns(),
         edit_href=url_for("product.edit"),
