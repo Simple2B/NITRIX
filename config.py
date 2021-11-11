@@ -22,6 +22,10 @@ class BaseConfig(object):
     DISABLE_OTP = bool(int(os.environ.get("DISABLE_OTP", "0")))
     ADMIN_NAME = os.environ.get("ADMIN_NAME", "admin")
     ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "1234")
+    REDIS_URL_FOR_CELERY = os.environ.get("REDIS_URL_FOR_CELERY", "redis://redis")
+    CELERY_PERIODIC_CHECK_TIME = float(
+        os.environ.get("CELERY_PERIODIC_CHECK_TIME", "10.0")
+    )
 
     @staticmethod
     def configure(app):
