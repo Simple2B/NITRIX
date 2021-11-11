@@ -12,7 +12,7 @@ class _NinjaInvoice(BaseModel):
     balance: 0
     client_id: 'WJxbojagwO'
     vendor_id: ''
-    status_id: '1'
+    status_id: int
     design_id: 'Wpmbk5ezJn'
     recurring_id: ''
     created_at: 1636567060
