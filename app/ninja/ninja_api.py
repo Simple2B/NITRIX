@@ -1,13 +1,33 @@
 import os
 import requests
 import json
+from typing import Any
 from dotenv import load_dotenv
+from pydantic import BaseModel
 
 from app.logger import log
 from .client import NinjaClient
 from .product import NinjaProduct
 
 load_dotenv()
+
+
+class Pagination(BaseModel):
+    total: int
+    count: int
+    per_page: int
+    current_page: int
+    total_pages: int
+    links: list[Any]
+
+
+class Meta(BaseModel):
+    pagination: Pagination
+
+
+class ArrayData(BaseModel):
+    data: list[Any]
+    meta: Meta
 
 
 class NinjaApi(object):

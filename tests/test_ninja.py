@@ -102,6 +102,9 @@ def test_add_update_product(api: NinjaApi):
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_invoice(api: NinjaApi):
+    invoices = NinjaInvoice.all()
+    assert invoices
+
     client = api.add_client(TEST_CLIENT_NAME)
     assert client and client.name == TEST_CLIENT_NAME
     invoice = NinjaInvoice.add(client.id, TEST_INVOICE_DATE, TEST_INVOICE_DUE_DATE)
