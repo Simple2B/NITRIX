@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Any
 from pydantic import BaseModel
 from app.logger import log
@@ -10,9 +10,9 @@ class NinjaInvitations(BaseModel):
     client_contact_id: str
     key: str
     link: str
-    sent_date: datetime
-    viewed_date: datetime
-    opened_date: datetime
+    sent_date: str
+    viewed_date: str
+    opened_date: str
     updated_at: datetime
     archived_at: datetime
 
@@ -39,7 +39,7 @@ class _NinjaInvoice(BaseModel):
     date: str
     last_sent_date: str
     next_send_date: str
-    due_date: datetime
+    due_date: date
     terms: str
     public_notes: str
     private_notes: str
@@ -54,7 +54,7 @@ class _NinjaInvoice(BaseModel):
     is_amount_discount: bool
     footer: str
     partial: float
-    partial_due_date: datetime
+    partial_due_date: str
     custom_value1: str
     custom_value2: str
     custom_value3: str
