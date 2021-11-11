@@ -1,6 +1,8 @@
-from celery import Celery
-from config import BaseConfig as conf
 import subprocess
+from celery import Celery
+
+# from config import BaseConfig as conf
+
 
 celery = Celery(__name__)
 celery.conf.broker_url = "redis://:password@redis"
