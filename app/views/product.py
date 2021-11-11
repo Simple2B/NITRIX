@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Product
+from app.models import Product, HistoryChange
 from app.forms import ProductForm
 from app.logger import log
 
@@ -24,7 +24,13 @@ def edit():
         form.save_route = url_for("product.save")
         form.delete_route = url_for("product.delete")
         form.close_button = url_for("main.products")
-
+        HistoryChange(
+            change_type=HistoryChange.EditType.changes_product,
+            item_id=product.id,  #
+            value_name="product",
+            before_value_str="",  # ??? what is edited
+            after_value_str="Changed",  # "None" ?? ""
+        ).save()
         return render_template("product_add_edit.html", form=form)
     else:
         form = ProductForm()
@@ -51,6 +57,13 @@ def save():
         else:
             product = Product(name=form.name.data, status=form.status.data)
         product.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.creation_product,
+            item_id=product.id,  #
+            value_name="product",
+            before_value_str="",  # ??? what is edited
+            after_value_str="Created",  # "None" ?? ""
+        ).save()
         log(log.INFO, "Product-{} was saved".format(product.id))
         return redirect(url_for("main.products", id=product.id))
     else:
@@ -67,6 +80,13 @@ def delete():
         product = Product.query.filter(Product.id == product_id).first()
         product.deleted = True
         product.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_product,
+            item_id=product_id,  #
+            value_name="product",
+            before_value_str="",  # ???
+            after_value_str="Deleted",  # "None" ?? ""
+        ).save()
         return redirect(url_for("main.products"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.products"))
