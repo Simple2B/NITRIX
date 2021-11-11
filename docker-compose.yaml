@@ -13,6 +13,29 @@ services:
     ports:
       - 127.0.0.1:${LOCAL_DB_PORT}:5432
 
+  worker:
+    build: .
+    restart: always
+    environment:
+      - FLASK_ENV=production
+      - FLASK_APP=flask_app
+      - FLASK_DEBUG=1
+    volumes:
+      - ./.env:/app/.env
+    command: poetry run celery -A app.worker worker -B --loglevel=INFO
+    depends_on:
+      - redis
+
+  redis:
+    restart: always
+    image: "redis:alpine"
+    ports:
+      - 127.0.0.1:${REDIS_PORT}:6379
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+
   app:
     build: .
     # restart: always
