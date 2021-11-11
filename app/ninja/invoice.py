@@ -1,72 +1,87 @@
+from datetime import datetime
+from typing import Any
 from pydantic import BaseModel
 from app.logger import log
 from app.ninja import api, ArrayData
 
 
+class NinjaInvitations(BaseModel):
+    id: str
+    client_contact_id: str
+    key: str
+    link: str
+    sent_date: datetime
+    viewed_date: datetime
+    opened_date: datetime
+    updated_at: datetime
+    archived_at: datetime
+
+
 class _NinjaInvoice(BaseModel):
     id: str
     user_id: str
-    project_id: ''
-    assigned_user_id: ''
-    amount: 0
-    balance: 0
-    client_id: 'WJxbojagwO'
-    vendor_id: ''
+    project_id: str
+    assigned_user_id: str
+    amount: int
+    balance: float
+    client_id: str
+    vendor_id: str
     status_id: int
-    design_id: 'Wpmbk5ezJn'
-    recurring_id: ''
-    created_at: 1636567060
-    updated_at: 1636567061
-    archived_at: 0
-    is_deleted: False
-    number: '0001'
-    discount: 0
-    po_number: ''
-    date: ''
-    last_sent_date: ''
-    next_send_date: ''
-    due_date: '1980-02-29'
-    terms: ''
-    public_notes: ''
-    private_notes: ''
-    uses_inclusive_taxes: False
-    tax_name1: ''
-    tax_rate1: 0
-    tax_name2: ''
-    tax_rate2: 0
-    tax_name3: ''
-    tax_rate3: 0
-    total_taxes: 0
-    is_amount_discount: True
-    footer: ''
-    partial: 0
-    partial_due_date: ''
-    custom_value1: ''
-    custom_value2: ''
-    custom_value3: ''
-    custom_value4: ''
-    has_tasks: False
-    has_expenses: False
-    custom_surcharge1: 0
-    custom_surcharge2: 0
-    custom_surcharge3: 0
-    custom_surcharge4: 0
-    exchange_rate: 1
-    custom_surcharge_tax1: False
-    custom_surcharge_tax2: False
-    custom_surcharge_tax3: False
-    custom_surcharge_tax4: False
-    line_items: []
-    entity_type: 'invoice'
-    reminder1_sent: ''
-    reminder2_sent: ''
-    reminder3_sent: ''
-    reminder_last_sent: ''
-    paid_to_date: 0
-    subscription_id: ''
-    auto_bill_enabled: False
-    invitations: [{'id': 'VolejRejNm', 'client_contact_id': 'WJxbojagwO', 'key': 'qFxyr9gpO4pDnsxlkmXx...UQZjLvEtR1', 'link': 'https://ninja.simple...UQZjLvEtR1', 'sent_date': '', 'viewed_date': '', 'opened_date': '', 'updated_at': 1636567061, 'archived_at': 0, ...}]
-    documents: []
+    design_id: str
+    recurring_id: str
+    created_at: datetime
+    updated_at: datetime
+    archived_at: datetime
+    is_deleted: bool
+    number: str
+    discount: float
+    po_number: str
+    date: str
+    last_sent_date: str
+    next_send_date: str
+    due_date: datetime
+    terms: str
+    public_notes: str
+    private_notes: str
+    uses_inclusive_taxes: bool
+    tax_name1: str
+    tax_rate1: float
+    tax_name2: str
+    tax_rate2: float
+    tax_name3: str
+    tax_rate3: float
+    total_taxes: float
+    is_amount_discount: bool
+    footer: str
+    partial: float
+    partial_due_date: datetime
+    custom_value1: str
+    custom_value2: str
+    custom_value3: str
+    custom_value4: str
+    has_tasks: bool
+    has_expenses: bool
+    custom_surcharge1: float
+    custom_surcharge2: float
+    custom_surcharge3: float
+    custom_surcharge4: float
+    exchange_rate: float  # int
+    custom_surcharge_tax1: bool
+    custom_surcharge_tax2: bool
+    custom_surcharge_tax3: bool
+    custom_surcharge_tax4: bool
+    line_items: list[Any]
+    entity_type: str
+    reminder1_sent: str
+    reminder2_sent: str
+    reminder3_sent: str
+    reminder_last_sent: str
+    paid_to_date: datetime
+    subscription_id: str
+    auto_bill_enabled: bool
+    invitations: list[NinjaInvitations]  # [{}] was not full
+    documents: list[Any]
+
 
 class NinjaInvoice(object):
     """Ninja Invoice entity"""
