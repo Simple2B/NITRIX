@@ -37,7 +37,7 @@ def delete():
     if ninja.configured:
         ninja_product = ninja.get_product(product.ninja_product_id)
         if ninja_product:
-            ninja.delete_product(ninja_product.id, ninja_product.product_key)
+            ninja.delete_product(ninja_product.id)
         else:
             log(log.ERROR, NINJA_ERROR)
             flash(NINJA_ERROR, "danger")

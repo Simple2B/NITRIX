@@ -118,19 +118,17 @@ class NinjaApi(object):
         """
         log(log.DEBUG, "NinjaApi.clients")
         res = self.do_get(self.BASE_URL + "clients")
+        res = ArrayData.parse_obj(res)
         clients = (
-            [NinjaClient.parse_obj(client_data) for client_data in res["data"]]
+            [NinjaClient.parse_obj(client_data) for client_data in res.data]
             if res
             else []
         )
         next_link = NinjaApi.get_next_link(res)
         while next_link:
             res = self.do_get(next_link)
-            clients += (
-                [NinjaClient.parse_obj(client_data) for client_data in res["data"]]
-                if res
-                else []
-            )
+            res = ArrayData.parse_obj(res)
+            clients += [NinjaClient.parse_obj(client_data) for client_data in res.data]
             next_link = NinjaApi.get_next_link(res)
         return clients
 
@@ -181,13 +179,13 @@ class NinjaApi(object):
         """
         log(log.DEBUG, "NinjaApi.products")
         res = self.do_get(self.BASE_URL + "products")
-        prods = [NinjaProduct.parse_obj(data) for data in res["data"]] if res else []
+        res = ArrayData.parse_obj(res)
+        prods = [NinjaProduct.parse_obj(data) for data in res.data]
         next_link = NinjaApi.get_next_link(res)
         while next_link:
             res = self.do_get(next_link)
-            prods += (
-                [NinjaProduct.parse_obj(data) for data in res["data"]] if res else []
-            )
+            res = ArrayData.parse_obj(res)
+            prods += [NinjaProduct.parse_obj(data) for data in res.data]
             next_link = NinjaApi.get_next_link(res)
         return prods
 
@@ -256,7 +254,7 @@ class NinjaApi(object):
             qty=qty,
         )
 
-    def delete_product(self, prod_id: str, product_key: str = None):
+    def delete_product(self, prod_id: str):
         """deletes product by id (archive product)
 
         Arguments:
