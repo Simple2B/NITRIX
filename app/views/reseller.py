@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Reseller
+from app.models import Reseller, HistoryChange
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 from app.ninja import api as ninja
@@ -67,18 +67,20 @@ def save():
             if reseller is None:
                 flash("Wrong reseller id.", "danger")
                 return redirect(url_for("main.resellers"))
-            for k in request.form.keys():
-                reseller.__setattr__(k, form.__getattribute__(k).data)
+            HistoryChange(
+                change_type=HistoryChange.EditType.changes_reseller,
+                item_id=reseller.id,
+                value_name="name",
+                before_value_str=reseller.name,
+                after_value_str=form.name.data,
+            ).save()
+            reseller.name = form.name.data
+            reseller.save()
         else:
-            reseller = Reseller(
-                name=form.name.data,
-                status=form.status.data,
-                comments=form.comments.data,
-            )
             # Check uniqueness of Reseller name
-            if Reseller.query.filter(Reseller.name == reseller.name).first():
+            if Reseller.query.filter(Reseller.name == form.name.data).first():
                 flash("This name is already taken!Try again", "danger")
-                return redirect(url_for("reseller.edit", id=reseller.id))
+                return redirect(url_for("reseller.edit", id=0))
             ninja_client = (
                 ninja.add_client(name=form.name.data) if ninja.configured else None
             )
@@ -88,8 +90,11 @@ def save():
                 status=form.status.data,
                 comments=form.comments.data,
                 ninja_client_id=ninja_client_id,
-            )
-        reseller.save()
+            ).save()
+            HistoryChange(
+                change_type=HistoryChange.EditType.creation_reseller,
+                item_id=reseller.id,
+            ).save()
         log(log.INFO, "Reseller was saved")
         if form.id.data > 0:
             if request.form["submit"] == "save_and_edit":
@@ -110,8 +115,13 @@ def delete():
         reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
         reseller.deleted = True
         reseller.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_reseller,
+            item_id=reseller.id,
+        ).save()
         if ninja.configured:
             ninja.delete_client(client_id=reseller.ninja_client_id)
+
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.resellers"))

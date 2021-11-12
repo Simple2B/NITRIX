@@ -1,6 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Product
+from app.models import Product, HistoryChange
 from app.forms import ProductForm
 from app.logger import log
 
@@ -24,7 +24,6 @@ def edit():
         form.save_route = url_for("product.save")
         form.delete_route = url_for("product.delete")
         form.close_button = url_for("main.products")
-
         return render_template("product_add_edit.html", form=form)
     else:
         form = ProductForm()
@@ -46,11 +45,21 @@ def save():
             if product is None:
                 flash("Wrong product id.", "danger")
                 return redirect(url_for("main.products"))
-            for k in request.form.keys():
-                product.__setattr__(k, form.__getattribute__(k).data)
+            HistoryChange(
+                change_type=HistoryChange.EditType.changes_product,
+                item_id=product.id,
+                value_name="name",
+                before_value_str=product.name,
+                after_value_str=form.name.data,
+            ).save()
+            product.name = form.name.data
+            product.save()
         else:
-            product = Product(name=form.name.data, status=form.status.data)
-        product.save()
+            product = Product(name=form.name.data, status=form.status.data).save()
+            HistoryChange(
+                change_type=HistoryChange.EditType.creation_product,
+                item_id=product.id,
+            ).save()
         log(log.INFO, "Product-{} was saved".format(product.id))
         return redirect(url_for("main.products", id=product.id))
     else:
@@ -67,6 +76,10 @@ def delete():
         product = Product.query.filter(Product.id == product_id).first()
         product.deleted = True
         product.save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_product,
+            item_id=product.id,
+        ).save()
         return redirect(url_for("main.products"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.products"))

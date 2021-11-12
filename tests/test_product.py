@@ -1,7 +1,7 @@
 import pytest
 
 from app import db, create_app
-from app.models import Product
+from app.models import Product, HistoryChange
 from .test_auth import register, login
 
 
@@ -44,6 +44,9 @@ def test_save_product(client):
     )
     assert response.status_code == 200
     assert b"TEST PRODUCT NAME" in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 1
+    assert history[0].change_type == HistoryChange.EditType.creation_product
     # edit exists product
     response = client.post(
         "/product_save",
@@ -53,6 +56,12 @@ def test_save_product(client):
     assert response.status_code == 200
     assert b"TEST PRODUCT NAME" not in response.data
     assert b"ANOTHER PRODUCT NAME" in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 2
+    assert history[1].before_value_str == "TEST PRODUCT NAME"
+    assert history[1].after_value_str == "ANOTHER PRODUCT NAME"
+    assert history[1].change_type == HistoryChange.EditType.changes_product
+
     # save product with wrong id
     response = client.post(
         "/product_save",
@@ -74,9 +83,15 @@ def test_delete_product(client):
     )
     assert response.status_code == 200
     assert b"TEST PRODUCT NAME" in response.data
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 1
+    assert history[0].change_type == HistoryChange.EditType.creation_product
     product = Product.query.first()
     assert product
     product_id = product.id
     response = client.get(f"/product_delete?id={product_id}")
     assert response.status_code == 302
     assert product.deleted
+    history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
+    assert len(history) == 2
+    assert history[1].change_type == HistoryChange.EditType.deletion_product

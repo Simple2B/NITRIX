@@ -7,6 +7,7 @@
     "noqa",
     "otpauth",
     "pydantic",
+    "Popen",
     "skipif",
     "totp",
     "urandom",

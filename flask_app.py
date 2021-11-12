@@ -200,5 +200,13 @@ def fix_activation_date():
     db.session.commit()
 
 
+@app.cli.command()
+def scheduler_task():
+    """Regular task"""
+    from app.scheduler import sync_scheduler
+
+    sync_scheduler()
+
+
 if __name__ == "__main__":
     app.run()
