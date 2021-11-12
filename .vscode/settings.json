@@ -6,6 +6,7 @@
     "NITRIX",
     "noqa",
     "otpauth",
+    "Popen",
     "skipif",
     "totp",
     "urandom",
