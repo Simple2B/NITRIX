@@ -102,6 +102,9 @@ def test_add_update_product(api: NinjaApi):
 
 @pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
 def test_invoice(api: NinjaApi):
+    # for prod in api.products:
+    #     api.delete_product(prod.id)
+
     invoices = NinjaInvoice.all()
     assert invoices
 

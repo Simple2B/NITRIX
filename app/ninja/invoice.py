@@ -17,6 +17,10 @@ class NinjaInvitations(BaseModel):
     archived_at: datetime
 
 
+class NinjaInvoiceItem(BaseModel):
+    {'product_key': 'Kryptr', 'notes': '5 Months', 'cost': 1000, 'product_cost': 0, 'quantity': 1, 'tax_name1': '', 'tax_rate1': 0, 'tax_name2': '', 'tax_rate2': 0, 'tax_name3': '', 'tax_rate3': 0, 'custom_value1': '', 'custom_value2': '', 'custom_value3': '', ...}
+
+
 class _NinjaInvoice(BaseModel):
     id: str
     user_id: str
@@ -172,7 +176,7 @@ class NinjaInvoice(object):
         )
         if not res or not res["data"]:
             return res
-        return NinjaInvoice(res["data"])
+        return _NinjaInvoice.parse_obj(res["data"])
 
     def delete(self):
         log(log.DEBUG, "NinjaInvoice.delete %d", self.id)

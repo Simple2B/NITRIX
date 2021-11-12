@@ -86,7 +86,7 @@ class NinjaApi(object):
             response.raise_for_status()
         except requests.HTTPError as error:
             log(log.ERROR, "NinjaApi.HTTPError: %s", error)
-        return response.ok
+        return response.json()
 
     def do_put(self, url: str, **data):
         headers = {
@@ -257,15 +257,11 @@ class NinjaApi(object):
             qty=qty,
         )
 
-    def delete_product(self, prod_id: int, product_key: str):
+    def delete_product(self, prod_id: str, product_key: str = None):
         """deletes product by id (archive product)
 
         Arguments:
             prod_id {int} -- Invoice Ninja Product ID
         """
-        log(log.DEBUG, "NinjaApi.delete_product %s", prod_id)
-        return self.do_put(
-            "{}products/{}?action=delete".format(self.BASE_URL, prod_id),
-            id=prod_id,
-            product_key=product_key,
-        )
+        res_data = self.do_delete(f"{self.BASE_URL}products/{prod_id}")
+        return NinjaProduct.parse_obj(res_data["data"])
