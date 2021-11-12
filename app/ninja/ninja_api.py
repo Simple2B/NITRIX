@@ -1,7 +1,7 @@
 import os
 import requests
 import json
-from typing import Any
+from typing import Any, Optional
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
@@ -12,13 +12,18 @@ from .product import NinjaProduct
 load_dotenv()
 
 
+class PaginationLinks(BaseModel):
+    next: Optional[str]
+    previous: Optional[str]
+
+
 class Pagination(BaseModel):
     total: int
     count: int
     per_page: int
     current_page: int
     total_pages: int
-    links: list[Any]
+    links: Optional[PaginationLinks]
 
 
 class Meta(BaseModel):
@@ -104,7 +109,7 @@ class NinjaApi(object):
             response.raise_for_status()
         except requests.HTTPError as error:
             log(log.ERROR, "NinjaApi.HTTPError: %s", error)
-        return response.ok if response.ok else None
+        return response.json() if response.ok else None
 
     @property
     def clients(self):
@@ -164,16 +169,10 @@ class NinjaApi(object):
         return self.do_delete(f"{self.BASE_URL}clients/{client_id}")
 
     @staticmethod
-    def get_next_link(response):
-        if "meta" in response:
-            meta = response["meta"]
-            if "pagination" in meta:
-                pagination = meta["pagination"]
-                if "links" in pagination:
-                    links = pagination["links"]
-                    if "next" in links:
-                        return links["next"]
-        return None
+    def get_next_link(response: ArrayData):
+        pagination_links = response.meta.pagination.links
+        if pagination_links:
+            return pagination_links.next
 
     @property
     def products(self):
