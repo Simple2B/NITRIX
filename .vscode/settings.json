@@ -1,6 +1,7 @@
 {
   "python.linting.flake8Enabled": true,
   "cSpell.words": [
+    "dateutil",
     "dotenv",
     "imei",
     "NITRIX",
