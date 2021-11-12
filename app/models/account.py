@@ -39,9 +39,12 @@ class Account(db.Model, ModelMixin):
 
     @property
     def expiration_date(self):
-        enddate = AccountExtension.query.with_entities(AccountExtension.end_date).filter(
-            self.id == AccountExtension.account_id
-        ).order_by(desc(AccountExtension.end_date)).first()
+        enddate = (
+            AccountExtension.query.with_entities(AccountExtension.end_date)
+            .filter(self.id == AccountExtension.account_id)
+            .order_by(desc(AccountExtension.end_date))
+            .first()
+        )
         if enddate:
             return enddate.end_date
         else:

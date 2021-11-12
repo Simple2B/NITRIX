@@ -9,6 +9,7 @@ from app.logger import log
 from app.ninja import api as ninja
 from app.utils import organize_list_starting_with_value
 from app.controller.account import add_ninja_invoice
+from app.controller.account_extension import check_and_set_history_changes
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
 
@@ -140,6 +141,7 @@ def save_update():
     extension = AccountExtension.query.filter(
         AccountExtension.id == form.id.data
     ).first()
+    check_and_set_history_changes(form, extension)
     extension.reseller_id = form.reseller_id.data
     extension.product_id = form.product_id.data
     extension.months = form.months.data
@@ -149,13 +151,6 @@ def save_update():
     )
     account_id = extension.account_id
     extension.save()
-    HistoryChange(
-        change_type=HistoryChange.EditType.extensions_account_change,
-        item_id=extension.id,
-        value_name="",  # ??? months | exp date
-        before_value_str="",  # ??? end date old
-        after_value_str="",  # ??? end date new
-    ).save()
     return redirect(url_for("account.edit", id=account_id))
 
 
