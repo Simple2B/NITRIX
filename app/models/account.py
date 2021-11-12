@@ -50,6 +50,8 @@ class Account(db.Model, ModelMixin):
         else:
             return self.__add_months(self.activation_date, self.months)
 
+    ### we fail here --> line 68 -->  change.value_str for change in self.changes.filter_by(change_type="name").all()
+    ### we delete account changes and no ref to history changes as i see...
     def to_dict(self) -> dict:
         return {
             "id": self.id,
