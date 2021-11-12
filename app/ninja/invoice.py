@@ -15,10 +15,34 @@ class NinjaInvitations(BaseModel):
     opened_date: str
     updated_at: datetime
     archived_at: datetime
+    created_at: datetime
+    email_status: str
+    email_error: str
 
 
 class NinjaInvoiceItem(BaseModel):
-    {'product_key': 'Kryptr', 'notes': '5 Months', 'cost': 1000, 'product_cost': 0, 'quantity': 1, 'tax_name1': '', 'tax_rate1': 0, 'tax_name2': '', 'tax_rate2': 0, 'tax_name3': '', 'tax_rate3': 0, 'custom_value1': '', 'custom_value2': '', 'custom_value3': '', ...}
+    product_key: str
+    notes: str
+    cost: float
+    product_cost: float
+    quantity: int
+    tax_name1: str
+    tax_rate1: float
+    tax_name2: str
+    tax_rate2: float
+    tax_name3: str
+    tax_rate3: float
+    custom_value1: str
+    custom_value2: str
+    custom_value3: str
+    discount: float
+    type_id: str
+    createdAt: datetime
+    is_amount_discount: bool
+    sort_id: str
+    line_total: float
+    gross_line_total: float
+    date: str
 
 
 class _NinjaInvoice(BaseModel):
@@ -69,12 +93,12 @@ class _NinjaInvoice(BaseModel):
     custom_surcharge2: float
     custom_surcharge3: float
     custom_surcharge4: float
-    exchange_rate: float  # int
+    exchange_rate: float
     custom_surcharge_tax1: bool
     custom_surcharge_tax2: bool
     custom_surcharge_tax3: bool
     custom_surcharge_tax4: bool
-    line_items: list[Any]
+    line_items: list[NinjaInvoiceItem]
     entity_type: str
     reminder1_sent: str
     reminder2_sent: str
@@ -83,7 +107,7 @@ class _NinjaInvoice(BaseModel):
     paid_to_date: datetime
     subscription_id: str
     auto_bill_enabled: bool
-    invitations: list[NinjaInvitations]  # [{}] was not full
+    invitations: list[NinjaInvitations]
     documents: list[Any]
 
 
