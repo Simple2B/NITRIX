@@ -113,7 +113,7 @@ def test_invoice(api: NinjaApi):
     assert invoices
     invoice = invoices[0]
     # TODO: fix
-    items = invoice.items
+    items = invoice.line_items
     assert items
     item = items[0]
     assert item
