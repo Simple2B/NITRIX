@@ -1,7 +1,8 @@
 from typing import Any, Optional
 from pydantic import BaseModel
 from app.logger import log
-from app.ninja import api, ArrayData
+from app.ninja import api
+from app.ninja.ninja_api import ArrayData
 
 
 class NinjaInvitations(BaseModel):
