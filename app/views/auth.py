@@ -62,7 +62,7 @@ def otp_verify():
     form = TwoFactorForm(request.form)
     if form.validate_on_submit():
         log(log.INFO, "otp form validated")
-        user = User.query.filter(User.id == session.get("id")).first()
+        user: User = User.query.filter(User.id == session.get("id")).first()
         if session["id"] and user.verify_totp(form.token.data):
             log(log.INFO, "user logged in")
             login_user(user)

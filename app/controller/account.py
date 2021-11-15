@@ -36,6 +36,7 @@ def all_phones():
     return all_phones
 
 
+# to sync
 def add_ninja_invoice(account: Account, is_new: bool, mode: str):
     if mode == EXTENDED:
         reseller_product = (
@@ -64,6 +65,7 @@ def add_ninja_invoice(account: Account, is_new: bool, mode: str):
             .first()
         )
     # Invoice_date is always the first day of current month
+    # first day o the week?
     date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
     invoice_date = date
     current_invoice = None
@@ -433,7 +435,7 @@ class AccountController(object):
                                 break
                         break
                 self.account.activation_date = form.activation_date.data
-                add_ninja_invoice(self.account, True, "Activated")
+                add_ninja_invoice(self.account, True, "Activated")  # to sync
 
         else:
             if Account.query.filter(

@@ -26,8 +26,11 @@ def add():
         return redirect(url_for("main.accounts"))
     account_id = int(request.args["id"])
     account = Account.query.filter(Account.id == account_id).first()
-    account_extension = AccountExtension.query.order_by(AccountExtension.end_date.desc()).filter(
-        AccountExtension.account_id == account_id).first()
+    account_extension = (
+        AccountExtension.query.order_by(AccountExtension.end_date.desc())
+        .filter(AccountExtension.account_id == account_id)
+        .first()
+    )
     if not account_extension:
         account_extension = account
         end_date = account.activation_date + relativedelta(months=account.months)
@@ -117,7 +120,7 @@ def save_new():
     account.is_new = False
     # Register product in Invoice Ninja
     if ninja.configured and not app.config["TESTING"]:
-        add_ninja_invoice(account, False, "Extended")
+        add_ninja_invoice(account, False, "Extended")  # to sync
     return redirect(url_for("account.edit", id=form.id.data))
 
 

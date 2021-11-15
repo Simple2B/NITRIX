@@ -4,7 +4,7 @@ from ..database import db
 from datetime import datetime, date
 from app.utils import ModelMixin
 from sqlalchemy.orm import relationship
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 from app.models.account_extensions import AccountExtension
 
 
@@ -39,15 +39,26 @@ class Account(db.Model, ModelMixin):
 
     @property
     def expiration_date(self):
-        enddate = AccountExtension.query.with_entities(AccountExtension.end_date).filter(
-            self.id == AccountExtension.account_id
-        ).order_by(desc(AccountExtension.end_date)).first()
+        enddate = (
+            AccountExtension.query.with_entities(AccountExtension.end_date)
+            .filter(self.id == AccountExtension.account_id)
+            .order_by(desc(AccountExtension.end_date))
+            .first()
+        )
         if enddate:
             return enddate.end_date
         else:
             return self.__add_months(self.activation_date, self.months)
 
     def to_dict(self) -> dict:
+        from .history_changes import HistoryChange
+
+        changes = HistoryChange.query.filter(
+            and_(
+                HistoryChange.change_type == HistoryChange.EditType.changes_account,
+                HistoryChange.item_id == self.id,
+            )
+        )
         return {
             "id": self.id,
             "name": self.name,
@@ -61,14 +72,18 @@ class Account(db.Model, ModelMixin):
             "months": self.months,
             "prev_names": ", ".join(
                 [
-                    change.value_str
-                    for change in self.changes.filter_by(change_type="name").all()
+                    change.before_value_str
+                    for change in changes.filter(
+                        HistoryChange.value_name == "name"
+                    ).all()
                 ]
             ),
             "prev_sims": ", ".join(
                 [
-                    change.value_str
-                    for change in self.changes.filter_by(change_type="sim").all()
+                    change.before_value_str
+                    for change in changes.filter(
+                        HistoryChange.value_name == "sim"
+                    ).all()
                 ]
             ),
         }

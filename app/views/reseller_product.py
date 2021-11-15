@@ -1,10 +1,9 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Product, ResellerProduct
+from app.models import Product, ResellerProduct, HistoryChange
 from app.forms import ResellerProductForm
 from app.logger import log
-from app.ninja import api as ninja
-from app.utils import ninja_product_name
+from app.controller.reseller_product import check_and_set_history_changes
 
 reseller_product_blueprint = Blueprint("reseller_product", __name__)
 NINJA_ERROR = "Ninja connection failed"
@@ -34,13 +33,13 @@ def delete():
         ResellerProduct.id == int(request.args["id"])
     ).first()
     reseller_id = product.reseller_id
-    if ninja.configured:
-        ninja_product = ninja.get_product(product.ninja_product_id)
-        if ninja_product:
-            ninja.delete_product(ninja_product.id)
-        else:
-            log(log.ERROR, NINJA_ERROR)
-            flash(NINJA_ERROR, "danger")
+    # if ninja.configured:
+    #     ninja_product = ninja.get_product(product.ninja_product_id)
+    #     if ninja_product:
+    #         ninja.delete_product(ninja_product.id)
+    #     else:
+    #         log(log.ERROR, NINJA_ERROR)
+    #         flash(NINJA_ERROR, "danger")
     product.delete()
     return redirect(url_for("reseller.edit", id=reseller_id))
 
@@ -89,7 +88,9 @@ def save():
         product.months = form.months.data
         product.init_price = form.init_price.data
         product.ext_price = form.ext_price.data
-
+        # change
+        check_and_set_history_changes(form, product)
+        product.save()
     else:
         product = (
             ResellerProduct.query.filter(
@@ -108,27 +109,30 @@ def save():
             months=form.months.data,
             init_price=form.init_price.data,
             ext_price=form.ext_price.data,
-        )
-    product.save()
-    if ninja.configured:
-        product_key = ninja_product_name(product.product.name, product.months)
-        if form.id.data < 0:
-            ninja_product = ninja.add_product(
-                product_key=product_key,
-                notes=product.reseller.name,
-                cost=product.init_price,
-            )
-            if ninja_product:
-                product.ninja_product_id = ninja_product.id
-                product.save()
-        else:
-            ninja_product = ninja.get_product(product.ninja_product_id)
-            if ninja_product:
-                ninja.update_product(
-                    ninja_product.id,
-                    product_key=product_key,
-                    notes=product.reseller.name,
-                    cost=product.init_price,
-                )
+        ).save()
+        HistoryChange(
+            change_type=HistoryChange.EditType.creation_reseller_product,
+            item_id=product.product_id,
+        ).save()
+    # if ninja.configured:
+    #     product_key = ninja_product_name(product.product.name, product.months)
+    #     if form.id.data < 0:
+    #         ninja_product = ninja.add_product(  # to sync
+    #             product_key=product_key,
+    #             notes=product.reseller.name,
+    #             cost=product.init_price,
+    #         )
+    #         if ninja_product:
+    #             product.ninja_product_id = ninja_product.id
+    #             product.save()
+    #     else:
+    #         ninja_product = ninja.get_product(product.ninja_product_id)
+    #         if ninja_product:
+    #             ninja.update_product(  # to sync
+    #                 ninja_product.id,
+    #                 product_key=product_key,
+    #                 notes=product.reseller.name,
+    #                 cost=product.init_price,
+    #             )
 
     return redirect(url_for("reseller.edit", id=form.reseller_id.data))

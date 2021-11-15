@@ -81,15 +81,17 @@ def save():
             if Reseller.query.filter(Reseller.name == form.name.data).first():
                 flash("This name is already taken!Try again", "danger")
                 return redirect(url_for("reseller.edit", id=0))
-            ninja_client = (
-                ninja.add_client(name=form.name.data) if ninja.configured else None
-            )
-            ninja_client_id = ninja_client.id if ninja_client else 0
+            # ninja_client = (
+            #     ninja.add_client(name=form.name.data)  # to sync
+            #     if ninja.configured
+            #     else None
+            # )
+            # ninja_client_id = ninja_client.id if ninja_client else 0
             reseller = Reseller(
                 name=form.name.data,
                 status=form.status.data,
                 comments=form.comments.data,
-                ninja_client_id=ninja_client_id,
+                ninja_client_id=0,
             ).save()
             HistoryChange(
                 change_type=HistoryChange.EditType.creation_reseller,

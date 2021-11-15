@@ -166,6 +166,14 @@ class NinjaApi(object):
         log(log.DEBUG, "NinjaApi.delete_client %s", client_id)
         return self.do_delete(f"{self.BASE_URL}clients/{client_id}")
 
+    def update_client(self, client_id: str, name: str):
+        log(log.DEBUG, "NinjaApi.update_client %s", client_id)
+        return self.do_put(
+            f"{self.BASE_URL}clients/{client_id}",
+            id=client_id,
+            name=name,
+        )
+
     @staticmethod
     def get_next_link(response: ArrayData):
         pagination_links = response.meta.pagination.links
