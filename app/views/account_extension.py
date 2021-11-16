@@ -3,12 +3,13 @@ from flask import current_app as app
 from flask_login import login_required
 from dateutil.relativedelta import relativedelta
 
-from app.models import Account, AccountExtension, Product, Reseller
+from app.models import Account, AccountExtension, Product, Reseller, HistoryChange
 from app.forms import AccountExtensionForm
 from app.logger import log
 from app.ninja import api as ninja
 from app.utils import organize_list_starting_with_value
 from app.controller.account import add_ninja_invoice
+from app.controller.account_extension import check_and_set_history_changes
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
 
@@ -26,8 +27,11 @@ def add():
         return redirect(url_for("main.accounts"))
     account_id = int(request.args["id"])
     account = Account.query.filter(Account.id == account_id).first()
-    account_extension = AccountExtension.query.order_by(AccountExtension.end_date.desc()).filter(
-        AccountExtension.account_id == account_id).first()
+    account_extension = (
+        AccountExtension.query.order_by(AccountExtension.end_date.desc())
+        .filter(AccountExtension.account_id == account_id)
+        .first()
+    )
     if not account_extension:
         account_extension = account
         end_date = account.activation_date + relativedelta(months=account.months)
@@ -109,6 +113,10 @@ def save_new():
     m = account_ext.months if account_ext.months else 0
     account_ext.end_date = account_ext.extension_date + relativedelta(months=m)
     account_ext.save()
+    HistoryChange(
+        change_type=HistoryChange.EditType.extension_account_new,
+        item_id=account_ext.id,
+    ).save()
     account.product_id = form.product_id.data
     account.reseller_id = form.reseller_id.data
     # account.months = form.months.data
@@ -116,7 +124,7 @@ def save_new():
     account.save()
     account.is_new = False
     # Register product in Invoice Ninja
-    if ninja.configured and not app.config["TESTING"]:
+    if ninja.configured and not app.config["TESTING"]:  # ninja sync will do it
         add_ninja_invoice(account, False, "Extended")
     return redirect(url_for("account.edit", id=form.id.data))
 
@@ -133,6 +141,7 @@ def save_update():
     extension = AccountExtension.query.filter(
         AccountExtension.id == form.id.data
     ).first()
+    check_and_set_history_changes(form, extension)
     extension.reseller_id = form.reseller_id.data
     extension.product_id = form.product_id.data
     extension.months = form.months.data
@@ -159,6 +168,10 @@ def delete():
         flash(UNKNOWN_ID, "danger")
         return redirect(url_for("main.accounts"))
     account_id = extension.account_id
+    HistoryChange(
+        change_type=HistoryChange.EditType.extensions_account_delete,
+        item_id=extension.id,
+    ).save()
     extension.delete()
     return redirect(url_for("account.edit", id=account_id))
 

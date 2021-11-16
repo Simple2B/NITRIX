@@ -39,14 +39,19 @@ class Account(db.Model, ModelMixin):
 
     @property
     def expiration_date(self):
-        enddate = AccountExtension.query.with_entities(AccountExtension.end_date).filter(
-            self.id == AccountExtension.account_id
-        ).order_by(desc(AccountExtension.end_date)).first()
+        enddate = (
+            AccountExtension.query.with_entities(AccountExtension.end_date)
+            .filter(self.id == AccountExtension.account_id)
+            .order_by(desc(AccountExtension.end_date))
+            .first()
+        )
         if enddate:
             return enddate.end_date
         else:
             return self.__add_months(self.activation_date, self.months)
 
+    # we fail here --> line 68 -->  change.value_str for change in self.changes.filter_by(change_type="name").all()
+    # we delete account changes and no ref to history changes as i see...
     def to_dict(self) -> dict:
         return {
             "id": self.id,
