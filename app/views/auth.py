@@ -76,7 +76,7 @@ def otp_verify():
         flash("Invalid OTP token. Try again.", "danger")
         log(log.WARNING, "Invalid OTP token")
     elif form.is_submitted():
-        log(log.WARNING, "OTP form validation error")
+        log(log.WARNING, "OTP form validation error [%s]", form.errors)
     return render_template("otp_form.html", form=form)
 
 

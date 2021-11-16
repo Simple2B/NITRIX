@@ -52,7 +52,9 @@ def login(client, user_name, password="password"):
         if b"Wrong user name or password." in res.data:
             return res
         return client.post(
-            url_for("auth.otp_verify"), data=dict(token=totp), follow_redirects=True
+            url_for("auth.otp_verify"),
+            data=dict(token=f"{totp:06d}"),
+            follow_redirects=True,
         )
 
 
