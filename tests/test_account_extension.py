@@ -1,7 +1,14 @@
 import pytest
 from flask import url_for
 from app import create_app, db
-from app.models import AccountExtension, Account, Product, Phone, Reseller
+from app.models import (
+    AccountExtension,
+    Account,
+    Product,
+    Phone,
+    Reseller,
+    HistoryChange,
+)
 from datetime import datetime
 from .test_auth import register, login, logout
 from .mock_db import create_mock_db
@@ -112,6 +119,8 @@ def test_save_new(client):
     check_not_auth_post(client, "account_extension.save_new")
     login(client, LOGIN)
     check_id_post(client, "account_extension.save_new")
+    history = HistoryChange.query.all()
+    assert len(history) == 0
     # what if no account by an account_id
     redirect = client.post(
         url_for("account_extension.save_new"),
@@ -120,11 +129,14 @@ def test_save_new(client):
             reseller_id=CORRECT_ID,
             product_id=CORRECT_ID,
             months=CORRECT_MONTHS,
+            follow_redirects=True,
         ),
     )
     assert redirect.status_code == 302  # to the main.accounts
     response = client.get(redirect.location)
     assert UNKNOWN_ID.encode() in response.data
+    history = HistoryChange.query.all()
+    assert len(history) == 0
 
     check_partial_data(client, "account_extension.save_new")
     # what if wrong months
@@ -158,6 +170,9 @@ def test_save_new(client):
     ).all()
     assert response.status_code == 302
     assert extensions
+    history = HistoryChange.query.all()
+    assert history
+    assert history[0].change_type == HistoryChange.EditType.extension_account_new
     remove_data(ids)
 
 
@@ -222,7 +237,7 @@ def check_partial_data(client, blueprint):
 
 
 def check_id(client, blueprint):
-    """ verify different ID values behavior """
+    """verify different ID values behavior"""
     # what if id is empty
     redirect = client.get(url_for(blueprint, id=EMPTY_ID))
     assert redirect.status_code == 302  # to the main.accounts
