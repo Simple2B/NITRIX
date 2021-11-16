@@ -5,21 +5,20 @@ from flask import flash, url_for
 from flask import current_app as app
 from cerberus import Validator
 
-from config import SIM_COST_DISCOUNT, SIM_COST_ACCOUNT_COMMENT
+from config import SIM_COST_ACCOUNT_COMMENT
 from app.models import (
     Account,
     Product,
     Reseller,
     AccountExtension,
     Phone,
-    ResellerProduct,
     HistoryChange,
 )
 from app.forms import AccountForm
 from app.database import db
 from app.logger import log
 
-from app.utils import ninja_product_name, organize_list_starting_with_value
+from app.utils import organize_list_starting_with_value
 
 
 EXTENDED = "Extended"
@@ -315,7 +314,6 @@ class AccountController(object):
             if self.account.activation_date.date() != form.activation_date.data:
 
                 self.account.activation_date = form.activation_date.data
-                # add_ninja_invoice(self.account, True, "Activated")  # to sync
 
         else:
             if Account.query.filter(
@@ -370,14 +368,6 @@ class AccountController(object):
             item_id=self.account.id,
         ).save()
 
-        # TODO: THIS IS BAD CODE - need todo this correct
-        # invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
-        # for invoice in invoices:
-        #     for item in invoice.invoice_items:
-        #         if self.account.name in item.get('notes'):
-        #             log(log.DEBUG, "deleting item for account [%s]", self.account.name)
-        #             invoice.delete_item(item)
-        #             invoice.save()
         self.account.name = f"{self.account.name}-Deleted-{datetime.now()}"
         self.account.deleted = True
         self.account.save()

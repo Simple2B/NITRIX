@@ -4,8 +4,6 @@ from app.models import Reseller, HistoryChange
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
 
-# from app.ninja import api as ninja
-
 
 reseller_blueprint = Blueprint("reseller", __name__)
 
@@ -82,17 +80,10 @@ def save():
             if Reseller.query.filter(Reseller.name == form.name.data).first():
                 flash("This name is already taken!Try again", "danger")
                 return redirect(url_for("reseller.edit", id=0))
-            # ninja_client = (
-            #     ninja.add_client(name=form.name.data)  # to sync
-            #     if ninja.configured
-            #     else None
-            # )
-            # ninja_client_id = ninja_client.id if ninja_client else 0
             reseller = Reseller(
                 name=form.name.data,
                 status=form.status.data,
                 comments=form.comments.data,
-                ninja_client_id=0,
             ).save()
             HistoryChange(
                 change_type=HistoryChange.EditType.creation_reseller,
@@ -122,8 +113,6 @@ def delete():
             change_type=HistoryChange.EditType.deletion_reseller,
             item_id=reseller.id,
         ).save()
-        # if ninja.configured:
-        #     ninja.delete_client(client_id=reseller.ninja_client_id)
 
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from sqlalchemy import and_
 from app.models import (
     HistoryChange,

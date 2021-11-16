@@ -5,8 +5,6 @@ from app.forms import PhoneForm
 from app.logger import log
 from app.controller.phone import check_and_set_history_changes
 
-# from app.ninja import api as ninja
-
 
 phone_blueprint = Blueprint("phone", __name__)
 
@@ -81,25 +79,6 @@ def save():
             ).save()
 
         phone.save()
-        # Update Invoice Ninja
-        # product_key = f"Phone-{phone.name}"  # noqa E999
-        # if ninja.configured:
-        #     if form.id.data < 0:
-        #         ninja_product = ninja.add_product(
-        #             product_key=product_key, notes="Phone", cost=phone.price
-        #         )
-        #         if ninja_product:
-        #             phone.ninja_product_id = ninja_product.id
-        #             phone.save()
-        #     else:
-        #         ninja_product = ninja.get_product(phone.ninja_product_id)
-        #         if ninja_product:
-        #             ninja.update_product(
-        #                 ninja_product.id,
-        #                 product_key=product_key,
-        #                 notes="Price",
-        #                 cost=phone.price,
-        #             )
         log(log.INFO, "Phone-{} was saved".format(phone.id))
         return redirect(url_for("main.phones", id=phone.id))
     else:
@@ -120,10 +99,6 @@ def delete():
             change_type=HistoryChange.EditType.deletion_phone,
             item_id=phone.id,
         ).save()
-        # Delete in Invoice Ninja
-        # if ninja.configured:
-        #     ninja_product = ninja.get_product(phone.ninja_product_id)
-        #     ninja.delete_product(ninja_product.id)
         return redirect(url_for("main.phones"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.phones"))

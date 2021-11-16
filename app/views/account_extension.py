@@ -8,10 +8,8 @@ from app.models import Account, AccountExtension, Product, Reseller, HistoryChan
 from app.forms import AccountExtensionForm
 from app.logger import log
 
-# from app.ninja import api as ninja
 from app.utils import organize_list_starting_with_value
 
-# from app.controller.account import add_ninja_invoice
 from app.controller.account_extension import check_and_set_history_changes
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
@@ -126,9 +124,6 @@ def save_new():
     # account.activation_date = form.extension_date.data
     account.save()
     account.is_new = False
-    # Register product in Invoice Ninja
-    # if ninja.configured and not app.config["TESTING"]:  # ninja sync will do it
-    #     add_ninja_invoice(account, False, "Extended")
     return redirect(url_for("account.edit", id=form.id.data))
 
 
