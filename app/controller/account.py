@@ -18,9 +18,9 @@ from app.models import (
 from app.forms import AccountForm
 from app.database import db
 from app.logger import log
-from app.ninja import NinjaInvoice
+
 from app.utils import ninja_product_name, organize_list_starting_with_value
-from app.ninja import api as ninja
+
 
 EXTENDED = "Extended"
 
@@ -34,103 +34,6 @@ def all_phones():
     all_phones = phones.all()
     all_phones = organize_list_starting_with_value(all_phones, "None")
     return all_phones
-
-
-# to sync
-def add_ninja_invoice(account: Account, is_new: bool, mode: str):
-    if mode == EXTENDED:
-        reseller_product = (
-            ResellerProduct.query.filter(
-                ResellerProduct.reseller_id == account.reseller_id
-            )
-            .filter(ResellerProduct.product_id == account.extensions[-1].product_id)
-            .filter(ResellerProduct.months == account.extensions[-1].months)
-            .first()
-        )
-    else:
-        reseller_product = (
-            ResellerProduct.query.filter(
-                ResellerProduct.reseller_id == account.reseller_id
-            )
-            .filter(ResellerProduct.product_id == account.product_id)
-            .filter(ResellerProduct.months == account.months)
-            .first()
-        )
-    if not reseller_product:
-        # Locking for this product in NITRIX reseller
-        reseller_product = (
-            ResellerProduct.query.filter(ResellerProduct.reseller_id == 1)
-            .filter(ResellerProduct.product_id == account.product_id)
-            .filter(ResellerProduct.months == account.months)
-            .first()
-        )
-    # Invoice_date is always the first day of current month
-    # first day o the week?
-    date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
-    invoice_date = date
-    current_invoice = None
-    log(log.DEBUG, "Get all invoices...")
-    invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
-    log(log.DEBUG, "Got [%s] invoices!", len(invoices))
-    for invoice in invoices:
-        if (
-            invoice.invoice_date == invoice_date
-            and invoice.client_id == account.reseller.ninja_client_id
-        ):
-            # found invoice
-            current_invoice = invoice
-            log(log.DEBUG, "add_ninja_invoice: found invoice [%s]", invoice.id)
-            break
-    else:
-        # need a new invoice
-        log(log.DEBUG, "add_ninja_invoice: need create new invoice!")
-        current_invoice = NinjaInvoice.add(
-            account.reseller.ninja_client_id, invoice_date
-        )
-    if current_invoice:
-        if mode == EXTENDED:
-            extension_date = account.extensions[-1].extension_date
-            extension_month = account.extensions[-1].months
-            ext_price = reseller_product.ext_price
-            added_item = current_invoice.add_item(
-                ninja_product_name(account.product.name, extension_month),
-                f'{account.name}.  {mode}: {extension_date.strftime("%Y-%m-%d")}',
-                cost=ext_price if reseller_product else 0,
-            )
-        else:
-            added_item = current_invoice.add_item(
-                ninja_product_name(account.product.name, account.months),
-                f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
-                cost=reseller_product.init_price if reseller_product else 0,
-            )
-        if not added_item:
-            log(log.ERROR, "Could not add item to invoice in invoice Ninja!")
-            return None
-        if is_new:
-            if account.phone.name != "None":
-                phone_name = f"Phone-{account.phone.name}"
-                added_item = current_invoice.add_item(
-                    phone_name,
-                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
-                    cost=account.phone.price,
-                )
-                if not added_item:
-                    log(log.ERROR, "Could not add item to invoice in invoice Ninja!")
-                    return None
-            if SIM_COST_ACCOUNT_COMMENT in account.comment:
-                added_item = current_invoice.add_item(
-                    "SIM Cost",
-                    f'{account.name}.  {mode}: {account.activation_date.strftime("%Y-%m-%d")}',
-                    SIM_COST_DISCOUNT,
-                )
-                if not added_item:
-                    log(log.ERROR, "Could not add item to invoice in invoice Ninja!")
-                    return None
-        log(log.INFO, "Invoice into Invoice Ninja added successfully")
-        return True
-    else:
-        log(log.ERROR, "Could not add invoice to Invoice Ninja!")
-        return None
 
 
 def document_changes_if_exist(account, form):
@@ -195,7 +98,7 @@ def document_changes_if_exist(account, form):
         HistoryChange(
             change_type=HistoryChange.EditType.changes_account,
             item_id=account.id,
-            value_name="activation date",
+            value_name="activation_date",
             before_value_str=account.activation_date.strftime("%Y-%m-%d"),
             after_value_str=form.activation_date.data.strftime("%Y-%m-%d"),
         ).save()
@@ -410,32 +313,9 @@ class AccountController(object):
             self.account.months = form.months.data
             self.account.name = form.name.data
             if self.account.activation_date.date() != form.activation_date.data:
-                date = datetime.today().replace(day=1).strftime("%Y-%m-%d")
-                invoice_date = date
-                invoices = [i for i in NinjaInvoice.all() if not i.is_deleted]
-                for invoice in invoices:
-                    if (
-                        invoice.invoice_date == invoice_date
-                        and invoice.client_id == self.account.reseller.ninja_client_id
-                    ):
-                        # found invoice
-                        for item in invoice.invoice_items:
-                            log(log.DEBUG, item["notes"])
-                            log(
-                                log.DEBUG,
-                                f"{self.account.name}.  "
-                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}',
-                            )
-                            if item["notes"] == (
-                                f"{self.account.name}.  "
-                                f'Activated: {self.account.activation_date.strftime("%Y-%m-%d")}'
-                            ):
-                                invoice.delete_item(item)
-                                invoice.save()
-                                break
-                        break
+
                 self.account.activation_date = form.activation_date.data
-                add_ninja_invoice(self.account, True, "Activated")  # to sync
+                # add_ninja_invoice(self.account, True, "Activated")  # to sync
 
         else:
             if Account.query.filter(
@@ -472,7 +352,6 @@ class AccountController(object):
                 change_type=HistoryChange.EditType.creation_account,
                 item_id=self.account.id,
             ).save()
-            self.connect_to_ninja(self.account)
         reseller = Reseller.query.filter(
             Reseller.id == self.account.reseller_id
         ).first()
@@ -480,17 +359,6 @@ class AccountController(object):
         reseller.save()
         log(log.INFO, "Account data was saved")
         return self.account
-
-    def connect_to_ninja(self, account):
-        log(log.DEBUG, "connect_to_ninja account:%d", account.id)
-        if ninja.configured:
-            ninja_api_result = add_ninja_invoice(account, self.new_account, "Activated")
-            if not ninja_api_result:
-                log(
-                    log.ERROR,
-                    "Could not register account as invoice in Invoice Ninja!",
-                )
-                flash("WARNING! Account registration in Ninja failed!", "danger")
 
     def delete(self):
         log(log.INFO, "/account_delete")
@@ -573,7 +441,6 @@ class AccountController(object):
                     else row["comment"] + f"\r\n\r\n{SIM_COST_ACCOUNT_COMMENT}",
                 )
                 db.session.add(imported_account)
-                self.connect_to_ninja(imported_account)
         db.session.commit()
         log(log.INFO, "Import successfull")
         if not app.config["TESTING"]:

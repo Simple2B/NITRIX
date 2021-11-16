@@ -3,7 +3,8 @@ from flask_login import login_required
 from app.models import Reseller, HistoryChange
 from app.forms import ResellerForm, ResellerProductForm
 from app.logger import log
-from app.ninja import api as ninja
+
+# from app.ninja import api as ninja
 
 
 reseller_blueprint = Blueprint("reseller", __name__)
@@ -121,8 +122,8 @@ def delete():
             change_type=HistoryChange.EditType.deletion_reseller,
             item_id=reseller.id,
         ).save()
-        if ninja.configured:
-            ninja.delete_client(client_id=reseller.ninja_client_id)
+        # if ninja.configured:
+        #     ninja.delete_client(client_id=reseller.ninja_client_id)
 
         return redirect(url_for("main.resellers"))
     flash("Wrong request", "danger")

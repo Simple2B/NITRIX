@@ -6,15 +6,33 @@ from .methods import (
     creation_product,
     changes_reseller_product,
     changes_reseller,
+    extension_account_new,
+    extensions_account_change,
+    changes_account,
+    creation_account,
+    creation_phone,
+    changes_phone,
+    deletion_phone,
 )
 
+# changes_product : changes_product
+# deletion_phone_delete : deletion_phone_delete
+# creation_phone:creation_phone
+# changes_phone:changes_phone
 
 _DISPATCHER_MAP = {
-    HistoryChange.EditType.creation_reseller_product: creation_reseller_product,
-    HistoryChange.EditType.creation_reseller: creation_reseller,
-    HistoryChange.EditType.creation_product: creation_product,
-    HistoryChange.EditType.changes_reseller_product: changes_reseller_product,
-    HistoryChange.EditType.changes_reseller: changes_reseller,
+    HistoryChange.EditType.creation_reseller_product: creation_reseller_product,  # +
+    HistoryChange.EditType.creation_reseller: creation_reseller,  # +
+    HistoryChange.EditType.creation_product: creation_product,  # +
+    HistoryChange.EditType.changes_reseller_product: changes_reseller_product,  # +
+    HistoryChange.EditType.changes_reseller: changes_reseller,  # +
+    HistoryChange.EditType.extension_account_new: extension_account_new,  # +
+    HistoryChange.EditType.extensions_account_change: extensions_account_change,
+    HistoryChange.EditType.changes_account: changes_account,  # pass
+    HistoryChange.EditType.creation_account: creation_account,  # +
+    HistoryChange.EditType.creation_phone: creation_phone,  # +
+    HistoryChange.EditType.changes_phone: changes_phone,  # +
+    HistoryChange.EditType.deletion_phone: deletion_phone,  # +
 }
 
 
