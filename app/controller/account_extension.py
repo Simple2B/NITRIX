@@ -35,7 +35,7 @@ def check_and_set_history_changes(
         HistoryChange(
             change_type=HistoryChange.EditType.extensions_account_change,
             item_id=extension.id,
-            value_name="extension date",
+            value_name="extension_date",
             before_value_str=str(extension.extension_date),
             after_value_str=str(form.extension_date.data),
         ).save()
@@ -47,7 +47,7 @@ def check_and_set_history_changes(
         HistoryChange(
             change_type=HistoryChange.EditType.extensions_account_change,
             item_id=extension.id,
-            value_name="end date",
+            value_name="end_date",
             before_value_str=str(extension.end_date),
             after_value_str=str(
                 extension.extension_date + relativedelta(months=extension.months)
