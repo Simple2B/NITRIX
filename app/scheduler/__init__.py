@@ -47,13 +47,17 @@ def sync_scheduler():
     4. if response ok, mark synced = True (if not try send again or go to next?)
     6.
     """
-    log(log.INFO, "[SHED] Start sync scheduler")
+    log(log.DEBUG, ".")
 
     changes: list[HistoryChange] = HistoryChange.query.filter(
         HistoryChange.synced == False  # noqa E712
     ).all()
-    log(log.INFO, "[SHED] Invoices: [%s]", changes)
+    len_changes = len(changes)
+    if not changes:
+        return
+    log(log.INFO, "[SHED] Found [%d] changes", len_changes)
 
+    log(log.INFO, "[SHED] Start sync scheduler")
     for change in changes:
         if change.change_type not in _DISPATCHER_MAP:
             log(
