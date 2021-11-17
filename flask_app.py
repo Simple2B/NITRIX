@@ -137,14 +137,14 @@ def create_database(test_data=False):
         user_type=User.Type.super_admin,
         activated=User.Status.active,
     ).save(False)
-    User(
-        name="user",
-        password="user",
-        user_type=User.Type.user,
-        activated=User.Status.active,
-    ).save(False)
-    add_reseller_with_test_products(name="NITRIX", comments="Main reseller")
     if test_data:
+        User(
+            name="user",
+            password="user",
+            user_type=User.Type.user,
+            activated=User.Status.active,
+        ).save(False)
+        add_reseller_with_test_products(name="NITRIX", comments="Main reseller")
         add_phone(name="Samsung", price=54.00)
         add_phone(name="Nokia", price=38.00)
         add_phone(name="Lg", price=30.00)
