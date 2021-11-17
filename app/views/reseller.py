@@ -29,7 +29,8 @@ def edit():
     log(log.INFO, "/reseller_edit")
     if "id" in request.args:
         id = int(request.args["id"])
-        reseller = Reseller.query.filter(Reseller.id == id).first()
+        log(log.DEBUG, "Id: [%d]", id)
+        reseller = Reseller.query.get(id)
         if reseller is None:
             flash("Wrong account id.", "danger")
             return redirect(url_for("main.resellers"))

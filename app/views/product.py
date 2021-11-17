@@ -13,10 +13,11 @@ def edit():
     log(log.INFO, "/product_details")
     if "id" in request.args:
         id = int(request.args["id"])
-        product = Product.query.filter(Product.id == id).first()
-        if product is None:
+        log(log.DEBUG, "Id: [%d]", id)
+        product = Product.query.get(id)
+        if not product:
             flash("Wrong account id.", "danger")
-            log(log.WARNING, "Invalid id")
+            log(log.ERROR, "Invalid id")
             return redirect(url_for("main.products"))
         form = ProductForm(id=product.id, name=product.name, status=product.status.name)
 
