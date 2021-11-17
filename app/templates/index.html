@@ -103,7 +103,7 @@
     entries
   </div>
     <form class="form-inline float-right" action="{{ url_for('main.accounts')}}">
-      {{ form.hidden_tag() }}
+      {#{ form.hidden_tag() }#}
       <div class="form-row mb-1">
         <input type="text" class="form-control form-control-outline-secondary my-sm-0 " name="filter" value='{{filter}}' >
       <div class="col-1.5 form-group m-0 "></div>
