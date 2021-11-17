@@ -41,6 +41,7 @@ def save():
     log(log.INFO, "/product_save")
     form = ProductForm(request.form)
     log(log.DEBUG, "form: [%s]", form.errors)
+    log(log.DEBUG, "form: [%s]", form.data)
     if form.validate_on_submit():
         if form.id.data > 0:
             product = Product.query.get(form.id.data)
