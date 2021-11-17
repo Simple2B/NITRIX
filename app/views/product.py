@@ -40,9 +40,10 @@ def edit():
 def save():
     log(log.INFO, "/product_save")
     form = ProductForm(request.form)
+    log(log.DEBUG, "form: [%s]", form.form_errors)
     if form.validate_on_submit():
         if form.id.data > 0:
-            product = Product.query.filter(Product.id == form.id.data).first()
+            product = Product.query.get(form.id.data)
             if product is None:
                 flash("Wrong product id.", "danger")
                 return redirect(url_for("main.products"))
@@ -74,7 +75,7 @@ def save():
 def delete():
     if "id" in request.args:
         product_id = int(request.args["id"])
-        product = Product.query.filter(Product.id == product_id).first()
+        product = Product.query.get(product_id)
         product.deleted = True
         product.save()
         HistoryChange(

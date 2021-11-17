@@ -63,7 +63,7 @@ def save():
     form = ResellerForm(request.form)
     if form.validate_on_submit():
         if form.id.data > 0:
-            reseller = Reseller.query.filter(Reseller.id == form.id.data).first()
+            reseller = Reseller.query.get(form.id.data)
             if reseller is None:
                 flash("Wrong reseller id.", "danger")
                 return redirect(url_for("main.resellers"))
@@ -107,7 +107,7 @@ def save():
 def delete():
     if "id" in request.args:
         reseller_id = int(request.args["id"])
-        reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
+        reseller = Reseller.query.get(reseller_id)
         reseller.deleted = True
         reseller.save()
         HistoryChange(
