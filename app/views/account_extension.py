@@ -1,16 +1,11 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
-
-# from flask import current_app as app
 from flask_login import login_required
 from dateutil.relativedelta import relativedelta
-
 from app.models import Account, AccountExtension, Product, Reseller, HistoryChange
 from app.forms import AccountExtensionForm
 from app.logger import log
-
 from app.utils import organize_list_starting_with_value
-
-from app.controller.account_extension import check_and_set_history_changes
+from app.controller.account_extension import update_account_extension_history
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
 
@@ -139,7 +134,7 @@ def save_update():
     extension = AccountExtension.query.filter(
         AccountExtension.id == form.id.data
     ).first()
-    check_and_set_history_changes(form, extension)
+    update_account_extension_history(form, extension)
     extension.reseller_id = form.reseller_id.data
     extension.product_id = form.product_id.data
     extension.months = form.months.data

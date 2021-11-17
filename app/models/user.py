@@ -58,8 +58,7 @@ class User(db.Model, UserMixin, ModelMixin):
 
     def verify_totp(self, token):
         """validates 6-digit OTP code retrieved from Google"""
-        int_token = int(token)
-        return onetimepass.valid_totp(f"{int_token:06d}", self.otp_secret)
+        return onetimepass.valid_totp(token, self.otp_secret)
 
     @classmethod
     def authenticate(cls, user_name, password):

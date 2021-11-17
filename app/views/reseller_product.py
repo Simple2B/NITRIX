@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.models import Product, ResellerProduct, HistoryChange
 from app.forms import ResellerProductForm
 from app.logger import log
-from app.controller.reseller_product import check_and_set_history_changes
+from app.controller.reseller_product import update_reseller_product_history
 
 reseller_product_blueprint = Blueprint("reseller_product", __name__)
 
@@ -81,7 +81,7 @@ def save():
         product.init_price = form.init_price.data
         product.ext_price = form.ext_price.data
         # change
-        check_and_set_history_changes(form, product)
+        update_reseller_product_history(form, product)
         product.save()
     else:
         product = (

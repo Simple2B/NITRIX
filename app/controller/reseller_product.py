@@ -2,7 +2,9 @@ from app.forms import ResellerProductForm
 from app.models import ResellerProduct, HistoryChange
 
 
-def check_and_set_history_changes(form: ResellerProductForm, product: ResellerProduct):
+def update_reseller_product_history(
+    form: ResellerProductForm, product: ResellerProduct
+):
     if product.months != form.months.data:
         HistoryChange(
             change_type=HistoryChange.EditType.changes_reseller_product,

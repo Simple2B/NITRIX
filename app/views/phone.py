@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.models import Phone, HistoryChange
 from app.forms import PhoneForm
 from app.logger import log
-from app.controller.phone import check_and_set_history_changes
+from app.controller.phone import update_phone_history
 
 
 phone_blueprint = Blueprint("phone", __name__)
@@ -54,7 +54,7 @@ def save():
                 return redirect(url_for("main.phones"))
             for k in request.form.keys():
                 phone.__setattr__(k, form.__getattribute__(k).data)
-            check_and_set_history_changes(form, phone)
+            update_phone_history(form, phone)
         else:
             # Check uniqueness Phone name
             if (

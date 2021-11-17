@@ -37,15 +37,12 @@ _DISPATCHER_MAP = {
 
 
 def sync_scheduler():
-    # TODO: fix docs
     """
-    1. get current time and date
-    2. get all needed invoices in some list (creation date is lower than current;
-        filtered by HistoryChange.change_type creation, change;
-        all in one list or separate?)
-    3. go thru list with cycle and send each invoice
-    4. if response ok, mark synced = True (if not try send again or go to next?)
-    6.
+    0. With periodic time call this scheduler (time sets in .env)
+    1. get current changes: list[HistoryChange] where synced is False
+    2. If no such changes we stop
+    3. go thru changes with cycle and if its in _DISPATCHER_MAP we call its method
+    4. if method return True, mark chaneg as synced = True
     """
     log(log.DEBUG, ".")
 

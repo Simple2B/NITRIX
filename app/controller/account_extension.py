@@ -2,7 +2,7 @@ from app.forms import AccountExtensionForm
 from app.models import AccountExtension, HistoryChange
 
 
-def check_and_set_history_changes(
+def update_account_extension_history(
     form: AccountExtensionForm, extension: AccountExtension
 ):
 
