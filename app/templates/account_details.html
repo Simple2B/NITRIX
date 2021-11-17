@@ -3,7 +3,7 @@
 {% block account_details %}
 <div class="container">
   <form action="{{form.save_route}}" method="POST" id="main-form">
-
+    {{ form.hidden_tag() }}
     <div class="row pt-3 pl-4">
       {% if form.is_edit %}
       <h2>Edit Account</h2>
