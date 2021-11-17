@@ -1,9 +1,9 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for
 from flask_login import login_required
-from app.models import Phone
+from app.models import Phone, HistoryChange
 from app.forms import PhoneForm
 from app.logger import log
-from app.ninja import api as ninja
+from app.controller.phone import update_phone_history
 
 
 phone_blueprint = Blueprint("phone", __name__)
@@ -46,9 +46,6 @@ def save():
     form = PhoneForm(request.form)
     if form.validate_on_submit():
         # If we have this name in database
-        if Phone.query.filter(Phone.name == form.name.data).first():
-            phone = Phone.query.filter(Phone.name == form.name.data).first()
-            phone.delete = False
 
         if form.id.data > 0:
             phone = Phone.query.filter(Phone.id == form.id.data).first()
@@ -57,34 +54,31 @@ def save():
                 return redirect(url_for("main.phones"))
             for k in request.form.keys():
                 phone.__setattr__(k, form.__getattribute__(k).data)
+            update_phone_history(form, phone)
         else:
-            phone = Phone(
-                name=form.name.data, price=form.price.data, status=form.status.data
-            )
             # Check uniqueness Phone name
-            if Phone.query.filter(Phone.name == phone.name).first():
+            if (
+                Phone.query.filter(Phone.name == form.name.data)
+                .filter(Phone.deleted == True)  # noqa E712
+                .first()
+            ):
                 flash("This name is already taken!Try again", "danger")
-                return redirect(url_for("phone.edit", id=phone.id))
-        phone.save()
-        # Update Invoice Ninja
-        product_key = f"Phone-{phone.name}"  # noqa E999
-        if ninja.configured:
-            if form.id.data < 0:
-                ninja_product = ninja.add_product(
-                    product_key=product_key, notes="Phone", cost=phone.price
-                )
-                if ninja_product:
-                    phone.ninja_product_id = ninja_product.id
-                    phone.save()
+                return redirect(url_for("phone.edit", id=form.id.data))
+            phone = Phone.query.filter(Phone.name == form.name.data).first()
+            if phone:
+                phone.deleted = False
+                phone.price = form.price.data
+                phone.status = form.status.data
             else:
-                ninja_product = ninja.get_product(phone.ninja_product_id)
-                if ninja_product:
-                    ninja.update_product(
-                        ninja_product.id,
-                        product_key=product_key,
-                        notes="Price",
-                        cost=phone.price,
-                    )
+                phone = Phone(
+                    name=form.name.data, price=form.price.data, status=form.status.data
+                )
+            HistoryChange(
+                change_type=HistoryChange.EditType.creation_phone,
+                item_id=phone.id,
+            ).save()
+
+        phone.save()
         log(log.INFO, "Phone-{} was saved".format(phone.id))
         return redirect(url_for("main.phones", id=phone.id))
     else:
@@ -101,10 +95,10 @@ def delete():
         phone = Phone.query.filter(Phone.id == phone_id).first()
         phone.deleted = True
         phone.save()
-        # Delete in Invoice Ninja
-        if ninja.configured:
-            ninja_product = ninja.get_product(phone.ninja_product_id)
-            ninja.delete_product(ninja_product.id)
+        HistoryChange(
+            change_type=HistoryChange.EditType.deletion_phone,
+            item_id=phone.id,
+        ).save()
         return redirect(url_for("main.phones"))
     flash("Wrong request", "danger")
     return redirect(url_for("main.phones"))

@@ -47,7 +47,7 @@ def save():
                     "account.edit",
                     prev_reseller=account.reseller.name,
                     prev_product=account.product.name,
-                    prev_phone=account.phone.name,
+                    prev_phone=account.phone.name if account.phone else "None",
                     prev_month=account.months,
                     prev_simcost=form.sim_cost.data,
                 )

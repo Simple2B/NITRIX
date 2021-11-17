@@ -22,7 +22,9 @@ services:
       - FLASK_DEBUG=1
     volumes:
       - ./.env:/app/.env
-    command: poetry run celery -A app.worker worker -B --loglevel=INFO
+    command: poetry run celery -A app.worker worker -B
+    # command: poetry run celery -A app.worker worker -B --loglevel=INFO
+
     depends_on:
       - redis
 

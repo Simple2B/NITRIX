@@ -62,7 +62,7 @@ def otp_verify():
     form = TwoFactorForm(request.form)
     if form.validate_on_submit():
         log(log.INFO, "otp form validated")
-        user = User.query.filter(User.id == session.get("id")).first()
+        user: User = User.query.filter(User.id == session.get("id")).first()
         if session["id"] and user.verify_totp(form.token.data):
             log(log.INFO, "user logged in")
             login_user(user)
@@ -76,7 +76,7 @@ def otp_verify():
         flash("Invalid OTP token. Try again.", "danger")
         log(log.WARNING, "Invalid OTP token")
     elif form.is_submitted():
-        log(log.WARNING, "OTP form validation error")
+        log(log.WARNING, "OTP form validation error [%s]", form.errors)
     return render_template("otp_form.html", form=form)
 
 

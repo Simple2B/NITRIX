@@ -31,9 +31,15 @@ class HistoryChange(db.Model, ModelMixin):
         creation_product = "creation_product"
         deletion_product = "deletion_product"
         changes_product = "changes_product"
+        creation_reseller_product = "creation_reseller_product"
+        deletion_reseller_product = "deletion_reseller_product"
+        changes_reseller_product = "changes_reseller_product"
+        creation_phone = "creation_phone"
+        changes_phone = "changes_phone"
+        deletion_phone = "deletion_phone"
 
     id = db.Column(db.Integer, primary_key=True)
-    item_id = db.Column(db.Integer)  # acc | res | prod id
+    item_id = db.Column(db.Integer)  # acc | res | prod id | res_pro_id | phone_id
     user_id = db.Column(
         db.Integer, db.ForeignKey("users.id"), default=get_current_user_id
     )

@@ -4,7 +4,7 @@ from ..database import db
 from datetime import datetime, date
 from app.utils import ModelMixin
 from sqlalchemy.orm import relationship
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 from app.models.account_extensions import AccountExtension
 
 
@@ -27,7 +27,7 @@ class Account(db.Model, ModelMixin):
     product = relationship("Product")
     phone = relationship("Phone")
     reseller = relationship("Reseller")
-    extensions = relationship("AccountExtension")
+    extensions = relationship("AccountExtension", viewonly=True)
 
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:
@@ -53,6 +53,14 @@ class Account(db.Model, ModelMixin):
     # we fail here --> line 68 -->  change.value_str for change in self.changes.filter_by(change_type="name").all()
     # we delete account changes and no ref to history changes as i see...
     def to_dict(self) -> dict:
+        from .history_changes import HistoryChange
+
+        changes = HistoryChange.query.filter(
+            and_(
+                HistoryChange.change_type == HistoryChange.EditType.changes_account,
+                HistoryChange.item_id == self.id,
+            )
+        )
         return {
             "id": self.id,
             "name": self.name,
@@ -66,14 +74,18 @@ class Account(db.Model, ModelMixin):
             "months": self.months,
             "prev_names": ", ".join(
                 [
-                    change.value_str
-                    for change in self.changes.filter_by(change_type="name").all()
+                    change.before_value_str
+                    for change in changes.filter(
+                        HistoryChange.value_name == "name"
+                    ).all()
                 ]
             ),
             "prev_sims": ", ".join(
                 [
-                    change.value_str
-                    for change in self.changes.filter_by(change_type="sim").all()
+                    change.before_value_str
+                    for change in changes.filter(
+                        HistoryChange.value_name == "sim"
+                    ).all()
                 ]
             ),
         }

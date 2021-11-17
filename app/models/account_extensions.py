@@ -18,3 +18,4 @@ class AccountExtension(db.Model, ModelMixin):
     reseller = relationship("Reseller")
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"))
     product = relationship("Product")
+    account = relationship("Account")
