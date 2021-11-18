@@ -54,12 +54,13 @@ def save():
                 return redirect(url_for("main.phones"))
             for k in request.form.keys():
                 phone.__setattr__(k, form.__getattribute__(k).data)
+            phone.save()
             update_phone_history(form, phone)
         else:
             # Check uniqueness Phone name
             if (
                 Phone.query.filter(Phone.name == form.name.data)
-                .filter(Phone.deleted == True)  # noqa E712
+                .filter(Phone.deleted == False)  # noqa E712
                 .first()
             ):
                 flash("This name is already taken!Try again", "danger")
@@ -69,16 +70,16 @@ def save():
                 phone.deleted = False
                 phone.price = form.price.data
                 phone.status = form.status.data
+                phone.save()
             else:
                 phone = Phone(
                     name=form.name.data, price=form.price.data, status=form.status.data
-                )
+                ).save()
             HistoryChange(
                 change_type=HistoryChange.EditType.creation_phone,
                 item_id=phone.id,
             ).save()
 
-        phone.save()
         log(log.INFO, "Phone-{} was saved".format(phone.id))
         return redirect(url_for("main.phones", id=phone.id))
     else:
