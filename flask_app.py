@@ -137,7 +137,7 @@ def create_database(test_data=False):
         user_type=User.Type.super_admin,
         activated=User.Status.active,
     ).save(False)
-    add_reseller_with_test_products(name="NITRIX", comments="Main reseller")
+    add_reseller(name="NITRIX", comments="Main reseller")
     if test_data:
         User(
             name="user",
