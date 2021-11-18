@@ -153,8 +153,18 @@ def extension_account_new(change: HistoryChange):
         and_(
             ResellerProduct.product_id == ext_account.product_id,
             ResellerProduct.reseller_id == ext_account.reseller_id,
+            ResellerProduct.months == ext_account.months,
         )
     ).first()
+    if not reseller_product:
+        # try to find suitable product of reseller NITRIX
+        reseller_product: ResellerProduct = ResellerProduct.query.filter(
+            and_(
+                ResellerProduct.product_id == ext_account.product_id,
+                ResellerProduct.reseller_id == 1,
+                ResellerProduct.months == ext_account.months,
+            )
+        ).first()
     assert reseller_product
     current_invoice = get_current_invoice(
         invoice_date, account.reseller.ninja_client_id
@@ -186,8 +196,18 @@ def extensions_account_change(change: HistoryChange):
         and_(
             ResellerProduct.product_id == ext_account.product_id,
             ResellerProduct.reseller_id == ext_account.reseller_id,
+            ResellerProduct.months == ext_account.months,
         )
     ).first()
+    if not reseller_product:
+        # try to find suitable product of reseller NITRIX
+        reseller_product: ResellerProduct = ResellerProduct.query.filter(
+            and_(
+                ResellerProduct.product_id == ext_account.product_id,
+                ResellerProduct.reseller_id == 1,
+                ResellerProduct.months == ext_account.months,
+            )
+        ).first()
     assert reseller_product
     for item in invoice.line_items:
         log(log.DEBUG, "[SHED] update invoice item [%s]", item["notes"])
