@@ -104,7 +104,7 @@ def save():
         ).save()
         HistoryChange(
             change_type=HistoryChange.EditType.creation_reseller_product,
-            item_id=product.product_id,
+            item_id=product.id,
         ).save()
 
     return redirect(url_for("reseller.edit", id=form.reseller_id.data))

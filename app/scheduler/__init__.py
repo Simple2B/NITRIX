@@ -56,6 +56,7 @@ def sync_scheduler():
 
     log(log.INFO, "[SHED] Start sync scheduler")
     for change in changes:
+        change: HistoryChange = change
         if change.change_type not in _DISPATCHER_MAP:
             log(
                 log.WARNING,
@@ -65,6 +66,7 @@ def sync_scheduler():
             )
             continue
         method = _DISPATCHER_MAP[change.change_type]
+        log(log.INFO, "[SHED] Change: [%s]", change.change_type)
         if method(change):
             change.synced = True
             change.save()

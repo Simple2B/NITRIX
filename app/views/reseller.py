@@ -67,15 +67,16 @@ def save():
             if reseller is None:
                 flash("Wrong reseller id.", "danger")
                 return redirect(url_for("main.resellers"))
-            HistoryChange(
-                change_type=HistoryChange.EditType.changes_reseller,
-                item_id=reseller.id,
-                value_name="name",
-                before_value_str=reseller.name,
-                after_value_str=form.name.data,
-            ).save()
-            reseller.name = form.name.data
-            reseller.save()
+            if reseller.name != form.name.data:
+                HistoryChange(
+                    change_type=HistoryChange.EditType.changes_reseller,
+                    item_id=reseller.id,
+                    value_name="name",
+                    before_value_str=reseller.name,
+                    after_value_str=form.name.data,
+                ).save()
+                reseller.name = form.name.data
+                reseller.save()
         else:
             # Check uniqueness of Reseller name
             if Reseller.query.filter(Reseller.name == form.name.data).first():
