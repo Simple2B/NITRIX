@@ -98,7 +98,8 @@ def save():
         return redirect(url_for("reseller.edit", id=reseller.id))
     else:
         flash("Form validation error", "danger")
-        log(log.ERROR, "Form validation error")
+        log(log.ERROR, "Form validation error [%s]", form.errors)
+
     return redirect(url_for("reseller.edit", id=form.id.data))
 
 
