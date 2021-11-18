@@ -55,7 +55,10 @@ def creation_reseller_product(change: HistoryChange):
         reseller_product.product.name, reseller_product.months
     )
     for prod in ninja.products:
-        if prod.product_key == product_key:
+        if (
+            prod.product_key == product_key
+            and prod.notes == reseller_product.reseller.name
+        ):
             ninja_product = prod
             break
     else:
@@ -232,6 +235,7 @@ def changes_account(change: HistoryChange):
 
 def creation_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_account
+    log(log.INFO, "[SHED] Change is [%s]", change)
     account: Account = Account.query.get(change.item_id)
     invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
     reseller_product: ResellerProduct = ResellerProduct.query.filter(
