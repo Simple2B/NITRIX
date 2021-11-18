@@ -242,8 +242,17 @@ def creation_account(change: HistoryChange):
         and_(
             ResellerProduct.product_id == account.product_id,
             ResellerProduct.reseller_id == account.reseller_id,
+            ResellerProduct.months == account.months,
         )
     ).first()
+    if not reseller_product:
+        reseller_product: ResellerProduct = ResellerProduct.query.filter(
+            and_(
+                ResellerProduct.product_id == account.product_id,
+                ResellerProduct.reseller_id == 1,
+                ResellerProduct.months == account.months,
+            )
+        ).first()
     assert reseller_product
     current_invoice = get_current_invoice(
         invoice_date, account.reseller.ninja_client_id
