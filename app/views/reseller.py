@@ -29,7 +29,8 @@ def edit():
     log(log.INFO, "/reseller_edit")
     if "id" in request.args:
         id = int(request.args["id"])
-        reseller = Reseller.query.filter(Reseller.id == id).first()
+        log(log.DEBUG, "Id: [%d]", id)
+        reseller = Reseller.query.get(id)
         if reseller is None:
             flash("Wrong account id.", "danger")
             return redirect(url_for("main.resellers"))
@@ -62,19 +63,20 @@ def save():
     form = ResellerForm(request.form)
     if form.validate_on_submit():
         if form.id.data > 0:
-            reseller = Reseller.query.filter(Reseller.id == form.id.data).first()
+            reseller = Reseller.query.get(form.id.data)
             if reseller is None:
                 flash("Wrong reseller id.", "danger")
                 return redirect(url_for("main.resellers"))
-            HistoryChange(
-                change_type=HistoryChange.EditType.changes_reseller,
-                item_id=reseller.id,
-                value_name="name",
-                before_value_str=reseller.name,
-                after_value_str=form.name.data,
-            ).save()
-            reseller.name = form.name.data
-            reseller.save()
+            if reseller.name != form.name.data:
+                HistoryChange(
+                    change_type=HistoryChange.EditType.changes_reseller,
+                    item_id=reseller.id,
+                    value_name="name",
+                    before_value_str=reseller.name,
+                    after_value_str=form.name.data,
+                ).save()
+                reseller.name = form.name.data
+                reseller.save()
         else:
             # Check uniqueness of Reseller name
             if Reseller.query.filter(Reseller.name == form.name.data).first():
@@ -97,7 +99,8 @@ def save():
         return redirect(url_for("reseller.edit", id=reseller.id))
     else:
         flash("Form validation error", "danger")
-        log(log.ERROR, "Form validation error")
+        log(log.ERROR, "Form validation error [%s]", form.errors)
+
     return redirect(url_for("reseller.edit", id=form.id.data))
 
 
@@ -106,7 +109,7 @@ def save():
 def delete():
     if "id" in request.args:
         reseller_id = int(request.args["id"])
-        reseller = Reseller.query.filter(Reseller.id == reseller_id).first()
+        reseller = Reseller.query.get(reseller_id)
         reseller.deleted = True
         reseller.save()
         HistoryChange(

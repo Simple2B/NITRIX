@@ -8,7 +8,7 @@ def update_reseller_product_history(
     if product.months != form.months.data:
         HistoryChange(
             change_type=HistoryChange.EditType.changes_reseller_product,
-            item_id=product.product_id,
+            item_id=product.id,
             value_name="months",
             before_value_str=str(product.months),
             after_value_str=str(form.months.data),
@@ -16,7 +16,7 @@ def update_reseller_product_history(
     if product.init_price != form.init_price.data:
         HistoryChange(
             change_type=HistoryChange.EditType.changes_reseller_product,
-            item_id=product.product_id,
+            item_id=product.id,
             value_name="init_price",
             before_value_str=str(product.init_price),
             after_value_str=str(form.init_price.data),
@@ -24,7 +24,7 @@ def update_reseller_product_history(
     if product.ext_price != form.ext_price.data:
         HistoryChange(
             change_type=HistoryChange.EditType.changes_reseller_product,
-            item_id=product.product_id,
+            item_id=product.id,
             value_name="ext_price",
             before_value_str=str(product.ext_price),
             after_value_str=str(form.ext_price.data),

@@ -45,9 +45,9 @@ class HistoryChange(db.Model, ModelMixin):
     )
     date = db.Column(db.DateTime, default=datetime.now)
     change_type = db.Column(Enum(EditType))
-    value_name = db.Column(db.String(64))
-    before_value_str = db.Column(db.String(64))
-    after_value_str = db.Column(db.String(64))
+    value_name = db.Column(db.String(64), default="")
+    before_value_str = db.Column(db.String(64), default="")
+    after_value_str = db.Column(db.String(64), default="")
     synced = db.Column(db.Boolean, default=False)
     user = relationship("User", viewonly=True)
 

@@ -3,6 +3,7 @@
 {%block content %}
 <div class="container-fluid mt-3">
   <form>
+    {{ form.hidden_tag() }}
     <div class="row pl-3 pb-3">
       {% if form.is_edit %}
       <h2>Phone edit</h2>

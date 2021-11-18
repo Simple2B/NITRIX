@@ -3,6 +3,7 @@
 {% block reseller_edit %}
 <div class="container">
   <form action="{{form.save_route}}" method="POST" id="main-form">
+    {{ form.hidden_tag() }}
     <div class="row pl-3 pb-3">
       {% if form.is_edit %}
       <h1>Reseller edit</h1>

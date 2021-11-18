@@ -19,7 +19,7 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_APP=flask_app
-      - FLASK_DEBUG=1
+      - FLASK_DEBUG=0
     volumes:
       - ./.env:/app/.env
     command: poetry run celery -A app.worker worker -B
@@ -50,7 +50,7 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_APP=flask_app
-      - FLASK_DEBUG=1
+      - FLASK_DEBUG=0
     ports:
       - 127.0.0.1:7777:5000
     command: ./start_server.sh

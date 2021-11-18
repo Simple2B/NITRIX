@@ -156,6 +156,7 @@
           </div>
           {% else %}
           <form action="{{form.save_route}}" method="POST" id="main-form">
+            {{ form.hidden_tag() }}
             {% block content %} {% endblock %}
             <div class="card-footer mt-6">
               <div class="row">

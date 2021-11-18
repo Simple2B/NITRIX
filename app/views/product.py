@@ -13,10 +13,11 @@ def edit():
     log(log.INFO, "/product_details")
     if "id" in request.args:
         id = int(request.args["id"])
-        product = Product.query.filter(Product.id == id).first()
-        if product is None:
+        log(log.DEBUG, "Id: [%d]", id)
+        product = Product.query.get(id)
+        if not product:
             flash("Wrong account id.", "danger")
-            log(log.WARNING, "Invalid id")
+            log(log.ERROR, "Invalid id")
             return redirect(url_for("main.products"))
         form = ProductForm(id=product.id, name=product.name, status=product.status.name)
 
@@ -39,9 +40,10 @@ def edit():
 def save():
     log(log.INFO, "/product_save")
     form = ProductForm(request.form)
+    log(log.DEBUG, "form: [%s]", form.data)
     if form.validate_on_submit():
         if form.id.data > 0:
-            product = Product.query.filter(Product.id == form.id.data).first()
+            product = Product.query.get(form.id.data)
             if product is None:
                 flash("Wrong product id.", "danger")
                 return redirect(url_for("main.products"))
@@ -64,7 +66,7 @@ def save():
         return redirect(url_for("main.products", id=product.id))
     else:
         flash("Form validation error", "danger")
-        log(log.WARNING, "Form validation error")
+        log(log.ERROR, "Form validation error [%s]", form.errors)
     return redirect(url_for("product.edit", id=form.id.data))
 
 
@@ -73,7 +75,7 @@ def save():
 def delete():
     if "id" in request.args:
         product_id = int(request.args["id"])
-        product = Product.query.filter(Product.id == product_id).first()
+        product = Product.query.get(product_id)
         product.deleted = True
         product.save()
         HistoryChange(
