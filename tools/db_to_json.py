@@ -1,7 +1,8 @@
+import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel
-import json
+from sqlalchemy import and_
 from app.logger import log
 from app.models import (
     User,
@@ -15,6 +16,11 @@ from app.models import (
 )
 
 DB_MIGRATION_DIR = "data-migrations/"
+os.makedirs(DB_MIGRATION_DIR, exist_ok=True)
+
+
+class OutData(BaseModel):
+    data: list[Any]
 
 
 class PhoneModel(BaseModel):
@@ -48,7 +54,6 @@ class ResellerModel(BaseModel):
 
 
 class ResellerProductModel(BaseModel):
-
     months: int
     init_price: float
     ext_price: float
@@ -61,7 +66,6 @@ class ResellerProductModel(BaseModel):
 
 
 class AccountModel(BaseModel):
-
     name: str
     sim: str
     imei: str
@@ -104,7 +108,6 @@ class UserModel(BaseModel):
 
 
 class AccountChangesModel(BaseModel):
-
     date: datetime
     change_type: AccountChanges.ChangeType
     value_str: Optional[str] = None
@@ -117,130 +120,88 @@ class AccountChangesModel(BaseModel):
         use_enum_values = True
 
 
+def write_json(file_name: str, data: OutData):
+    file_path = os.path.join(DB_MIGRATION_DIR, f"{file_name}.json")
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(data.json(indent=2))
+    log(log.DEBUG, "Created file: [%s]", file_path)
+
+
 def get_users():
-
-    users = User.query.filter(User.deleted == False).all()  # noqa E712
+    users = User.query.filter(
+        and_(User.deleted == False, User.name != "admin")  # noqa E712
+    ).all()
     log(log.DEBUG, "[GET users from db]Got [%d] users!", len(users))
-    user_list: list[UserModel] = []
-    for user in users:
-        user: User = user
-        if user.name != "admin":
-            new_user = UserModel.from_orm(user)
-            user_list.append(new_user.dict())
-
-    with open(DB_MIGRATION_DIR + "user_list.json", "w", encoding="utf-8") as f:
-        json.dump(user_list, f, indent=2, ensure_ascii=False)
-    log(log.DEBUG, "[GET users from db] Finished !")
+    write_json("users", OutData(data=[UserModel.from_orm(user) for user in users]))
 
 
 def get_resellers():
+    resellers = Reseller.query.filter(
+        and_(Reseller.deleted == False, Reseller.name != "NITRIX")  # noqa E712
+    ).all()
 
-    resellers = Reseller.query.filter(Reseller.deleted == False).all()  # noqa E712
-
-    resellers_list: list[ResellerModel] = []
-    log(log.DEBUG, "[GET resellers from db]Got [%s] resellers!", len(resellers))
-
-    for reseller in resellers:
-        reseller: Reseller = reseller
-        if reseller.name != "NITRIX":
-            new_reseller = ResellerModel.from_orm(reseller)
-            resellers_list.append(new_reseller.dict())
-
-    with open(DB_MIGRATION_DIR + "resellers_list.json", "w", encoding="utf-8") as f:
-        json.dump(resellers_list, f, ensure_ascii=False)
-    log(log.DEBUG, "[GET resellers from db] Finished !")
+    log(log.DEBUG, "[GET resellers from db]Got [%d] resellers!", len(resellers))
+    write_json(
+        "resellers",
+        OutData(data=[ResellerModel.from_orm(reseller) for reseller in resellers]),
+    )
 
 
 def get_reseller_products():
-
     reseller_products = ResellerProduct.query.all()
-
-    reseller_products_list: list[ResellerProductModel] = []
     log(
         log.DEBUG,
-        "[GET reseller_products from db]Got [%s] reseller_products!",
+        "[GET reseller_products from db]Got [%d] reseller_products!",
         len(reseller_products),
     )
-
-    for res_prod in reseller_products:
-        res_prod: ResellerProduct = res_prod
-        new_res_prod = ResellerProductModel.from_orm(res_prod)
-        reseller_products_list.append(new_res_prod.dict())
-
-    with open(
-        DB_MIGRATION_DIR + "reseller_products_list.json", "w", encoding="utf-8"
-    ) as f:
-        json.dump(reseller_products_list, f, ensure_ascii=False)
-        log(log.DEBUG, "[GET reseller_products from db] Finished !")
+    write_json(
+        "reseller_products",
+        OutData(
+            data=[
+                ResellerProductModel.from_orm(res_prod)
+                for res_prod in reseller_products
+            ]
+        ),
+    )
 
 
 def get_products():
-
     products = Product.query.filter(Product.deleted == False).all()  # noqa E712
-    products_list: list[ProductModel] = []
-    log(log.DEBUG, "[GET products from db]Got [%s] products!", len(products))
-
-    for product in products:
-        product: Product = product
-        new_product = ProductModel.from_orm(product)
-        products_list.append(new_product.dict())
-
-    with open(DB_MIGRATION_DIR + "products_list.json", "w", encoding="utf-8") as f:
-        json.dump(products_list, f, ensure_ascii=False)
-
-    log(log.DEBUG, "[GET products from db] Finished !")
+    log(log.DEBUG, "[GET products from db]Got [%d] products!", len(products))
+    write_json(
+        "products",
+        OutData(data=[ProductModel.from_orm(product) for product in products]),
+    )
 
 
 def get_phones():
-
-    phones = Phone.query.filter(Phone.deleted == False).all()  # noqa E712
-
-    log(log.DEBUG, "[GET phones from db]Got [%s] phones!", len(phones))
-    phones_list: list[PhoneModel] = []
-
-    for phone in phones:
-        phone: Phone = phone
-        if phone.name != "None":
-            new_phone = PhoneModel.from_orm(phone)
-            phones_list.append(new_phone.dict())
-
-    with open(DB_MIGRATION_DIR + "phone_list.json", "w", encoding="utf-8") as f:
-        json.dump(phones_list, f, ensure_ascii=False)
-    log(log.DEBUG, "[GET phones from db] Finished !")
+    phones = Phone.query.filter(
+        and_(Phone.deleted == False, Phone.name != "None")  # noqa E712
+    ).all()
+    log(log.DEBUG, "[GET phones from db]Got [%d] phones!", len(phones))
+    write_json("phones", OutData(data=[PhoneModel.from_orm(phone) for phone in phones]))
 
 
 def get_accounts():
-
     accounts = Account.query.filter(Account.deleted == False).all()  # noqa E712
     log(log.DEBUG, "[GET accounts from db] Got [%s] accounts!", len(accounts))
-
-    accounts_list: list[AccountModel] = []
-
-    for account in accounts:
-        new_account = AccountModel.from_orm(account)
-        accounts_list.append(new_account.dict())
-
-    with open(DB_MIGRATION_DIR + "accounts_list.json", "w", encoding="utf-8") as f:
-        json.dump(accounts_list, f, ensure_ascii=False)
-    log(log.DEBUG, "[GET accounts from db] Finished !")
+    write_json(
+        "accounts",
+        OutData(data=[AccountModel.from_orm(account) for account in accounts]),
+    )
 
 
 def get_account_ext():
-
     accounts_ext = AccountExtension.query.all()
     log(
-        log.DEBUG, "[GET accounts_ext from db]Got [%s] accounts_ext!", len(accounts_ext)
+        log.DEBUG, "[GET accounts_ext from db]Got [%d] accounts_ext!", len(accounts_ext)
     )
-
-    accounts_ext_list: list[AccountExtensionModel] = []
-
-    for acc_ext in accounts_ext:
-        new_acc_ext = AccountExtensionModel.from_orm(acc_ext)
-        accounts_ext_list.append(new_acc_ext.json())
-
-    with open(DB_MIGRATION_DIR + "accounts_ext_list.json", "w", encoding="utf-8") as f:
-        json.dump(accounts_ext_list, f, ensure_ascii=False)
-    log(log.DEBUG, "[GET accounts_ext from db] Finished !")
+    write_json(
+        "accounts_ext",
+        OutData(
+            data=[AccountExtensionModel.from_orm(acc_ext) for acc_ext in accounts_ext]
+        ),
+    )
 
 
 def get_account_changes():
@@ -251,15 +212,12 @@ def get_account_changes():
         "[GET accounts_changes from db]Got [%s] accounts_changes!",
         len(accounts_changes),
     )
-
-    accounts_changes_list: list[AccountChangesModel] = []
-
-    for acc_change in accounts_changes:
-        new_acc_ext = AccountChangesModel.from_orm(acc_change)
-        accounts_changes_list.append(new_acc_ext.json())
-
-    with open(
-        DB_MIGRATION_DIR + "accounts_changes_list.json", "w", encoding="utf-8"
-    ) as f:
-        json.dump(accounts_changes_list, f, ensure_ascii=False)
-    log(log.DEBUG, "[GET accounts_changes from db] Finished !")
+    write_json(
+        "accounts_changes",
+        OutData(
+            data=[
+                AccountChangesModel.from_orm(acc_change)
+                for acc_change in accounts_changes
+            ]
+        ),
+    )
