@@ -129,7 +129,7 @@ def get_users():
             user_list.append(new_user.dict())
 
     with open(DB_MIGRATION_DIR + "user_list.json", "w", encoding="utf-8") as f:
-        json.dump(user_list, f, ensure_ascii=False)
+        json.dump(user_list, f, indent=2, ensure_ascii=False)
     log(log.DEBUG, "[GET users from db] Finished !")
 
 
@@ -218,7 +218,7 @@ def get_accounts():
 
     for account in accounts:
         new_account = AccountModel.from_orm(account)
-        accounts_list.append(new_account.json())
+        accounts_list.append(new_account.dict())
 
     with open(DB_MIGRATION_DIR + "accounts_list.json", "w", encoding="utf-8") as f:
         json.dump(accounts_list, f, ensure_ascii=False)
