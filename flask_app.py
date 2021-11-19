@@ -24,7 +24,7 @@ def get_context():
 
 
 def create_database(test_data=False):
-    """ build database """
+    """build database"""
 
     def add_reseller_product(product, months, initprice, extprice, reseller):
         reseller_product = ResellerProduct(
@@ -167,6 +167,7 @@ def reset_db(test_data=False):
 def restore_ninja_db_invoice_items(test_data=False):
     """Restore invoice items in the InvoiceNinja"""
     from tools import restore_invoice_ninja_invoice_items
+
     restore_invoice_ninja_invoice_items()
 
 
@@ -175,16 +176,44 @@ def fix_activation_date():
     """Fix wrong activation date"""
     accounts = Account.query.all()
     for account in accounts:
-        extensions = AccountExtension.query.filter(
-            AccountExtension.account_id == account.id
-        ).order_by(AccountExtension.extension_date.asc()).first()
+        extensions = (
+            AccountExtension.query.filter(AccountExtension.account_id == account.id)
+            .order_by(AccountExtension.extension_date.asc())
+            .first()
+        )
         if extensions:
             if account.activation_date > extensions.extension_date:
-                swap_value = account.activation_date - relativedelta(months=extensions.months)
+                swap_value = account.activation_date - relativedelta(
+                    months=extensions.months
+                )
                 account.activation_date = extensions.extension_date
                 extensions.extension_date = swap_value
                 db.session.add(account)
     db.session.commit()
+
+
+@app.cli.command()
+def make_data_migration():
+    """Get all db data to json files"""
+    from tools import (
+        get_account_ext,
+        get_accounts,
+        get_phones,
+        get_products,
+        get_reseller_products,
+        get_resellers,
+        get_users,
+        get_account_changes,
+    )
+
+    get_users()
+    get_phones()
+    get_products()
+    get_resellers()
+    get_reseller_products()
+    get_accounts()
+    get_account_ext()
+    get_account_changes()
 
 
 if __name__ == "__main__":
