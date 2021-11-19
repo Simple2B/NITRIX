@@ -30,8 +30,8 @@ class AccountChanges(db.Model, ModelMixin):
     change_type = db.Column(Enum(ChangeType), default=ChangeType.name)
     value_str = db.Column(db.String(60), nullable=False)
     new_value_str = db.Column(db.String(60), nullable=True)
-    account = relationship("Account", backref=db.backref("changes", lazy="dynamic"))
-    user = relationship("User", backref=db.backref("changes", lazy="dynamic"))
+    account = relationship("Account", viewonly=True)
+    user = relationship("User", viewonly=True)
 
     @property
     def message_by_account(self):

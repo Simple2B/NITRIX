@@ -24,10 +24,10 @@ class Account(db.Model, ModelMixin):
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
     deleted = db.Column(db.Boolean, default=False)
-    product = relationship("Product")
-    phone = relationship("Phone")
-    reseller = relationship("Reseller")
-    extensions = relationship("AccountExtension")
+    product = relationship("Product", viewonly=True)
+    phone = relationship("Phone", viewonly=True)
+    reseller = relationship("Reseller", viewonly=True)
+    extensions = relationship("AccountExtension", viewonly=True)
 
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:
@@ -39,9 +39,12 @@ class Account(db.Model, ModelMixin):
 
     @property
     def expiration_date(self):
-        enddate = AccountExtension.query.with_entities(AccountExtension.end_date).filter(
-            self.id == AccountExtension.account_id
-        ).order_by(desc(AccountExtension.end_date)).first()
+        enddate = (
+            AccountExtension.query.with_entities(AccountExtension.end_date)
+            .filter(self.id == AccountExtension.account_id)
+            .order_by(desc(AccountExtension.end_date))
+            .first()
+        )
         if enddate:
             return enddate.end_date
         else:
