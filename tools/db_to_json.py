@@ -1,6 +1,5 @@
-import os
 from datetime import datetime
-from typing import Optional, Any
+from typing import Optional
 from pydantic import BaseModel
 from sqlalchemy import and_
 from app.logger import log
@@ -14,13 +13,7 @@ from app.models import (
     AccountExtension,
     AccountChanges,
 )
-
-DB_MIGRATION_DIR = "data-migrations/"
-os.makedirs(DB_MIGRATION_DIR, exist_ok=True)
-
-
-class OutData(BaseModel):
-    data: list[Any]
+from .write_json import write_json, OutData
 
 
 class PhoneModel(BaseModel):
@@ -120,13 +113,6 @@ class AccountChangesModel(BaseModel):
         use_enum_values = True
 
 
-def write_json(file_name: str, data: OutData):
-    file_path = os.path.join(DB_MIGRATION_DIR, f"{file_name}.json")
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(data.json(indent=2))
-    log(log.DEBUG, "Created file: [%s]", file_path)
-
-
 def get_users():
     users = User.query.filter(
         and_(User.deleted == False, User.name != "admin")  # noqa E712
@@ -194,7 +180,9 @@ def get_accounts():
 def get_account_ext():
     accounts_ext = AccountExtension.query.all()
     log(
-        log.DEBUG, "[GET accounts_ext from db]Got [%d] accounts_ext!", len(accounts_ext)
+        log.DEBUG,
+        "[GET accounts_ext from db] Got [%d] accounts_ext!",
+        len(accounts_ext),
     )
     write_json(
         "accounts_ext",

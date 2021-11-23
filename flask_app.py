@@ -20,7 +20,7 @@ app = create_app()
 @app.shell_context_processor
 def get_context():
     """Objects exposed here will be automatically available from the shell."""
-    return dict(app=app, db=db, m=models, forms=forms)
+    return dict(app=app, db=db, m=models, forms=forms, ninja=ninja)
 
 
 def create_database(test_data=False):
@@ -204,6 +204,9 @@ def make_data_migration():
         get_resellers,
         get_users,
         get_account_changes,
+        get_ninja_clients,
+        get_ninja_products,
+        get_ninja_invoices,
     )
 
     get_users()
@@ -214,6 +217,9 @@ def make_data_migration():
     get_accounts()
     get_account_ext()
     get_account_changes()
+    get_ninja_clients()
+    get_ninja_products()
+    get_ninja_invoices()
 
 
 if __name__ == "__main__":
