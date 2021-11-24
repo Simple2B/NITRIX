@@ -199,5 +199,16 @@ def scheduler_task():
     sync_scheduler()
 
 
+@app.cli.command()
+def make_data_migration():
+    """Get all db data from json files"""
+    from tools import get_phones, get_users, get_resellers, get_products
+
+    # get_phones()
+    # get_users()
+    # get_resellers()
+    get_products()
+
+
 if __name__ == "__main__":
     app.run()
