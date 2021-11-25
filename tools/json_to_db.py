@@ -23,6 +23,7 @@ class PhoneModel(BaseModel):
     name: str
     status: Phone.Status
     price: float
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -32,6 +33,7 @@ class PhoneModel(BaseModel):
 class ProductModel(BaseModel):
     name: str
     status: Product.Status
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -43,6 +45,7 @@ class ResellerModel(BaseModel):
     name: str
     status: Reseller.Status
     comments: str
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -71,6 +74,7 @@ class AccountModel(BaseModel):
     product: ProductModel
     phone: PhoneModel
     reseller: ResellerModel
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -97,6 +101,7 @@ class UserModel(BaseModel):
     activated: User.Status
     otp_secret: str
     otp_active: bool
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -169,9 +174,7 @@ def get_resellers():
         Reseller(
             name=reseller_model.name,
             status=Reseller.Status(reseller_model.status),
-            comments=reseller_model.comments
-            if len(reseller_model.comments) < 60
-            else reseller_model.comments[0:59],
+            comments=reseller_model.comments,
         ).save(commit=False)
     db.session.commit()
     resellers = Reseller.query.all()
