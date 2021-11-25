@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Any
 from pydantic import BaseModel
 
+from app.logger import log
+
 
 class NinjaClientContact(BaseModel):
     id: str
@@ -75,3 +77,12 @@ class NinjaClient(BaseModel):
     contacts: list[NinjaClientContact]
     documents: list[Any]
     gateway_tokens: list[Any]
+
+    def save(self):
+        from app.ninja import api
+
+        log(log.DEBUG, "Save NinjaClient [%s]", self.id)
+        api_result = api.do_put(
+            f"{api.BASE_URL}clients/{self.id}", **self.dict(exclude_none=True)
+        )
+        return NinjaClient.parse_obj(api_result["data"]) if api_result else None

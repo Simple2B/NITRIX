@@ -211,16 +211,18 @@ def make_data_migration():
         get_reseller_products,
         get_accounts_changes,
         get_account_ext,
+        get_ninja_clients,
     )
 
-    get_phones()
-    get_users()
-    get_resellers()
-    get_products()
-    get_reseller_products()
-    get_accounts()
-    get_account_ext()
-    get_accounts_changes()
+    # get_phones()
+    # get_users()
+    # get_resellers()
+    # get_products()
+    # get_reseller_products()
+    # get_accounts()
+    # get_account_ext()
+    # get_accounts_changes()
+    get_ninja_clients()
 
 
 if __name__ == "__main__":

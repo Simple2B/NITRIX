@@ -9,3 +9,4 @@ from .json_to_db import (  # noqa 401
     get_account_ext,
     get_accounts_changes,
 )
+from .json_to_ninja import get_ninja_clients

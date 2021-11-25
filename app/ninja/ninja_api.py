@@ -144,7 +144,7 @@ class NinjaApi(object):
             return res
         return NinjaClient.parse_obj(res["data"])
 
-    def add_client(self, name: str):
+    def add_client(self, name: str) -> NinjaClient:
         """adds new client
             curl -X POST ninja.test/api/v1/clients -H "Content-Type:application/json" \
                 -d '{"name":"Client"}' -H "X-API-Token: TOKEN"
