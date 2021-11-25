@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any
 from pydantic import BaseModel
 
@@ -10,8 +9,8 @@ class NinjaClientContact(BaseModel):
     first_name: str
     last_name: str
     email: str
-    created_at: datetime
-    updated_at: datetime
+    created_at: str
+    updated_at: str
     archived_at: int
     is_primary: bool
     is_locked: bool
@@ -41,9 +40,9 @@ class NinjaClient(BaseModel):
     private_notes: str
     balance: float
     group_settings_id: str
-    paid_to_date: datetime
+    paid_to_date: str
     credit_balance: float
-    last_login: datetime
+    last_login: str
     size_id: str
     public_notes: str
     client_hash: str
@@ -69,9 +68,9 @@ class NinjaClient(BaseModel):
     is_deleted: bool
     vat_number: str
     id_number: str
-    updated_at: datetime
-    archived_at: datetime
-    created_at: datetime
+    updated_at: str
+    archived_at: str
+    created_at: str
     display_name: str
     number: str
     contacts: list[NinjaClientContact]

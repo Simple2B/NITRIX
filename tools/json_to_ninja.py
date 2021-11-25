@@ -3,6 +3,8 @@ from .read_json import read_json
 from app.ninja.client import NinjaClient
 from app.ninja import api as ninja
 
+from app.logger import log
+
 
 def get_ninja_clients():
     for json_client in read_json("ninja_clients"):
@@ -12,13 +14,14 @@ def get_ninja_clients():
         ninja_client.is_deleted = client.is_deleted
         if client.contacts:
             if ninja_client.contacts:
+                contact_origin = client.contacts[0]
                 contact = ninja_client.contacts[0]
-                contact.contact_key = client.contacts
-                account_key: str
-                email: str
-                id: int
-                is_owner: bool
-                contact_key: str
-                is_primary: bool
-                send_invoice: bool
+                contact.contact_key = contact_origin.contact_key
+                contact.email = contact_origin.email
+                contact.is_primary = contact_origin.is_primary
+                contact.send_email = contact_origin.send_invoice
+            else:
+                log(log.WARNING, "[get_ninja_clients] not found create contact info")
+        else:
+            log(log.WARNING, "[get_ninja_clients] cannot create contact info")
         ninja_client.save()
