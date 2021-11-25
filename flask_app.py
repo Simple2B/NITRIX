@@ -210,16 +210,17 @@ def make_data_migration():
         get_accounts,
         get_reseller_products,
         get_accounts_changes,
+        get_account_ext,
     )
 
-    # get_phones()
-    # get_users()
-    # get_resellers()
-    # get_products()
-    # get_accounts()
-    # get_reseller_products()
-    # get_account_ext()
-    # get_accounts_changes()
+    get_phones()
+    get_users()
+    get_resellers()
+    get_products()
+    get_reseller_products()
+    get_accounts()
+    get_account_ext()
+    get_accounts_changes()
 
 
 if __name__ == "__main__":

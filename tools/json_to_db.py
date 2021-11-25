@@ -141,7 +141,7 @@ def get_phones():
         phone: PhoneModel = PhoneModel.parse_obj(phone)
         Phone(
             name=phone.name,
-            status=Phone.Status(phone.name),
+            status=Phone.Status(phone.status),
             price=phone.price,
         ).save(commit=False)
     db.session.commit()
@@ -152,7 +152,7 @@ def get_users():
     users = read_json("users")
     log(log.DEBUG, "[GET users from file] Got [%d] users!", len(users))
     for user in users:
-        user_model: UserModel = Reseller.parse_obj(user)
+        user_model: UserModel = UserModel.parse_obj(user)
         User(
             name=user_model.name,
             user_type=User.Type[user_model.user_type],
@@ -170,7 +170,6 @@ def get_resellers():
     log(log.DEBUG, "[GET resellers from file] Got [%d] resellers!", len(resellers))
     for reseller in resellers:
         reseller_model: ResellerModel = ResellerModel.parse_obj(reseller)
-        # TODO : check len of reseller comments
         Reseller(
             name=reseller_model.name,
             status=Reseller.Status(reseller_model.status),
@@ -213,7 +212,6 @@ def get_reseller_products():
             Product.name == reseller_product_model.product.name
         ).first()
         assert product
-        # TODO: no ninja_product_id
         ResellerProduct(
             product_id=product.id,
             reseller_id=reseller.id,
@@ -241,7 +239,7 @@ def get_accounts():
         phone = Phone.query.filter(Phone.name == account_model.phone.name).first()
         assert phone
         Account(
-            name=account_model.name,
+            name=account_model.name[:60],
             product_id=product.id,
             phone_id=phone.id,
             reseller_id=reseller.id,
@@ -256,7 +254,7 @@ def get_accounts():
 
 
 def get_account_ext():
-    account_ext = read_json("account_ext")
+    account_ext = read_json("accounts_ext")
     log(
         log.DEBUG,
         "[GET account extension from file] Got [%d] accounts!",
@@ -264,6 +262,9 @@ def get_account_ext():
     )
     for acc_ext in account_ext:
         acc_ext_model: AccountExtensionModel = AccountExtensionModel.parse_obj(acc_ext)
+        if not acc_ext_model.account:
+            log(log.WARNING, "[get_account_ext] no such account")
+            continue
         reseller = Reseller.query.filter(
             Reseller.name == acc_ext_model.reseller.name
         ).first()
@@ -272,12 +273,10 @@ def get_account_ext():
             Product.name == acc_ext_model.product.name
         ).first()
         assert product
-        # TODO: correct filtering account
         account = Account.query.filter(
             Account.name == acc_ext_model.account.name,
         ).first()
         assert account
-        # TODO : CHECK WHAT PRODUCTS MUST BE RES OR PROD (missing SKY prod in prod)
         AccountExtension(
             product_id=product.id,
             reseller_id=reseller.id,
@@ -299,18 +298,21 @@ def get_accounts_changes():
     )
     for change in accounts_changes:
         change: AccountChangesModel = AccountChangesModel.parse_obj(change)
+        if not change.account:
+            # log(log.WARNING, "[get_accounts_changes] no such account")
+            continue
         account = Account.query.filter(
-            Account.name == change.account.name,
+            Account.name == change.account.name[:60],
         ).first()
         assert account
         user = User.query.filter(User.name == change.user.name).first()
         assert user
         HistoryChange(
-            item_id=account.id,  # acc | res | prod id | res_pro_id | phone_id
+            item_id=account.id,
             user_id=user.id,
             date=change.date,
             change_type=HistoryChange.EditType.changes_account,
-            value_name=change.change_type.value.lower(),
+            value_name=change.change_type.lower(),
             before_value_str=change.value_str if change.value_str else "[Empty]",
             after_value_str=change.new_value_str if change.new_value_str else "[Empty]",
             synced=True,
