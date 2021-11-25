@@ -202,12 +202,24 @@ def scheduler_task():
 @app.cli.command()
 def make_data_migration():
     """Get all db data from json files"""
-    from tools import get_phones, get_users, get_resellers, get_products
+    from tools import (  # noqa 401
+        get_phones,
+        get_users,
+        get_resellers,
+        get_products,
+        get_accounts,
+        get_reseller_products,
+        get_accounts_changes,
+    )
 
     # get_phones()
     # get_users()
     # get_resellers()
-    get_products()
+    # get_products()
+    # get_accounts()
+    # get_reseller_products()
+    # get_account_ext()
+    # get_accounts_changes()
 
 
 if __name__ == "__main__":
