@@ -13,6 +13,7 @@ from app.models import (
 )
 from app.ninja import api as ninja
 from config import BaseConfig as conf
+from tools.json_to_ninja import get_ninja_invoices
 
 app = create_app()
 
@@ -212,6 +213,7 @@ def make_data_migration():
         get_accounts_changes,
         get_account_ext,
         get_ninja_clients,
+        get_ninja_products,
     )
 
     # get_phones()
@@ -222,7 +224,9 @@ def make_data_migration():
     # get_accounts()
     # get_account_ext()
     # get_accounts_changes()
-    get_ninja_clients()
+    # get_ninja_clients()
+    # get_ninja_products()
+    get_ninja_invoices()
 
 
 if __name__ == "__main__":

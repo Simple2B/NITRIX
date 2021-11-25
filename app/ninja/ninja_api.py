@@ -209,7 +209,9 @@ class NinjaApi(object):
             return res
         return NinjaProduct.parse_obj(res["data"])
 
-    def add_product(self, notes: str, product_key: str, cost: float, qty: float = 1.0):
+    def add_product(
+        self, notes: str, product_key: str, cost: float, qty: float = 1.0
+    ) -> NinjaProduct:
         """adds new product
             curl -X POST ninja.test/api/v1/products -H "Content-Type:application/json" \
                 -d '{"notes":"Notes"}' -H "X-API-Token: TOKEN"
@@ -230,6 +232,7 @@ class NinjaApi(object):
             product_key=product_key,
             cost=cost,
             qty=qty,
+            price=cost,
         )
         if not res or not res["data"]:
             return res
