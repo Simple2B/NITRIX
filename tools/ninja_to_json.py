@@ -11,11 +11,11 @@ class NinjaProductModel(BaseModel):
     product_key: str
     notes: str
     cost: float
+    is_deleted: bool
 
 
 # line_items FOR INVOICE MODEL
 class NinjaInvoiceItem(BaseModel):
-
     product_key: str
     notes: str
     cost: float
@@ -50,13 +50,14 @@ class NinjaClientModel(BaseModel):
     name: str
     display_name: str
     contacts: list[NinjaClientContact]
+    is_deleted: bool
 
     class Config:
         use_enum_values = True
 
 
 def get_ninja_clients():
-    clients = [c for c in api.clients if not c.is_deleted]
+    clients = [c for c in api.clients]
     log(log.DEBUG, "[GET clients from Ninja] Got [%d] clients!", len(clients))
     write_json(
         "ninja_clients",
@@ -67,7 +68,7 @@ def get_ninja_clients():
 
 
 def get_ninja_products():
-    products = [p for p in api.products if not p.is_deleted]
+    products = [p for p in api.products]
     log(log.DEBUG, "[GET products from Ninja] Got [%d] products!", len(products))
     write_json(
         "ninja_products",

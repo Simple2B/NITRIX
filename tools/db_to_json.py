@@ -20,6 +20,7 @@ class PhoneModel(BaseModel):
     name: str
     status: Phone.Status
     price: float
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -29,6 +30,7 @@ class PhoneModel(BaseModel):
 class ProductModel(BaseModel):
     name: str
     status: Product.Status
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -40,6 +42,7 @@ class ResellerModel(BaseModel):
     name: str
     status: Reseller.Status
     comments: str
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -68,6 +71,7 @@ class AccountModel(BaseModel):
     product: ProductModel
     phone: PhoneModel
     reseller: ResellerModel
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -94,6 +98,7 @@ class UserModel(BaseModel):
     activated: User.Status
     otp_secret: str
     otp_active: bool
+    deleted: bool
 
     class Config:
         orm_mode = True
@@ -114,17 +119,13 @@ class AccountChangesModel(BaseModel):
 
 
 def get_users():
-    users = User.query.filter(
-        and_(User.deleted == False, User.name != "admin")  # noqa E712
-    ).all()
+    users = User.query.filter(User.name != "admin").all()
     log(log.DEBUG, "[GET users from db]Got [%d] users!", len(users))
     write_json("users", OutData(data=[UserModel.from_orm(user) for user in users]))
 
 
 def get_resellers():
-    resellers = Reseller.query.filter(
-        and_(Reseller.deleted == False, Reseller.name != "NITRIX")  # noqa E712
-    ).all()
+    resellers = Reseller.query.filter(Reseller.name != "NITRIX").all()
 
     log(log.DEBUG, "[GET resellers from db]Got [%d] resellers!", len(resellers))
     write_json(
@@ -152,7 +153,7 @@ def get_reseller_products():
 
 
 def get_products():
-    products = Product.query.filter(Product.deleted == False).all()  # noqa E712
+    products = Product.query.all()
     log(log.DEBUG, "[GET products from db]Got [%d] products!", len(products))
     write_json(
         "products",
@@ -161,15 +162,13 @@ def get_products():
 
 
 def get_phones():
-    phones = Phone.query.filter(
-        and_(Phone.deleted == False, Phone.name != "None")  # noqa E712
-    ).all()
+    phones = Phone.query.filter(Phone.name != "None").all()
     log(log.DEBUG, "[GET phones from db]Got [%d] phones!", len(phones))
     write_json("phones", OutData(data=[PhoneModel.from_orm(phone) for phone in phones]))
 
 
 def get_accounts():
-    accounts = Account.query.filter(Account.deleted == False).all()  # noqa E712
+    accounts = Account.query.all()
     log(log.DEBUG, "[GET accounts from db] Got [%s] accounts!", len(accounts))
     write_json(
         "accounts",
