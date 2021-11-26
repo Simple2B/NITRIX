@@ -16,7 +16,9 @@ class AccountForm(FlaskForm):
         "Sim Cost:", default="yes", choices=[("yes", "Yes"), ("no", "No")]
     )
     imei = StringField("IMEI")
-    comment = StringField("Comment", Length(min=0, max=256), widget=TextArea())
+    comment = StringField(
+        "Comment", validators=[Length(min=0, max=256)], widget=TextArea()
+    )
     activation_date = DateField(
         "Activation date", validators=[DataRequired()], default=datetime.now
     )

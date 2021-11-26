@@ -12,5 +12,7 @@ class ResellerForm(FlaskForm):
         default="active",
         choices=[("not_active", "Not Active"), ("active", "Active")],
     )
-    comments = StringField("Comment:", Length(min=0, max=256), widget=TextArea())
+    comments = StringField(
+        "Comment:", validators=[Length(min=0, max=256)], widget=TextArea()
+    )
     submit = SubmitField("Save")
