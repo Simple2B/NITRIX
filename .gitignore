@@ -141,4 +141,5 @@ database-test.sqlite3
 /database-test.sqlite3-journal
 
 /logs/
+
 /data-migrations/
