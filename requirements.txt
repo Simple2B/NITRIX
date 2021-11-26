@@ -21,3 +21,5 @@ onetimepass
 pyqrcode
 timecop
 cerberus
+pydantic==1.8.2
+typing-extensions==3.10.0.2

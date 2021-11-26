@@ -133,6 +133,7 @@ dmypy.json
 database-devel.sqlite3
 database-develop.sqlite3
 database-test.sqlite3
+/database-develop.zip
 
 # backup folders
 /backup.*
