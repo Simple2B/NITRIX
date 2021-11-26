@@ -28,6 +28,7 @@ class Account(db.Model, ModelMixin):
     phone = relationship("Phone", viewonly=True)
     reseller = relationship("Reseller", viewonly=True)
     extensions = relationship("AccountExtension", viewonly=True)
+    changes = relationship("AccountChanges", viewonly=True)
 
     @staticmethod
     def __add_months(sourcedate: datetime, months: int) -> datetime:
@@ -65,13 +66,15 @@ class Account(db.Model, ModelMixin):
             "prev_names": ", ".join(
                 [
                     change.value_str
-                    for change in self.changes.filter_by(change_type="name").all()
+                    for change in self.changes
+                    if change.change_type == "name"
                 ]
             ),
             "prev_sims": ", ".join(
                 [
                     change.value_str
-                    for change in self.changes.filter_by(change_type="sim").all()
+                    for change in self.changes
+                    if change.change_type == "sim"
                 ]
             ),
         }
