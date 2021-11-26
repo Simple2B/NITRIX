@@ -140,6 +140,11 @@ def get_ninja_invoices():
             invoice_date=invoice.invoice_date,
             due_date=invoice.due_date,
         )
+        ninja_invoice.status_id = invoice.invoice_status_id
+        ninja_invoice.amount = invoice.amount
+        ninja_invoice.balance = invoice.balance
+        ninja_invoice.has_tasks = invoice.has_tasks
+        ninja_invoice.has_expenses = invoice.has_expenses
         for item in invoice.invoice_items:
             item: NinjaInvoiceItemModel = item
             assert item

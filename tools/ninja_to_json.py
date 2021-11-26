@@ -27,6 +27,12 @@ class NinjaInvoicesModel(BaseModel):
     client_id: int
     invoice_date: str
     due_date: str
+    invoice_status_id: int
+    amount: int
+    balance: float
+    has_tasks: bool
+    has_expenses: bool
+    updated_at: int
     invoice_items: list[NinjaInvoiceItem]
 
     class Config:
