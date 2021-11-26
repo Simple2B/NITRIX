@@ -18,7 +18,7 @@ class Reseller(db.Model, ModelMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60), unique=True, nullable=False)
     status = db.Column(Enum(Status), default=Status.active)
-    comments = db.Column(db.String(60))
+    comments = db.Column(db.String(256))
     deleted = db.Column(db.Boolean, default=False)
     last_activity = db.Column(db.DateTime, default=datetime.now)
     ninja_client_id = db.Column(db.String(64), default="")

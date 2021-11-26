@@ -42,7 +42,7 @@ def sync_scheduler():
     1. get current changes: list[HistoryChange] where synced is False
     2. If no such changes we stop
     3. go thru changes with cycle and if its in _DISPATCHER_MAP we call its method
-    4. if method return True, mark chaneg as synced = True
+    4. if method return True, mark change as synced = True
     """
     log(log.DEBUG, ".")
 

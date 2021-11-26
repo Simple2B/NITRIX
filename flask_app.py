@@ -13,6 +13,7 @@ from app.models import (
 )
 from app.ninja import api as ninja
 from config import BaseConfig as conf
+from tools.json_to_ninja import get_ninja_invoices
 
 app = create_app()
 
@@ -197,6 +198,35 @@ def scheduler_task():
     from app.scheduler import sync_scheduler
 
     sync_scheduler()
+
+
+@app.cli.command()
+def make_data_migration():
+    """Get all db data from json files"""
+    from tools import (  # noqa 401
+        get_phones,
+        get_users,
+        get_resellers,
+        get_products,
+        get_accounts,
+        get_reseller_products,
+        get_accounts_changes,
+        get_account_ext,
+        get_ninja_clients,
+        get_ninja_products,
+    )
+
+    get_phones()
+    get_users()
+    get_resellers()
+    get_products()
+    get_reseller_products()
+    get_accounts()
+    get_account_ext()
+    get_accounts_changes()
+    get_ninja_clients()
+    get_ninja_products()
+    get_ninja_invoices()
 
 
 if __name__ == "__main__":

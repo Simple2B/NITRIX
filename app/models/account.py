@@ -20,7 +20,7 @@ class Account(db.Model, ModelMixin):
     reseller_id = db.Column(db.Integer, db.ForeignKey("resellers.id"))
     sim = db.Column(db.String(20))
     imei = db.Column(db.String(60))
-    comment = db.Column(db.String(200))
+    comment = db.Column(db.String(256))
     activation_date = db.Column(db.DateTime, default=datetime.now)
     months = db.Column(db.Integer)
     deleted = db.Column(db.Boolean, default=False)

@@ -32,7 +32,7 @@ def get_monday(day: date):
     return day - delta
 
 
-def get_current_invoice(invoice_date: str, ninja_client_id: str):
+def get_current_invoice(invoice_date: str, ninja_client_id: str) -> NinjaInvoice:
     log(log.DEBUG, "[SHED] Get all invoices...")
     invoices: list[NinjaInvoice] = [i for i in NinjaInvoice.all() if not i.is_deleted]
     log(log.DEBUG, "[SHED] Got [%s] invoices!", len(invoices))
@@ -218,7 +218,6 @@ def extensions_account_change(change: HistoryChange):
         notes = f"{account.name}.  Extended: {date}"
         log(log.DEBUG, "[SHED] new notes :[%s]", notes)
         if item["notes"] == notes:
-            # TODO: consider to update (but not delete)
             item.product_key = (
                 ninja_product_name(account.product.name, ext_account.months),
             )
@@ -238,7 +237,12 @@ def changes_account(change: HistoryChange):
         invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
         invoice = get_current_invoice(invoice_date, account.reseller.ninja_client_id)
         if not invoice:
-            log(log.WARNING, "")
+            log(
+                log.WARNING,
+                "[SHED] Cant find invoice in [%s] for [%s]",
+                invoice_date,
+                account.reseller.ninja_client_id,
+            )
             return True
         for item in invoice.line_items:
             log(log.DEBUG, "[SHED] update invoice item [%s]", item["notes"])

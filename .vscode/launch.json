@@ -37,7 +37,7 @@
       "jinja": true
     },
     {
-      "name": "Restore DB",
+      "name": "Make Data Migration",
       "type": "python",
       "request": "launch",
       "module": "flask",
@@ -46,7 +46,7 @@
         "FLASK_ENV": "development",
         "FLASK_DEBUG": "1"
       },
-      "args": ["restore-ninja-db-invoice-items"],
+      "args": ["make-data-migration"],
       "jinja": true
     }
   ]
