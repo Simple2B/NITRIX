@@ -27,6 +27,7 @@ class BaseConfig(object):
     CELERY_PERIODIC_CHECK_TIME = float(
         os.environ.get("CELERY_PERIODIC_CHECK_TIME", "10.0")
     )
+    DATABASE_URL = os.environ.get("DATABASE_URL", "")
 
     @staticmethod
     def configure(app):
