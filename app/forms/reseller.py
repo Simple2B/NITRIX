@@ -6,7 +6,7 @@ from wtforms.widgets import TextArea
 
 class ResellerForm(FlaskForm):
     id = IntegerField("id", validators=[DataRequired()], default=-1)
-    name = StringField("Name:", validators=[DataRequired()])
+    name = StringField("Name:", validators=[DataRequired(), Length(min=1, max=60)])
     status = SelectField(
         "Activated:",
         default="active",
