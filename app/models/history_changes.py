@@ -57,17 +57,22 @@ class HistoryChange(db.Model, ModelMixin):
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Created by user [{self.user.name}]"
         if self.change_type == self.EditType.deletion_account:
             return f"[{self.date.strftime('%Y/%m/%d, %H:%M')}] Deleted by user [{self.user.name}]"
-        return "[{}] User [{}] changed [{}] value from [{}] to [{}]".format(
-            self.date.strftime("%Y/%m/%d, %H:%M:%S"),
-            self.user.name,
-            self.value_name,
-            self.before_value_str,
-            self.after_value_str,
-        )
+        if self.value_name:
+            return "[{}] User [{}] changed [{}] value from [{}] to [{}]".format(
+                self.date.strftime("%Y/%m/%d, %H:%M:%S"),
+                self.user.name,
+                self.value_name,
+                self.before_value_str,
+                self.after_value_str,
+            )
 
     @classmethod
     def get_history(cls, account):
         changes_list = cls.query.filter(cls.item_id == account.id).order_by(
             cls.date.desc()
         )
-        return [change.message_by_account for change in changes_list]
+        return [
+            change.message_by_account
+            for change in changes_list
+            if change.message_by_account
+        ]

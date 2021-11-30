@@ -190,7 +190,7 @@
     {%for change in form.name_changes %}
     <div class="row mb-2 ">
       <label class="col-sm-1 col-form-label">Name:</label>
-      <div class="col-sm-4 mx-3 form-control" readonly> {{change.value_str}} </div>
+      <div class="col-sm-4 mx-3 form-control" readonly> {{change.before_value_str}} </div>
       <label class="d-inline-flex  col-form-label">Change date:</label>
       <div class="col-sm-4">
         <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
@@ -205,7 +205,7 @@
     {%for change in form.sim_changes %}
     <div class="row mb-2">
       <label class="col-sm-1 col-form-label">SIM:</label>
-      <div class="col-sm-4 mx-3 form-control" readonly> {{change.value_str}} </div>
+      <div class="col-sm-4 mx-3 form-control" readonly> {{change.before_value_str}} </div>
       <label class="d-inline-flex  col-form-label">Change date:</label>
       <div class="col-sm-4">
         <input type="date" class="form-control" value="{{change.date.strftime('%Y-%m-%d')}}" readonly>
