@@ -28,6 +28,7 @@ class BaseConfig(object):
         os.environ.get("CELERY_PERIODIC_CHECK_TIME", "10.0")
     )
     DATABASE_URL = os.environ.get("DATABASE_URL", "")
+    DB_DUMP_DAYS_PERIOD = int(os.environ.get("DB_DUMP_DAYS_PERIOD", "30"))
 
     @staticmethod
     def configure(app):

@@ -6,6 +6,9 @@ from config import BaseConfig as conf
 from app.logger import log
 
 DB_DUMP_DIR = os.environ.get("DB_DUMP_DIR_CONT")
+DB_DUMP_DAYS_PERIOD = conf.DB_DUMP_DAYS_PERIOD
+SECONDS_IN_ONE_DAY = 86400
+DB_DUMP_DAYS_IN_SECONDS = DB_DUMP_DAYS_PERIOD * SECONDS_IN_ONE_DAY
 
 
 def get_filename() -> str:
@@ -18,7 +21,7 @@ def remove_old_data():
         f = os.path.join(DB_DUMP_DIR, f)
         if os.path.isfile(f) and f.endswith(".sql"):
             log(log.INFO, "Find file :[%s]", f)
-            if os.stat(f).st_mtime < now - 30 * 86400:
+            if os.stat(f).st_mtime < now - DB_DUMP_DAYS_IN_SECONDS:
                 os.remove(f)
                 log(log.INFO, "File removed :[%s]", f)
 
