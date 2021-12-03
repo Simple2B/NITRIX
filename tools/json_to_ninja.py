@@ -72,12 +72,12 @@ def get_ninja_products():
         ninja_prod = ninja.add_product(
             notes=prod.notes, product_key=prod.product_key, cost=prod.cost
         )
-        if not ninja_prod:
-            log(log.WARNING, "TO MANY REQUESTS TO NINJA [ninja.add_product]")
-            time.sleep(4)
-            ninja_prod = ninja.add_product(
-                notes=prod.notes, product_key=prod.product_key, cost=prod.cost
-            )
+        # if not ninja_prod:
+        #     log(log.WARNING, "TO MANY REQUESTS TO NINJA [ninja.add_product]")
+        #     time.sleep(4)
+        #     ninja_prod = ninja.add_product(
+        #         notes=prod.notes, product_key=prod.product_key, cost=prod.cost
+        #     )
         if prod.is_deleted:
             ninja.delete_product(ninja_prod.id)
         is_phone = prod.product_key.startswith(PHONE_PREFIX)
@@ -147,14 +147,14 @@ def get_ninja_invoices():
             invoice_date=invoice.invoice_date,
             due_date=invoice.due_date,
         )
-        if not ninja_invoice:
-            log(log.WARNING, "TO MANY REQUESTS TO NINJA [NinjaInvoice.add]")
-            time.sleep(4)
-            ninja_invoice: NinjaInvoice = NinjaInvoice.add(
-                client_id=client.id,
-                invoice_date=invoice.invoice_date,
-                due_date=invoice.due_date,
-            )
+        # if not ninja_invoice:
+        #     log(log.WARNING, "TO MANY REQUESTS TO NINJA [NinjaInvoice.add]")
+        #     time.sleep(4)
+        #     ninja_invoice: NinjaInvoice = NinjaInvoice.add(
+        #         client_id=client.id,
+        #         invoice_date=invoice.invoice_date,
+        #         due_date=invoice.due_date,
+        #     )
         ninja_invoice.status_id = invoice.invoice_status_id
         ninja_invoice.amount = invoice.amount
         ninja_invoice.balance = invoice.balance

@@ -72,6 +72,14 @@ class NinjaApi(object):
         }
         try:
             response = requests.post(url, headers=headers, data=data)
+
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, "NinjaApi [do_post] wrong NINJA_API_BASE_URL")
+            return None
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as error:
+            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
             if response.status_code == 429:
                 log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
                 counter = 0
@@ -87,13 +95,6 @@ class NinjaApi(object):
                         log.ERROR, "NinjaApi [do_post] to many requests"
                     )  # or raise error?...
                     return None
-        except requests.exceptions.ConnectionError:
-            log(log.ERROR, "NinjaApi [do_post] wrong NINJA_API_BASE_URL")
-            return None
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
         return response.json() if response.ok else None
 
     def do_delete(self, url: str):
@@ -118,6 +119,14 @@ class NinjaApi(object):
         data = json.dumps(data)
         try:
             response = requests.put(url, headers=headers, data=data)
+
+        except requests.exceptions.ConnectionError:
+            log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
+            return None
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as error:
+            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
             if response.status_code == 429:
                 log(log.WARNING, "NinjaApi [do_put]: to many requests !!!")
                 counter = 0
@@ -134,13 +143,6 @@ class NinjaApi(object):
                         log.ERROR, "NinjaApi [do_put] to many requests"
                     )  # or raise error?...
                     return None
-        except requests.exceptions.ConnectionError:
-            log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
-            return None
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
         return response.json() if response.ok else None
 
     @property
