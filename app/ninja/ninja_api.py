@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import json
 from typing import Any, Optional
@@ -71,8 +72,23 @@ class NinjaApi(object):
         }
         try:
             response = requests.post(url, headers=headers, data=data)
+            if response.status_code == 429:
+                log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
+                counter = 0
+                while counter < 5:
+                    time.sleep(int(response.headers["Retry-After"]))
+                    response = requests.post(url, headers=headers, data=data)
+                    if response.status_code == 200:
+                        break
+                    else:
+                        counter += 1
+                if counter > 5:
+                    log(
+                        log.ERROR, "NinjaApi [do_post] to many requests"
+                    )  # or raise error?...
+                    return None
         except requests.exceptions.ConnectionError:
-            log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
+            log(log.ERROR, "NinjaApi [do_post] wrong NINJA_API_BASE_URL")
             return None
         try:
             response.raise_for_status()
@@ -102,6 +118,22 @@ class NinjaApi(object):
         data = json.dumps(data)
         try:
             response = requests.put(url, headers=headers, data=data)
+            if response.status_code == 429:
+                log(log.WARNING, "NinjaApi [do_put]: to many requests !!!")
+                counter = 0
+                while counter < 5:
+                    log(log.WARNING, "NinjaApi [do_put]: [%s] try !!!", counter + 1)
+                    time.sleep(int(response.headers["Retry-After"]))
+                    response = requests.post(url, headers=headers, data=data)
+                    if response.status_code == 200:
+                        break
+                    else:
+                        counter += 1
+                if counter > 5:
+                    log(
+                        log.ERROR, "NinjaApi [do_put] to many requests"
+                    )  # or raise error?...
+                    return None
         except requests.exceptions.ConnectionError:
             log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
             return None
