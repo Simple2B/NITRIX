@@ -76,7 +76,7 @@ class NinjaApi(object):
                 log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
                 counter = 0
                 while counter < 5:
-                    time.sleep(int(response.headers["Retry-After"]))
+                    time.sleep(1)
                     response = requests.post(url, headers=headers, data=data)
                     if response.status_code == 200:
                         break
@@ -123,7 +123,7 @@ class NinjaApi(object):
                 counter = 0
                 while counter < 5:
                     log(log.WARNING, "NinjaApi [do_put]: [%s] try !!!", counter + 1)
-                    time.sleep(int(response.headers["Retry-After"]))
+                    time.sleep(1)
                     response = requests.post(url, headers=headers, data=data)
                     if response.status_code == 200:
                         break
