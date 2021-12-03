@@ -14,7 +14,6 @@ from app.models import (
 )
 from app.ninja import api as ninja
 from config import BaseConfig as conf
-from tools.json_to_ninja import get_ninja_invoices
 from app.logger import log
 
 app = create_app()
@@ -220,6 +219,7 @@ def make_data_migration():
         get_account_ext,
         get_ninja_clients,
         get_ninja_products,
+        get_ninja_invoices,
     )
 
     get_phones()

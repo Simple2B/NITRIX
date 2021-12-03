@@ -53,7 +53,7 @@ def get_ninja_clients():
                 log(log.WARNING, "[get_ninja_clients] not found create contact info")
         else:
             log(log.WARNING, "[get_ninja_clients] cannot create contact info")
-        ninja_client.save(False)
+        ninja_client.save()
 
     db.session.commit()
 
