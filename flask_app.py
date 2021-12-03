@@ -1,4 +1,5 @@
 #!python
+import time
 from dateutil.relativedelta import relativedelta
 import click
 from app import create_app, db, models, forms
@@ -14,6 +15,7 @@ from app.models import (
 from app.ninja import api as ninja
 from config import BaseConfig as conf
 from tools.json_to_ninja import get_ninja_invoices
+from app.logger import log
 
 app = create_app()
 
@@ -197,6 +199,10 @@ def scheduler_task():
     """Regular task"""
     from app.scheduler import sync_scheduler
 
+    if not ninja.configured:
+        log(log.INFO, "Ninja not configured")
+        time.sleep(60)
+        return
     sync_scheduler()
 
 
