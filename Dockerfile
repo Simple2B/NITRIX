@@ -5,6 +5,8 @@ FROM python:3.9
 
 WORKDIR /app
 
+RUN apt update
+RUN apt install postgresql-client -y
 
 # set environment varibles
 ENV PYTHONFAULTHANDLER 1

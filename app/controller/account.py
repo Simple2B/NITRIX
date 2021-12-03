@@ -24,14 +24,14 @@ from app.utils import organize_list_starting_with_value
 EXTENDED = "Extended"
 
 
-def all_phones():
+def all_phones(prev="None"):
     phones = Phone.query.filter(
         Phone.deleted == False, Phone.status == Phone.Status.active  # noqa E712
     ).order_by(
         Phone.name
     )  # noqa E712
     all_phones = phones.all()
-    all_phones = organize_list_starting_with_value(all_phones, "None")
+    all_phones = organize_list_starting_with_value(all_phones, prev)
     return all_phones
 
 
@@ -279,16 +279,7 @@ class AccountController(object):
             Reseller.query.order_by(Reseller.name).all(),
             prev_reseller if prev_reseller else "NITRIX",
         )
-        form.phones = (
-            organize_list_starting_with_value(
-                Phone.query.filter(Phone.deleted == False)  # noqa E712
-                .order_by(Phone.name)
-                .all(),
-                prev_phone,
-            )
-            if prev_phone
-            else Phone.query.all()
-        )
+        form.phones = all_phones(prev=prev_phone) if prev_phone else all_phones()
         form.is_edit = False
         form.save_route = url_for("account.save")
         form.delete_route = url_for("account.delete")
