@@ -84,6 +84,7 @@ class NinjaApi(object):
                 log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
                 counter = 0
                 while counter < 5:
+                    log(log.WARNING, "NinjaApi [do_post]: [%s] try !!!", counter + 1)
                     time.sleep(4)
                     response = requests.post(url, headers=headers, data=data)
                     if response.status_code == 200:
