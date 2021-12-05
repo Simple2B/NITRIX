@@ -1,5 +1,7 @@
 import re
 
+# import time
+
 from .ninja_to_json import (
     NinjaClientModel,
     NinjaProductModel,
@@ -58,13 +60,7 @@ def get_ninja_clients():
     db.session.commit()
 
 
-def dddd():
-    for p in ninja.products:
-        ninja.delete_product(p.id)
-
-
 def get_ninja_products():
-    # dddd()
     for json_prod in read_json("ninja_products"):
         prod: NinjaProductModel = NinjaProductModel.parse_obj(json_prod)
         assert prod.product_key
