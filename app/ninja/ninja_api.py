@@ -13,7 +13,7 @@ from .product import NinjaProduct
 load_dotenv()
 
 MAX_TRY_ATTEMPTS = 5
-ATTEMPT_SLEEP = 4
+ATTEMPT_SLEEP = 10
 
 
 class PaginationLinks(BaseModel):
@@ -87,7 +87,12 @@ class NinjaApi(object):
                     return None
                 log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
                 current_attempt += 1
-                log(log.WARNING, "NinjaApi [do_post]: [%d] try !!!", current_attempt)
+                log(
+                    log.WARNING,
+                    "NinjaApi [do_post]: Attempt [%d] try again after [%s] sec !!!",
+                    current_attempt,
+                    ATTEMPT_SLEEP,
+                )
                 time.sleep(ATTEMPT_SLEEP)
                 continue
             return response.json() if response.ok else None
@@ -126,7 +131,12 @@ class NinjaApi(object):
                     return None
                 log(log.WARNING, "NinjaApi [do_put]: to many requests !!!")
                 current_attempt += 1
-                log(log.WARNING, "NinjaApi [do_put]: [%d] try !!!", current_attempt)
+                log(
+                    log.WARNING,
+                    "NinjaApi [do_put]: attempt [%d] try again after [%s] sec!!!",
+                    current_attempt,
+                    ATTEMPT_SLEEP,
+                )
                 time.sleep(ATTEMPT_SLEEP)
                 continue
             return response.json() if response.ok else None
