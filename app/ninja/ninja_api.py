@@ -12,6 +12,9 @@ from .product import NinjaProduct
 
 load_dotenv()
 
+MAX_TRY_ATTEMPTS = 5
+ATTEMPT_SLEEP = 4
+
 
 class PaginationLinks(BaseModel):
     next: Optional[str]
@@ -66,37 +69,28 @@ class NinjaApi(object):
         return response.json() if response.ok else None
 
     def do_post(self, url: str, **data):
-        headers = {
+        HEADERS = {
             "X-API-Token": self.NINJA_TOKEN,
             "X-Requested-With": "XMLHttpRequest",
         }
-        try:
-            response = requests.post(url, headers=headers, data=data)
-
-        except requests.exceptions.ConnectionError:
-            log(log.ERROR, "NinjaApi [do_post] wrong NINJA_API_BASE_URL")
-            return None
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
-            if response.status_code == 429:
-                log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
-                counter = 0
-                while counter < 5:
-                    log(log.WARNING, "NinjaApi [do_post]: [%s] try !!!", counter + 1)
-                    time.sleep(4)
-                    response = requests.post(url, headers=headers, data=data)
-                    if response.status_code == 200:
-                        break
-                    else:
-                        counter += 1
-                if counter > 5:
-                    log(
-                        log.ERROR, "NinjaApi [do_post] to many requests"
-                    )  # or raise error?...
+        current_attempt = 0
+        while current_attempt < MAX_TRY_ATTEMPTS:
+            try:
+                response = requests.post(url, headers=HEADERS, data=data)
+                response.raise_for_status()
+            except requests.exceptions.ConnectionError:
+                log(log.ERROR, "NinjaApi [do_post] wrong NINJA_API_BASE_URL")
+                return None
+            except requests.HTTPError as error:
+                log(log.ERROR, "NinjaApi.HTTPError: %s", error)
+                if response.status_code != 429:
                     return None
-        return response.json() if response.ok else None
+                log(log.WARNING, "NinjaApi [do_post]: to many requests !!!")
+                current_attempt += 1
+                log(log.WARNING, "NinjaApi [do_post]: [%d] try !!!", current_attempt)
+                time.sleep(ATTEMPT_SLEEP)
+                continue
+            return response.json() if response.ok else None
 
     def do_delete(self, url: str):
         headers = {"X-API-Token": self.NINJA_TOKEN}
@@ -112,39 +106,30 @@ class NinjaApi(object):
         return response.json()
 
     def do_put(self, url: str, **data):
-        headers = {
+        HEADERS = {
             "X-API-Token": self.NINJA_TOKEN,
             "X-Requested-With": "XMLHttpRequest",
             "Content-Type": "application/json",
         }
         data = json.dumps(data)
-        try:
-            response = requests.put(url, headers=headers, data=data)
-
-        except requests.exceptions.ConnectionError:
-            log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
-            return None
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            log(log.ERROR, "NinjaApi.HTTPError: %s", error)
-            if response.status_code == 429:
-                log(log.WARNING, "NinjaApi [do_put]: to many requests !!!")
-                counter = 0
-                while counter < 5:
-                    log(log.WARNING, "NinjaApi [do_put]: [%s] try !!!", counter + 1)
-                    time.sleep(4)
-                    response = requests.post(url, headers=headers, data=data)
-                    if response.status_code == 200:
-                        break
-                    else:
-                        counter += 1
-                if counter > 5:
-                    log(
-                        log.ERROR, "NinjaApi [do_put] to many requests"
-                    )  # or raise error?...
+        current_attempt = 0
+        while current_attempt < MAX_TRY_ATTEMPTS:
+            try:
+                response = requests.put(url, headers=HEADERS, data=data)
+                response.raise_for_status()
+            except requests.exceptions.ConnectionError:
+                log(log.ERROR, "NinjaApi wrong NINJA_API_BASE_URL")
+                return None
+            except requests.HTTPError as error:
+                log(log.ERROR, "NinjaApi.HTTPError: %s", error)
+                if response.status_code != 429:
                     return None
-        return response.json() if response.ok else None
+                log(log.WARNING, "NinjaApi [do_put]: to many requests !!!")
+                current_attempt += 1
+                log(log.WARNING, "NinjaApi [do_put]: [%d] try !!!", current_attempt)
+                time.sleep(ATTEMPT_SLEEP)
+                continue
+            return response.json() if response.ok else None
 
     @property
     def clients(self):
