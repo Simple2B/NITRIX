@@ -5,7 +5,8 @@ from datetime import datetime, date
 from app.utils import ModelMixin
 from sqlalchemy.orm import relationship
 from sqlalchemy import desc
-from app.models.account_extensions import AccountExtension
+from .account_extensions import AccountExtension
+from .account_changes import AccountChanges
 
 
 class Account(db.Model, ModelMixin):
@@ -49,6 +50,10 @@ class Account(db.Model, ModelMixin):
             return enddate.end_date
         else:
             return self.__add_months(self.activation_date, self.months)
+
+    @property
+    def changes(self) -> list[AccountChanges]:
+        return AccountChanges.query.filter(AccountChanges.account_id == self.id)
 
     def to_dict(self) -> dict:
         return {

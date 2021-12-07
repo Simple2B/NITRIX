@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
-from sqlalchemy import and_
 from app.logger import log
 from app.models import (
     User,
