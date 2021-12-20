@@ -21,6 +21,8 @@ def sync_ninja_clients():
         if not reseller:
             log(log.WARNING, "Cannot find reseller by name [%s]", client.name)
             continue
+        if client.is_deleted and not reseller.deleted:
+            continue
         reseller.ninja_client_id = client.id
         if client.is_deleted != reseller.deleted:
             log(

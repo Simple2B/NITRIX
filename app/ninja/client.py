@@ -27,7 +27,6 @@ class NinjaClientContact(BaseModel):
 
 
 class NinjaClientSettings(BaseModel):
-    # entity: str
     currency_id: int
 
 
