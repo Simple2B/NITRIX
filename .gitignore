@@ -143,3 +143,5 @@ database-test.sqlite3
 
 /logs/
 /data-migrations/
+/data-dump/
+*.env
