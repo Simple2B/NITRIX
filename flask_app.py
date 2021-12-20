@@ -204,9 +204,6 @@ def make_data_migration():
         get_resellers,
         get_users,
         get_account_changes,
-        get_ninja_clients,
-        get_ninja_products,
-        get_ninja_invoices,
     )
 
     get_users()
@@ -217,9 +214,6 @@ def make_data_migration():
     get_accounts()
     get_account_ext()
     get_account_changes()
-    get_ninja_clients()
-    get_ninja_products()
-    get_ninja_invoices()
 
 
 if __name__ == "__main__":
