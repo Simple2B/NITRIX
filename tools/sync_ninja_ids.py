@@ -1,12 +1,5 @@
 import re
 
-# import time
-
-from .ninja_to_json import (
-    NinjaClientModel,
-    NinjaProductModel,
-)
-from .read_json import read_json
 from app.ninja import api as ninja
 from app.ninja.client import NinjaClient
 from app.ninja.product import NinjaProduct
