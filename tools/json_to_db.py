@@ -188,6 +188,7 @@ def get_products():
         Product(
             name=product_model.name,
             status=Product.Status(product_model.status),
+            deleted=product_model.deleted,
         ).save(commit=False)
     db.session.commit()
     log(log.DEBUG, "[GET products from file] Done!")
