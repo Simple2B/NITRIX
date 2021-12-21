@@ -143,6 +143,7 @@ def get_phones():
             name=phone.name,
             status=Phone.Status(phone.status),
             price=phone.price,
+            deleted=phone.deleted,
         ).save(commit=False)
     db.session.commit()
     log(log.DEBUG, "[GET phones from file] Done!")
@@ -160,6 +161,7 @@ def get_users():
             activated=User.Status(user_model.activated),
             otp_secret=user_model.otp_secret,
             otp_active=user_model.otp_active,
+            deleted=user_model.deleted,
         ).save(commit=False)
     db.session.commit()
     log(log.DEBUG, "[GET users from file] Done!")
@@ -174,6 +176,7 @@ def get_resellers():
             name=reseller_model.name,
             status=Reseller.Status(reseller_model.status),
             comments=reseller_model.comments,
+            deleted=reseller_model.deleted,
         ).save(commit=False)
     db.session.commit()
     resellers = Reseller.query.all()
@@ -249,6 +252,7 @@ def get_accounts():
             comment=account_model.comment,
             activation_date=account_model.activation_date,
             months=account_model.months,
+            deleted=account_model.deleted,
         ).save(commit=False)
     db.session.commit()
     log(log.DEBUG, "[GET accounts from file] Done!")
