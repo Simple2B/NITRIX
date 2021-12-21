@@ -17,12 +17,13 @@ PATTERN = re.compile(r"^(?P<prod_name>[\w\s-]*)\s(?P<months>[\d]+)\sMonths$")
 def sync_ninja_clients():
     for client in ninja.clients:
         client: NinjaClient = client
+        if client.is_deleted:
+            continue
         reseller: Reseller = Reseller.query.filter(Reseller.name == client.name).first()
         if not reseller:
             log(log.WARNING, "Cannot find reseller by name [%s]", client.name)
             continue
-        if client.is_deleted and not reseller.deleted:
-            continue
+
         reseller.ninja_client_id = client.id
         if client.is_deleted != reseller.deleted:
             log(
