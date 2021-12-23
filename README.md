@@ -4,6 +4,9 @@ Sales Tracking App
 
 # Migration from v4 to v5
 
+## Migration must be done with empty db on first run of project or after deleted db volume from docker
+
+
 ## first you need to checkout on branch version_1
 
 ``` git co version_1 ```
@@ -21,11 +24,15 @@ Sales Tracking App
 
 ``` git co develop ```
 
-## run command
+## if containers are running you must run command
 ```docker-compose down```
-
+## and delete db volume
+```docker volume rm <name> ```
 ## run command
 ```docker-compose up -d --build```
+
+## you need to initialize db with command 
+``` docker-compose exec app flask init-db ``` 
 ## to get data from json files to db run command
 
 ``` docker-compose exec app flask make-data-migration ``` 
