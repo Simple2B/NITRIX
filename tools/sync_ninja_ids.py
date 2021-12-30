@@ -17,10 +17,13 @@ PATTERN = re.compile(r"^(?P<prod_name>[\w\s-]*)\s(?P<months>[\d]+)\sMonths$")
 def sync_ninja_clients():
     for client in ninja.clients:
         client: NinjaClient = client
+        if client.is_deleted:
+            continue
         reseller: Reseller = Reseller.query.filter(Reseller.name == client.name).first()
         if not reseller:
             log(log.WARNING, "Cannot find reseller by name [%s]", client.name)
             continue
+
         reseller.ninja_client_id = client.id
         if client.is_deleted != reseller.deleted:
             log(
@@ -50,7 +53,7 @@ def sync_ninja_products():
                 phone.ninja_product_id = prod.id
                 phone.save(False)
             else:
-                log(log.WARNING, "[get_ninja_products] cannot found phone [%s]", name)
+                log(log.WARNING, "[sync_ninja_products] cannot found phone [%s]", name)
 
         else:
             reseller_name = prod.notes
@@ -58,7 +61,7 @@ def sync_ninja_products():
             if not match:
                 log(
                     log.WARNING,
-                    "[get_ninja_products] wrong product_key [%s]",
+                    "[sync_ninja_products] wrong product_key [%s]",
                     prod.product_key,
                 )
                 continue
@@ -66,9 +69,19 @@ def sync_ninja_products():
             months = int(match.group("months"))
             reseller = Reseller.query.filter(Reseller.name == reseller_name).first()
             if not reseller:
+                log(
+                    log.WARNING,
+                    "[sync_ninja_products] cannot find reseller by name: [%s]",
+                    reseller_name,
+                )
                 continue
             db_prod = Product.query.filter(Product.name == prod_name).first()
             if not db_prod:
+                log(
+                    log.WARNING,
+                    "[sync_ninja_products] cannot find db_prod by name: [%s]",
+                    prod_name,
+                )
                 continue
             reseller_product: ResellerProduct = ResellerProduct.query.filter(
                 and_(
@@ -78,6 +91,10 @@ def sync_ninja_products():
                 )
             ).first()
             if not reseller_product:
+                log(
+                    log.WARNING,
+                    "[sync_ninja_products] cannot find reseller_product !!!",
+                )
                 continue
             reseller_product.ninja_product_id = prod.id
             reseller_product.save(False)
