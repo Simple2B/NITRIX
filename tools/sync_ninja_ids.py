@@ -4,7 +4,7 @@ from app.ninja import api as ninja
 from app.ninja.client import NinjaClient
 from app.ninja.product import NinjaProduct
 from app.models import Reseller, Phone, ResellerProduct, Product
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 
 from app.logger import log
 from app import db
@@ -70,7 +70,9 @@ def sync_ninja_products():
                 continue
             prod_name = match.group("prod_name")
             months = int(match.group("months"))
-            reseller = Reseller.query.filter(Reseller.name == reseller_name).first()
+            reseller = Reseller.query.filter(
+                func.lower(Reseller.name) == func.lower(reseller_name)
+            ).first()
             if not reseller:
                 log(
                     log.WARNING,
