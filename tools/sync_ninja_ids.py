@@ -23,7 +23,8 @@ def sync_ninja_clients():
         if not reseller:
             log(log.WARNING, "Cannot find reseller by name [%s]", client.name)
             continue
-
+        if reseller.ninja_client_id:
+            continue
         reseller.ninja_client_id = client.id
         if client.is_deleted != reseller.deleted:
             log(
@@ -50,6 +51,8 @@ def sync_ninja_products():
             name = prod.product_key[prefix_len:]
             phone: Phone = Phone.query.filter(Phone.name == name).first()
             if phone:
+                if phone.ninja_product_id:
+                    continue
                 phone.ninja_product_id = prod.id
                 phone.save(False)
             else:
@@ -95,6 +98,8 @@ def sync_ninja_products():
                     log.WARNING,
                     "[sync_ninja_products] cannot find reseller_product !!!",
                 )
+                continue
+            if reseller_product.ninja_product_id:
                 continue
             reseller_product.ninja_product_id = prod.id
             reseller_product.save(False)
