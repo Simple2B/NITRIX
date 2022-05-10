@@ -261,6 +261,11 @@ def creation_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_account
     log(log.INFO, "[SHED] Change is [%s]", change)
     account: Account = Account.query.get(change.item_id)
+    if account.deleted:
+        log(
+            log.INFO, "[creation_account] account [%d] is deleted, skipping", account.id
+        )
+        return True
     invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
     reseller_product: ResellerProduct = ResellerProduct.query.filter(
         and_(

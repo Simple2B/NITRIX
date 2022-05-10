@@ -5,7 +5,7 @@ import pytest
 from flask import url_for
 from app import db, create_app
 from .test_auth import register, login
-from app.models import Product, Reseller, HistoryChange, Phone
+from app.models import Product, Reseller, HistoryChange, Phone, Account
 from app.scheduler import sync_scheduler
 
 load_dotenv()
@@ -132,6 +132,60 @@ def test_create_account(client):
     ).all()
 
     assert len(history) == 1
+    sync_scheduler()
+    history = HistoryChange.query.filter(
+        HistoryChange.synced == False  # noqa E712
+    ).all()
+    assert not history
+
+
+@pytest.mark.skipif(not NINJA_TOKEN, reason="unknown NINJA_TOKEN")
+def test_sync_deleted_account(client):
+    create_reseller_product(client)
+
+    URL_SAVE_ACC = "/account_save"
+    response = client.post(
+        URL_SAVE_ACC,
+        data=dict(
+            id=-1,
+            name="George",
+            phone_id=1,
+            sim_cost="yes",
+            months=3,
+            activation_date=datetime.now().date(),
+            sim="12312312123",
+            product_id=1,
+            reseller_id=1,
+            submit="Save",
+            comment="",
+        ),
+        follow_redirects=True,
+    )
+    assert response
+
+    history = HistoryChange.query.filter(
+        HistoryChange.change_type == HistoryChange.EditType.creation_account
+    ).all()
+    assert len(history) == 1
+
+    # get all changes except creation_account type and marking synced True
+    # as we wanna test only sync on deleted account
+    history_all = HistoryChange.query.filter(
+        HistoryChange.change_type != HistoryChange.EditType.creation_account
+    ).all()
+    assert history_all
+    for event in history_all:
+        event: HistoryChange = event
+        event.synced = True
+        event.save()
+
+    # getting account and simulating deletion
+    account: Account = Account.query.first()
+    assert account
+    account.deleted = True
+    account.save()
+
+    # running sync and excpecting to all HistoryChanges are synced
     sync_scheduler()
     history = HistoryChange.query.filter(
         HistoryChange.synced == False  # noqa E712
