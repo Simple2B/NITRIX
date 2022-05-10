@@ -36,7 +36,7 @@ def sync_ninja_clients():
             )
         reseller.save(False)
     db.session.commit()
-    for reseller in Reseller.query.all():
+    for reseller in Reseller.query.filter(Reseller.deleted == False).all():  # noqa E712
         reseller: Reseller = reseller
         if not reseller.ninja_client_id:
             log(log.WARNING, "Reseller [%s] has not ninja_client_id", reseller.name)
