@@ -29,6 +29,7 @@ class BaseConfig(object):
     )
     DATABASE_URL = os.environ.get("DATABASE_URL", "")
     DB_DUMP_DAYS_PERIOD = int(os.environ.get("DB_DUMP_DAYS_PERIOD", "30"))
+    APP_FOOTER_NAME = str(os.environ.get("APP_FOOTER_NAME", "NITRIX-2022"))
 
     @staticmethod
     def configure(app):
