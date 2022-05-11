@@ -276,8 +276,10 @@ class AccountController(object):
             form.process()
         form.month = prev_month
         form.resellers = organize_list_starting_with_value(
-            Reseller.query.order_by(Reseller.name).all(),
-            prev_reseller if prev_reseller else "NITRIX",
+            Reseller.query.order_by(Reseller.name)
+            .filter(Reseller.deleted == False)  # noqa E712
+            .all(),
+            prev_reseller,
         )
         form.phones = all_phones(prev=prev_phone) if prev_phone else all_phones()
         form.is_edit = False
