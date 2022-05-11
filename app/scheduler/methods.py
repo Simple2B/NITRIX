@@ -276,7 +276,6 @@ def creation_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_account
     log(log.INFO, "[SHED] Change is [%s]", change)
     account: Account = Account.query.get(change.item_id)
-    # TODO: check if we need this?
     if account.deleted:
         log(
             log.INFO, "[creation_account] account [%d] is deleted, skipping", account.id
