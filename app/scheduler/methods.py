@@ -238,7 +238,6 @@ def extensions_account_change(change: HistoryChange):
     return True
 
 
-# TODO:
 def changes_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_account
     if change.value_name == "activation_date":
