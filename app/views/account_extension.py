@@ -4,7 +4,6 @@ from dateutil.relativedelta import relativedelta
 from app.models import Account, AccountExtension, Product, Reseller, HistoryChange
 from app.forms import AccountExtensionForm
 from app.logger import log
-from app.utils import organize_list_starting_with_value
 from app.controller.account_extension import update_account_extension_history
 
 account_extension_blueprint = Blueprint("account_extension", __name__)
@@ -44,8 +43,10 @@ def add():
         .order_by(Product.name)
         .all()
     )
-    form.resellers = organize_list_starting_with_value(
-        Reseller.query.order_by(Reseller.name).all(), "NITRIX"
+    form.resellers = (
+        Reseller.query.order_by(Reseller.name)
+        .filter(Reseller.deleted == False)  # noqa E712
+        .all()
     )
     form.is_edit = False
     form.save_route = url_for("account_extension.save_new")

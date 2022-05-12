@@ -24,6 +24,8 @@ ACCOUNT_CHANGES = [
     "months",
 ]
 
+ZERO_PRICE = 0.0
+
 
 def get_monday(day: date):
     """get date of monday on this week"""
@@ -112,6 +114,13 @@ def creation_reseller(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_reseller
     reseller: Reseller = Reseller.query.get(change.item_id)
     assert reseller
+    if reseller.deleted:
+        log(
+            log.INFO,
+            "[creation_reseller] reseller [%d] is deleted, skipping",
+            reseller.id,
+        )
+        return True
     for client in ninja.clients:
         if client.name == reseller.name:
             ninja_client = client
@@ -129,6 +138,13 @@ def changes_reseller(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_reseller
     reseller: Reseller = Reseller.query.get(change.item_id)
     assert reseller
+    if reseller.deleted:
+        log(
+            log.INFO,
+            "[creation_reseller] reseller [%d] is deleted, skipping",
+            reseller.id,
+        )
+        return True
     if change.value_name != "name":
         log(
             log.WARNING,
@@ -156,23 +172,14 @@ def extension_account_new(change: HistoryChange):
             ResellerProduct.months == ext_account.months,
         )
     ).first()
-    if not reseller_product:
-        # try to find suitable product of reseller NITRIX
-        reseller_product: ResellerProduct = ResellerProduct.query.filter(
-            and_(
-                ResellerProduct.product_id == ext_account.product_id,
-                ResellerProduct.reseller_id == 1,
-                ResellerProduct.months == ext_account.months,
-            )
-        ).first()
-    assert reseller_product
+    # if reseller have such product we set his cost else we set 0
+    ext_price = reseller_product.ext_price if reseller_product else ZERO_PRICE
     current_invoice = get_current_invoice(
         invoice_date, account.reseller.ninja_client_id
     )
     assert current_invoice
     extension_date = ext_account.extension_date
     extension_month = ext_account.months
-    ext_price = reseller_product.ext_price
     mode = "Extended"
     added_item = current_invoice.add_item(
         ninja_product_name(account.product.name, extension_month),
@@ -186,7 +193,14 @@ def extension_account_new(change: HistoryChange):
 def extensions_account_change(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.extensions_account_change
     ext_account: AccountExtension = AccountExtension.query.get(change.item_id)
-    account = ext_account.account
+    account: Account = ext_account.account
+    if account.deleted:
+        log(
+            log.INFO,
+            "[extensions_account_change] account [%d] is deleted, skipping",
+            account.id,
+        )
+        return True
     invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
     invoice: NinjaInvoice = get_current_invoice(
         invoice_date, account.reseller.ninja_client_id
@@ -199,16 +213,10 @@ def extensions_account_change(change: HistoryChange):
             ResellerProduct.months == ext_account.months,
         )
     ).first()
-    if not reseller_product:
-        # try to find suitable product of reseller NITRIX
-        reseller_product: ResellerProduct = ResellerProduct.query.filter(
-            and_(
-                ResellerProduct.product_id == ext_account.product_id,
-                ResellerProduct.reseller_id == 1,
-                ResellerProduct.months == ext_account.months,
-            )
-        ).first()
-    assert reseller_product
+
+    # if reseller have such product we set his cost else we set 0
+    ext_price = reseller_product.ext_price if reseller_product else ZERO_PRICE
+
     for item in invoice.line_items:
         log(log.DEBUG, "[SHED] update invoice item [%s]", item["notes"])
         if change.value_name == "extension_date":
@@ -222,7 +230,7 @@ def extensions_account_change(change: HistoryChange):
                 ninja_product_name(account.product.name, ext_account.months),
             )
             item.notes = f'{account.name}.  Extended: {ext_account.extension_date.strftime("%Y-%m-%d")}'
-            item.cost = reseller_product.ext_price
+            item.cost = ext_price
 
             invoice.save()
             break
@@ -234,6 +242,13 @@ def changes_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_account
     if change.value_name == "activation_date":
         account: Account = Account.query.get(change.item_id)
+        if account.deleted:
+            log(
+                log.INFO,
+                "[changes_account] account [%d] is deleted, skipping",
+                account.id,
+            )
+            return True
         invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
         invoice = get_current_invoice(invoice_date, account.reseller.ninja_client_id)
         if not invoice:
@@ -261,6 +276,11 @@ def creation_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_account
     log(log.INFO, "[SHED] Change is [%s]", change)
     account: Account = Account.query.get(change.item_id)
+    if account.deleted:
+        log(
+            log.INFO, "[creation_account] account [%d] is deleted, skipping", account.id
+        )
+        return True
     invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
     reseller_product: ResellerProduct = ResellerProduct.query.filter(
         and_(
@@ -269,15 +289,10 @@ def creation_account(change: HistoryChange):
             ResellerProduct.months == account.months,
         )
     ).first()
-    if not reseller_product:
-        reseller_product: ResellerProduct = ResellerProduct.query.filter(
-            and_(
-                ResellerProduct.product_id == account.product_id,
-                ResellerProduct.reseller_id == 1,
-                ResellerProduct.months == account.months,
-            )
-        ).first()
-    assert reseller_product
+
+    # if reseller have such product we set his cost else we set 0
+    init_price = reseller_product.init_price if reseller_product else ZERO_PRICE
+
     current_invoice = get_current_invoice(
         invoice_date, account.reseller.ninja_client_id
     )
@@ -287,7 +302,7 @@ def creation_account(change: HistoryChange):
     added_item = current_invoice.add_item(
         ninja_product_name(account.product.name, account.months),
         notes,
-        cost=reseller_product.init_price,
+        cost=init_price,
     )
     assert added_item, f"Could not add item [{notes}]"
 
@@ -317,7 +332,9 @@ def creation_account(change: HistoryChange):
 def creation_phone(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.creation_phone
     phone: Phone = Phone.query.get(change.item_id)
-
+    if phone.deleted:
+        log(log.INFO, "[creation_phone] phone [%d] is deleted, skipping", phone.id)
+        return True
     product_key = f"Phone-{phone.name}"
     ninja_product = ninja.add_product(
         product_key=product_key, notes="Phone", cost=phone.price
@@ -336,6 +353,9 @@ def creation_phone(change: HistoryChange):
 def changes_phone(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_phone
     phone: Phone = Phone.query.get(change.item_id)
+    if phone.deleted:
+        log(log.INFO, "[changes_phone] phone [%d] is deleted, skipping", phone.id)
+        return True
     product_key = f"Phone-{phone.name}"
     ninja_product = ninja.get_product(phone.ninja_product_id)
     assert ninja_product
