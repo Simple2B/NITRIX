@@ -64,6 +64,8 @@ def sync_scheduler():
                 change.change_type,
                 change.id,
             )
+            change.synced = True
+            change.save()
             continue
         method = _DISPATCHER_MAP[change.change_type]
         log(log.INFO, "[SHED] Change: [%s]", change.change_type)
