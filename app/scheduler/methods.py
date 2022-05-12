@@ -218,14 +218,14 @@ def extensions_account_change(change: HistoryChange):
     ext_price = reseller_product.ext_price if reseller_product else ZERO_PRICE
 
     for item in invoice.line_items:
-        log(log.DEBUG, "[SHED] update invoice item [%s]", item["notes"])
+        log(log.DEBUG, "[SHED] update invoice item [%s]", item.notes)
         if change.value_name == "extension_date":
             date = change.before_value_str
         else:
             date = ext_account.extension_date.strftime("%Y-%m-%d")
         notes = f"{account.name}.  Extended: {date}"
         log(log.DEBUG, "[SHED] new notes :[%s]", notes)
-        if item["notes"] == notes:
+        if item.notes == notes:
             item.product_key = (
                 ninja_product_name(account.product.name, ext_account.months),
             )
@@ -260,11 +260,11 @@ def changes_account(change: HistoryChange):
             )
             return True
         for item in invoice.line_items:
-            log(log.DEBUG, "[SHED] update invoice item [%s]", item["notes"])
+            log(log.DEBUG, "[SHED] update invoice item [%s]", item.notes)
             date = account.activation_date.strftime("%Y-%m-%d")
             notes = f"{account.name}.  Activated: {date}"
             log(log.DEBUG, "[SHED] new notes :[%s]", notes)
-            if item["notes"] == notes:
+            if item.notes == notes:
                 # TODO: consider to update (but not delete)
                 invoice.delete_item(item)
                 invoice.save()
