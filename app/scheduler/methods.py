@@ -238,6 +238,7 @@ def extensions_account_change(change: HistoryChange):
     return True
 
 
+# TODO:
 def changes_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_account
     if change.value_name == "activation_date":
@@ -263,10 +264,10 @@ def changes_account(change: HistoryChange):
             log(log.DEBUG, "[SHED] update invoice item [%s]", item.notes)
             date = account.activation_date.strftime("%Y-%m-%d")
             notes = f"{account.name}.  Activated: {date}"
+            new_notes = f"{account.name}.  Activated: {change.after_value_str}"
             log(log.DEBUG, "[SHED] new notes :[%s]", notes)
             if item.notes == notes:
-                # TODO: consider to update (but not delete)
-                invoice.delete_item(item)
+                invoice.update_item(item, new_notes)
                 invoice.save()
                 break
     return True
