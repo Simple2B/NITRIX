@@ -136,6 +136,18 @@ class NinjaInvoice(BaseModel):
 
         return self.save()
 
+    def delete_item(self, item: NinjaInvoiceItem):
+        for i in self.line_items:
+            if item.notes == i.notes:
+                self.line_items.remove(i)
+                break
+
+    def update_item(self, item: NinjaInvoiceItem, note: str):
+        for i in self.line_items:
+            if item.notes == i.notes:
+                item.notes = note
+                break
+
     def save(self):
         log(log.DEBUG, "NinjaApi.update_invoice %s", self.id)
         api_result = api.do_put(
