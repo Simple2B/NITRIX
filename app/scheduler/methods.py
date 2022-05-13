@@ -240,35 +240,38 @@ def extensions_account_change(change: HistoryChange):
 
 def changes_account(change: HistoryChange):
     assert change.change_type == HistoryChange.EditType.changes_account
-    if change.value_name == "activation_date":
-        account: Account = Account.query.get(change.item_id)
-        if account.deleted:
-            log(
-                log.INFO,
-                "[changes_account] account [%d] is deleted, skipping",
-                account.id,
-            )
-            return True
-        invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
-        invoice = get_current_invoice(invoice_date, account.reseller.ninja_client_id)
-        if not invoice:
-            log(
-                log.WARNING,
-                "[SHED] Cant find invoice in [%s] for [%s]",
-                invoice_date,
-                account.reseller.ninja_client_id,
-            )
-            return True
-        for item in invoice.line_items:
-            log(log.DEBUG, "[SHED] update invoice item [%s]", item.notes)
-            date = account.activation_date.strftime("%Y-%m-%d")
-            notes = f"{account.name}.  Activated: {date}"
-            new_notes = f"{account.name}.  Activated: {change.after_value_str}"
-            log(log.DEBUG, "[SHED] new notes :[%s]", notes)
-            if item.notes == notes:
-                invoice.update_item(item, new_notes)
-                invoice.save()
-                break
+    # if change.value_name == "activation_date":
+    #     account: Account = Account.query.get(change.item_id)
+    #     if account.deleted:
+    #         log(
+    #             log.INFO,
+    #             "[changes_account] account [%d] is deleted, skipping",
+    #             account.id,
+    #         )
+    #         return True
+    #     invoice_date = get_monday(change.date).strftime("%Y-%m-%d")
+    #     invoice = get_current_invoice(invoice_date, account.reseller.ninja_client_id)
+    #     if not invoice:
+    #         log(
+    #             log.WARNING,
+    #             "[SHED] Cant find invoice in [%s] for [%s]",
+    #             invoice_date,
+    #             account.reseller.ninja_client_id,
+    #         )
+    #         return True
+    #     date = account.activation_date.strftime("%Y-%m-%d")
+    #     notes = f"{account.name}.  Activated: {change.before_value_str}"
+    #     new_notes = f"{account.name}.  Activated: {date}"
+    #     log(log.DEBUG, "[SHED] new notes :[%s]", new_notes)
+    #     for item in invoice.line_items:
+    #         log(log.DEBUG, "[SHED] update invoice item [%s]", item.notes)
+    #         if item.notes == notes:
+    #             # invoice.line_items.remove(item)
+    #             # invoice.update_item(item, new_notes)
+    #             log(log.DEBUG, "[SHED] updated invoice item [%s]", item.notes)
+    #             item.notes = new_notes
+    #             invoice.save()
+    #             break
     return True
 
 
