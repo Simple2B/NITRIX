@@ -55,10 +55,10 @@ def accounts():
             search = f"{flt}%"
             query = query.filter(
                 or_(
-                    Account.name.like(search),
-                    Account.sim.like(search),
-                    Product.name.like(search),
-                    Reseller.name.like(search),
+                    Account.name.ilike(search),
+                    Account.sim.ilike(search),
+                    Product.name.ilike(search),
+                    Reseller.name.ilike(search),
                 )
             )
     ordered_accounts = query.order_by(Account.id.desc()).paginate(
