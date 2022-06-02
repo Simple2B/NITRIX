@@ -1,14 +1,18 @@
-version: '3.9'
+version: "3.8"
 services:
   db:
     image: postgres:13
     restart: always
     volumes:
       - db_data:/var/lib/postgresql/data
+      - ./:/app
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGUSER: ${POSTGRES_USER}
+      PGDATABASE: ${POSTGRES_DB}
 
     ports:
       - 127.0.0.1:${LOCAL_DB_PORT}:5432
@@ -40,7 +44,7 @@ services:
 
   redis:
     restart: always
-    image: 'redis:alpine'
+    image: "redis:alpine"
     ports:
       - 127.0.0.1:${REDIS_PORT}:6379
     environment:
@@ -50,7 +54,7 @@ services:
 
   app:
     build: .
-    # restart: always
+    restart: always
     expose:
       - 5000
     # volumes:
