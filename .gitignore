@@ -144,4 +144,4 @@ database-test.sqlite3
 /logs/
 data-dump/*
 *.env
-
+/*.sql
