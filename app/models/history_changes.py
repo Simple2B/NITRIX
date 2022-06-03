@@ -76,3 +76,6 @@ class HistoryChange(db.Model, ModelMixin):
             for change in changes_list
             if change.message_by_account
         ]
+
+    def __repr__(self) -> str:
+        return f"<{self.id} {self.change_type.name} {self.value_name}>"

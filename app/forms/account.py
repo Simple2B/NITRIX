@@ -13,7 +13,7 @@ class AccountForm(FlaskForm):
     reseller_id = IntegerField("Reseller", validators=[DataRequired()])
     sim = StringField("SIM", [DataRequired(), Length(min=1, max=20)])
     sim_cost = SelectField(
-        "Sim Cost:", default="yes", choices=[("yes", "Yes"), ("no", "No")]
+        "Sim Cost:", default="no", choices=[("yes", "Yes"), ("no", "No")]
     )
     imei = StringField("IMEI", validators=[Length(min=0, max=60)])
     comment = StringField(

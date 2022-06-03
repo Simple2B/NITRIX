@@ -57,10 +57,15 @@ def test_save_product(client):
     assert b"TEST PRODUCT NAME" not in response.data
     assert b"ANOTHER PRODUCT NAME" in response.data
     history = HistoryChange.query.filter(HistoryChange.item_id == 1).all()
-    assert len(history) == 2
+    assert len(history) == 3
     assert history[1].before_value_str == "TEST PRODUCT NAME"
     assert history[1].after_value_str == "ANOTHER PRODUCT NAME"
     assert history[1].change_type == HistoryChange.EditType.changes_product
+    assert history[2].before_value_str == Product.Status.active.name
+    assert history[2].after_value_str == Product.Status.not_active.name
+    assert history[2].change_type == HistoryChange.EditType.changes_product
+    product: Product = Product.query.first()
+    assert product.status == Product.Status.not_active
 
     # save product with wrong id
     response = client.post(

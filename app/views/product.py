@@ -42,19 +42,30 @@ def save():
     form = ProductForm(request.form)
     log(log.DEBUG, "form: [%s]", form.data)
     if form.validate_on_submit():
-        if form.id.data > 0:
-            product = Product.query.get(form.id.data)
+        product_id = form.id.data
+        if product_id > 0:
+            product: Product = Product.query.get(product_id)
             if product is None:
                 flash("Wrong product id.", "danger")
                 return redirect(url_for("main.products"))
-            HistoryChange(
-                change_type=HistoryChange.EditType.changes_product,
-                item_id=product.id,
-                value_name="name",
-                before_value_str=product.name,
-                after_value_str=form.name.data,
-            ).save()
+            if product.name != form.name.data:
+                HistoryChange(
+                    change_type=HistoryChange.EditType.changes_product,
+                    item_id=product.id,
+                    value_name="name",
+                    before_value_str=product.name,
+                    after_value_str=form.name.data,
+                ).save()
+            if product.status.name != form.status.data:
+                HistoryChange(
+                    change_type=HistoryChange.EditType.changes_product,
+                    item_id=product.id,
+                    value_name="status",
+                    before_value_str=product.status.name,
+                    after_value_str=form.status.data,
+                ).save()
             product.name = form.name.data
+            product.status = Product.Status[form.status.data]
             product.save()
         else:
             product = Product(name=form.name.data, status=form.status.data).save()
