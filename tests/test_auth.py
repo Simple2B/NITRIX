@@ -1,6 +1,6 @@
 import time
 import timecop
-from flask import url_for
+from flask import url_for, current_app as app
 import pytest
 from onetimepass import get_hotp, get_totp
 from app import db, create_app
@@ -31,6 +31,12 @@ def register(user_name, password="password", user_type=User.Type.super_admin):
 
 
 def login(client, user_name, password="password"):
+    if app.config['DISABLE_OTP']:
+        return client.post(
+            "/login",
+            data=dict(user_name=user_name, password=password),
+            follow_redirects=True,
+        )
     secret = b"MFRGGZDFMZTWQ2LK"
     with timecop.freeze(time.time()):
         user = User.query.filter(User.name == user_name).first()
